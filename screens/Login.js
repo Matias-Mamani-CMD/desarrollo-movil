@@ -55,6 +55,7 @@ export default function Login({ navigation }) {
     <ImageBackground
       source={require('../assets/background.jpg')}
       style={styles.background}
+      imageStyle = {{opacity: 0.9}} //opacidad
     >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -74,7 +75,7 @@ export default function Login({ navigation }) {
             <TextInput
               style={styles.input}
               placeholder="Ingrese su correo"
-              placeholderTextColor="#ccc"
+              placeholderTextColor="#787878ff"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -88,7 +89,7 @@ export default function Login({ navigation }) {
             <TextInput
               style={styles.input}
               placeholder="Ingrese su contraseña"
-              placeholderTextColor="#ccc"
+              placeholderTextColor="#787878ff"
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
@@ -136,31 +137,34 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#fff',
+    color: '#2f2f2fff',
   },
   label: {
     alignSelf: 'flex-start',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
     marginTop: 10,
-    color: '#fff',
+    color: '#000000ff',
   },
   inputContainer: {
-    flexDirection: 'row',
+    borderColor: '#031666ff',
+    borderWidth: 1,
+    flexDirection: 'row',   // ícono e input en la misma línea
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderColor: '#b9770e',
-    marginBottom: 20,
-    width: '100%',
-  },
-  icon: {
-    marginRight: 10,
-    color: '#fff',
+    backgroundColor: '#fff', // fondo blanco
+    borderRadius: 12,        // bordes redondeados
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginBottom: 15,        // separación entre bloques
   },
   input: {
     flex: 1,
-    height: 40,
-    color: '#fff',
+    fontSize: 16,
+    color: '#000',           // texto oscuro para contraste
+    marginLeft: 8,           // espacio respecto al ícono
+  },
+  icon: {
+    color: '#333',           // ícono oscuro
   },
   button: {
     backgroundColor: '#031666ff',
@@ -170,12 +174,14 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   buttonText: {
-    color: '#fff',
+    color: '#ffffffff',
     fontSize: 16,
     fontWeight: 'bold',
   },
   signUpText: {
+    fontSize: 14,
+    fontWeight: 600,
     marginTop: 20,
-    color: '#007AFF',
+    color: '#000000ff',
   },
 });
