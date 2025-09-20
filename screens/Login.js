@@ -22,7 +22,14 @@ export default function Login({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
   const [rememberMe, setRememberMe] = useState(false); // guarda la función
+
+
+  //ESTADO PARA SABER SI EL CAMPO FUE SELECCIONADO
+  //SET ACTUALIZA EL ESTADO 
+  const [emailFocused, setEmailFocused] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -90,7 +97,7 @@ export default function Login({ navigation }) {
           <Text style={styles.title}>Iniciar sesión</Text>
 
           <Text style={styles.label}>Correo</Text>
-          <View style={styles.inputContainer}>
+          <View style={[styles.inputContainer,emailFocused && styles.inputContainerFocused]}>
             <FontAwesome name="envelope" size={20} style={styles.icon} />
             <TextInput
               style={styles.input}
@@ -100,11 +107,13 @@ export default function Login({ navigation }) {
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
+              onFocus={() => setEmailFocused(true)}   // Cuando el usuario toque el input
+              onBlur={() => setEmailFocused(false)}   // estado natural, el usuario no toco el input
             />
           </View>
 
           <Text style={styles.label}>Contraseña</Text>
-          <View style={styles.inputContainer}>
+          <View style={[styles.inputContainer, passwordFocused && styles.inputContainerFocused]}>
             <FontAwesome name="lock" size={20} style={styles.icon} />
             <TextInput
               style={styles.input}
@@ -113,6 +122,8 @@ export default function Login({ navigation }) {
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
+              onFocus={() => setPasswordFocused(true)} // Cuando el usuario toque el input
+              onBlur={() => setPasswordFocused(false)} // estado natural, el usuario no toco el input
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
               <FontAwesome 
@@ -147,6 +158,10 @@ export default function Login({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  inputContainerFocused: { //Estilo para el estado del input
+  borderColor: '#922b21',
+  borderWidth: 2,
+  },
   background: {
     flex: 1,
     width: '100%',
@@ -177,8 +192,6 @@ const styles = StyleSheet.create({
     color: '#000000ff',
   },
   inputContainer: {
-    borderColor: '#031666ff',
-    borderWidth: 1,
     flexDirection: 'row',   // ícono e input en la misma línea
     alignItems: 'center',
     backgroundColor: '#fff', // fondo blanco
