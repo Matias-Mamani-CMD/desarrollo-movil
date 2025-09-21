@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   View, 
-  Text, 
+  Text,
   TextInput, 
   TouchableOpacity, 
   StyleSheet, 
@@ -10,16 +10,19 @@ import {
   ImageBackground, 
   ScrollView, 
   KeyboardAvoidingView, 
-  Platform 
+  Platform,
+  Switch, // para agregar botón en opción "Recordarme"
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../src/config/firebaseConfig';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false); // guarda la función
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -29,6 +32,13 @@ export default function Login({ navigation }) {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
+
+      if (rememberMe) {
+        await AsyncStorage.setItem("userEmail", email);
+      } else {
+        await AsyncStorage.removeItem("userEmail"); 
+      } // Guarda el email si se marcó la casilla
+
       Alert.alert("Login exitoso", "Has iniciado sesión correctamente.");
       navigation.reset({ index: 0, routes: [{ name: 'Home' }] }); 
     } catch (error) {
@@ -50,6 +60,16 @@ export default function Login({ navigation }) {
       Alert.alert("Error", errorMessage);
     }
   };
+
+  React.useEffect(() => { 
+    const loadEmail = async () => { 
+      const savedEmail = await AsyncStorage.getItem("userEmail"); 
+      if (savedEmail) { setEmail(savedEmail); 
+        setRememberMe(true); 
+      }
+    }; 
+    loadEmail(); 
+  }, []); //recupera email guardado al abrir el inicio de sesión
 
   return (
     <ImageBackground
@@ -101,6 +121,16 @@ export default function Login({ navigation }) {
                 style={styles.icon} 
               />
             </TouchableOpacity>
+          </View>
+
+          <View style={styles.switchContainer}>
+            <Text style={styles.label}>Recordarme</Text> 
+            <Switch 
+              value={rememberMe} 
+              onValueChange={setRememberMe}
+              trackColor={{ false: "#ccc", true: "#0317668f" }}
+              thumbColor={rememberMe ? "#031666ff" : "#f4f3f4"}    // color del "botón"
+            /> 
           </View>
 
           <TouchableOpacity style={styles.button} onPress={handleLogin}>
@@ -184,4 +214,13 @@ const styles = StyleSheet.create({
     marginTop: 20,
     color: '#000000ff',
   },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    width: '100%',
+    marginTop: 10,
+    marginBottom: 20,
+  },
+
 });
