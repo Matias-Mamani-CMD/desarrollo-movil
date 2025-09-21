@@ -11,27 +11,23 @@ import {
   ScrollView, 
   KeyboardAvoidingView, 
   Platform,
-  Switch,
-  BackHandler
+  BackHandler,
+  ActivityIndicator
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../src/config/firebaseConfig';
+import { sendPasswordResetEmail } from 'firebase/auth';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function Login({ navigation }) {
+export default function ForgotPassword({ navigation }) {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const [emailFocused, setEmailFocused] = useState(false);
-  const [passwordFocused, setPasswordFocused] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Manejar botón físico de atrás - Siempre va a Welcome
+  // Manejar botón físico de atrás - Va a Login (no a Welcome)
   useEffect(() => {
     const backAction = () => {
-      navigation.replace('Welcome');
+      navigation.replace('Login');
       return true; // Previene el comportamiento por defecto
     };
 
@@ -43,31 +39,38 @@ export default function Login({ navigation }) {
     return () => backHandler.remove();
   }, [navigation]);
 
-  const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert("Error", "Por favor ingrese ambos campos.");
+  const handleResetPassword = async () => {
+    if (!email) {
+      Alert.alert("Error", "Por favor ingrese su correo electrónico.");
       return;
     }
 
+    // Validación básica de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert("Error", "Por favor ingrese un correo electrónico válido.");
+      return;
+    }
+
+    setIsLoading(true);
+    
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-
-      if (rememberMe) {
-        await AsyncStorage.setItem("userEmail", email);
-      } else {
-        await AsyncStorage.removeItem("userEmail"); 
-      }
-
-      Alert.alert("Login exitoso", "Has iniciado sesión correctamente.");
-      navigation.reset({ index: 0, routes: [{ name: 'Home' }] }); 
+      await sendPasswordResetEmail(auth, email);
+      Alert.alert(
+        "Correo enviado", 
+        "Se ha enviado un enlace para restablecer tu contraseña a tu correo electrónico.",
+        [
+          {
+            text: "OK",
+            onPress: () => navigation.replace('Login')
+          }
+        ]
+      );
     } catch (error) {
-      let errorMessage = "Hubo un problema al iniciar sesión.";
+      let errorMessage = "Hubo un problema al enviar el correo de restablecimiento.";
       switch (error.code) {
         case 'auth/invalid-email':
           errorMessage = "El formato del correo electrónico no es válido.";
-          break;
-        case 'auth/wrong-password':
-          errorMessage = "La contraseña es incorrecta.";
           break;
         case 'auth/user-not-found':
           errorMessage = "No se encontró un usuario con este correo.";
@@ -75,21 +78,17 @@ export default function Login({ navigation }) {
         case 'auth/network-request-failed':
           errorMessage = "Error de conexión, por favor intenta más tarde.";
           break;
+        case 'auth/too-many-requests':
+          errorMessage = "Demasiados intentos. Por favor espera antes de intentar nuevamente.";
+          break;
+        default:
+          errorMessage = `Error: ${error.code}. ${error.message}`;
       }
       Alert.alert("Error", errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
-
-  useEffect(() => { 
-    const loadEmail = async () => { 
-      const savedEmail = await AsyncStorage.getItem("userEmail"); 
-      if (savedEmail) { 
-        setEmail(savedEmail); 
-        setRememberMe(true); 
-      }
-    }; 
-    loadEmail(); 
-  }, []);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
@@ -105,7 +104,7 @@ export default function Login({ navigation }) {
             <Text style={styles.headerTitle}>Instituto{"\n"}Jean Piaget <Text style={styles.headerNumber}>N°8048</Text></Text>
           </View>
         </View>
-      
+        
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={{ flex: 1, width: '100%' }}
@@ -116,14 +115,15 @@ export default function Login({ navigation }) {
           >
             <Image source={require('../assets/logo.png')} style={styles.iconSign} />
 
-            <Text style={styles.title}>Iniciar sesión</Text>
+            <Text style={styles.title}>Restablecer contraseña</Text>
+            <Text style={styles.subtitle}>Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.</Text>
 
-            <Text style={styles.label}>Correo</Text>
+            <Text style={styles.label}>Correo electrónico</Text>
             <View style={[styles.inputContainer, emailFocused && styles.inputContainerFocused]}>
               <FontAwesome name="envelope" size={20} style={styles.icon} />
               <TextInput
                 style={styles.input}
-                placeholder="Ingrese su correo"
+                placeholder="Ingrese su correo electrónico"
                 placeholderTextColor="#787878ff"
                 value={email}
                 onChangeText={setEmail}
@@ -131,64 +131,30 @@ export default function Login({ navigation }) {
                 autoCapitalize="none"
                 onFocus={() => setEmailFocused(true)}
                 onBlur={() => setEmailFocused(false)}
+                editable={!isLoading}
               />
             </View>
 
-            <Text style={styles.label}>Contraseña</Text>
-            <View style={[styles.inputContainer, passwordFocused && styles.inputContainerFocused]}>
-              <FontAwesome name="lock" size={20} style={styles.icon} />
-              <TextInput
-                style={styles.input}
-                placeholder="Ingrese su contraseña"
-                placeholderTextColor="#787878ff"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-                onFocus={() => setPasswordFocused(true)}
-                onBlur={() => setPasswordFocused(false)}
-              />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <FontAwesome 
-                  name={showPassword ? "eye-slash" : "eye"} 
-                  size={20} 
-                  style={styles.icon} 
-                />
-              </TouchableOpacity>
-            </View>
-
-            {/* Enlace para olvidar contraseña */}
             <TouchableOpacity 
-              style={styles.forgotPasswordContainer}
-              onPress={() => navigation.navigate('ForgotPassword')}
+              style={[styles.button, isLoading && styles.buttonDisabled]} 
+              onPress={handleResetPassword}
+              disabled={isLoading}
             >
-              <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Enviar enlace</Text>
+              )}
             </TouchableOpacity>
 
-            <View style={styles.switchContainer}>
-              <Text style={styles.label}>Recordarme</Text> 
-              <Switch 
-                value={rememberMe} 
-                onValueChange={setRememberMe}
-                trackColor={{ false: "#ccc", true: "#0317668f" }}
-                thumbColor={rememberMe ? "#031666ff" : "#f4f3f4"}
-              /> 
-            </View>
-
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
-              <Text style={styles.buttonText}>Ingresar</Text>
-            </TouchableOpacity>
-
-            {/* Botón para volver a Welcome */}
+            {/* Botón para volver a Login */}
             <TouchableOpacity 
               style={styles.backButton}
-              onPress={() => navigation.replace('Welcome')}
+              onPress={() => navigation.replace('Login')}
+              disabled={isLoading}
             >
               <FontAwesome name="arrow-left" size={16} color="#031666ff" />
-              <Text style={styles.backButtonText}>Volver al inicio</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => navigation.replace('SignUp')}>
-              <Text style={styles.signUpText}>¿No tienes cuenta aún? Regístrate</Text>
+              <Text style={styles.backButtonText}>Volver al inicio de sesión</Text>
             </TouchableOpacity>
           </ScrollView>
         </KeyboardAvoidingView>
@@ -220,7 +186,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     backgroundColor: "#C8102E",
-    paddingLeft: 0,            
+    paddingLeft: 0,
   },
   logo: {
     width: 105,
@@ -256,8 +222,16 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '700',
-    marginBottom: 20,
+    marginBottom: 15,
     color: '#2f2f2fff',
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 16,
+    marginBottom: 25,
+    color: '#555',
+    textAlign: 'center',
+    paddingHorizontal: 10,
   },
   label: {
     alignSelf: 'flex-start',
@@ -273,7 +247,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 10,
     paddingVertical: 8,
-    marginBottom: 15,
+    marginBottom: 20,
     width: '100%',
   },
   input: {
@@ -285,17 +259,7 @@ const styles = StyleSheet.create({
   icon: {
     color: '#333',
   },
-  // Estilo para el contenedor del enlace "Olvidé contraseña"
-  forgotPasswordContainer: {
-    alignSelf: 'flex-end',
-    marginBottom: 15,
-  },
-  forgotPasswordText: {
-    fontSize: 14,
-    fontWeight: 600,
-    color: '#136dffff',
-  },
-  // Nuevos estilos para el botón de volver
+  // estilos para el botón de volver
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -310,12 +274,17 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#031666ff',
-    paddingVertical: 10,
+    paddingVertical: 15,
     paddingHorizontal: 40,
     borderRadius: 5,
-    marginTop: 20,
+    marginTop: 10,
     width: '100%',
     alignItems: 'center',
+    justifyContent: 'center',
+    height: 50,
+  },
+  buttonDisabled: {
+    backgroundColor: '#6c757d',
   },
   buttonText: {
     color: '#ffffffff',
@@ -327,14 +296,6 @@ const styles = StyleSheet.create({
     fontWeight: 600,
     marginTop: 20,
     color: '#136dffff',
-  },
-  switchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    width: '100%',
-    marginTop: 10,
-    marginBottom: 20,
   },
   footer: {
     alignItems: "center",

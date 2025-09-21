@@ -5,8 +5,10 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../src/config/firebaseConfig';
 import Welcome from '../screens/Welcome';
 import Login from '../screens/Login';
+import ForgotPassword from '../screens/ForgotPassword';
 import SignUp from '../screens/SignUp';
 import Home from '../screens/Home';
+import AboutUs from '../screens/AboutUs';
 
 const Stack = createStackNavigator();
 
@@ -22,20 +24,24 @@ function Navigation() {
   }, []);
 
   if (isAuthenticated === null) {
-    // Mientras carga el estado de Firebase podés mostrar un splash o loader
     return null;
   }
 
   return (
     <NavigationContainer>
       <Stack.Navigator 
-        screenOptions={{ headerShown: false }} 
+        screenOptions={{ 
+          headerShown: false,
+          gestureEnabled: false
+        }} 
         initialRouteName={isAuthenticated ? "Home" : "Welcome"}
       >
         <Stack.Screen name="Welcome" component={Welcome}/>
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="SignUp" component={SignUp} />
+        <Stack.Screen name="Login" component={Login} options={{ gestureEnabled: false }} />
+        <Stack.Screen name="SignUp" component={SignUp} options={{ gestureEnabled: false }} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ gestureEnabled: false }} />
         <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="AboutUs" component={AboutUs} options={{ gestureEnabled: false }} /> 
       </Stack.Navigator>
     </NavigationContainer>
   );

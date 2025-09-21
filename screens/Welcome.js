@@ -43,12 +43,16 @@ export default function Welcome({ navigation }) {
             </TouchableOpacity>
           </View>
         </View>
-
-
-
-        <View style={styles.aboutContainer}>
+        
+        {/* Botón About Us - POSICIÓN CORREGIDA */}
+        <TouchableOpacity 
+          style={styles.aboutContainer}
+          onPress={() => navigation.navigate("AboutUs")}
+        >
           <Text style={styles.aboutText}>Sobre nosotros</Text>
-        </View>
+          <FontAwesome name="info-circle" size={20} color="#1E2A78" style={styles.aboutIcon} />
+        </TouchableOpacity>
+        
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
@@ -62,8 +66,8 @@ const { width, height } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   safeArea: {
-  flex: 1,
-  padding: 0,   // eliminar todo padding automático
+    flex: 1,
+    padding: 0,
   },
   container: {
     flex: 1,
@@ -75,30 +79,30 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   header: {
-  flexDirection: "row",        // fila
-  alignItems: "center",        // centrado vertical
-  justifyContent: "flex-start",// al inicio
-  backgroundColor: "#C8102E",
-  paddingLeft: 0,            
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    backgroundColor: "#C8102E",
+    paddingLeft: 0,            
   },
   logo: {
-  width: 105,
-  height: 105,
-  resizeMode: "cover",
-  marginTop: -15,
-  marginBottom: -10,
-  marginLeft: -15,
+    width: 105,
+    height: 105,
+    resizeMode: "cover",
+    marginTop: -15,
+    marginBottom: -10,
+    marginLeft: -15,
   },
   headerTitle: {
-  color: "#fff",
-  fontSize: 24,
-  fontWeight: "800",
-  lineHeight: 28,
-  marginLeft: -10,
+    color: "#fff",
+    fontSize: 24,
+    fontWeight: "800",
+    lineHeight: 28,
+    marginLeft: -10,
   },
   headerNumber: {
-  color: "#fff",
-  fontSize: 13,
+    color: "#fff",
+    fontSize: 13,
   },
   mainContent: {
     flex: 1,
@@ -153,15 +157,27 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
   },
-    aboutContainer: {
+  aboutContainer: {
     position: 'absolute',
-    left: 250,
-    bottom: 70, // Ajusta este valor según la altura de tu footer
+    right: 20,
+    bottom: 80,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#1E2A78',
   },
   aboutText: {
-    fontSize: 20,
-    color: "#000000ff", // Azul oscuro para contraste
+    fontSize: 16,
+    color: "#1E2A78",
     fontWeight: '600',
+    marginRight: 8,
+  },
+  aboutIcon: {
+    // El icono ya tiene estilo
   },
   footer: {
     alignItems: "center",
