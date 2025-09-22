@@ -15,6 +15,7 @@ import {
 import { signOut } from 'firebase/auth';
 import { auth } from '../src/config/firebaseConfig';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function Home({ navigation }) {
   const [menuVisible, setMenuVisible] = useState(false);
@@ -59,39 +60,34 @@ export default function Home({ navigation }) {
 
         {/* Header con cuenta del tutor */}
           <View style={styles.header}>
-            <Image source={require('../assets/piaget-icon.png')} style={styles.logo} />
-            <View>
-              <Text style={styles.headerTitle}>Instituto{"\n"}Jean Piaget <Text style={styles.headerNumber}>N°8048</Text></Text>
+            {/* Contenedor de Logo y nombre */}
+            <View style={styles.headerLeft}>
+              <Image source={require('../assets/piaget-icon.png')} style={styles.logo} />
+              <View>
+                <Text style={styles.headerTitle}>Instituto{"\n"}Jean Piaget <Text style={styles.headerNumber}>N°8048</Text></Text>
+              </View>
             </View>
 
-            {/* Contenedor de íconos en el header */}
-            <View style={styles.headerIconsContainer}>
-              {/* Cuadro azul con ícono de tutor */}
-              <View style={styles.blueIconBox}>
-                <Image 
-                  source={require('../assets/logo.png')}
-                  style={styles.iconTutor}
-                />
-                {/* Ícono de menú */}
-                <TouchableOpacity onPress={toggleMenu} style={styles.menuIcon}>
-                  <Image 
-                    source={require('../assets/flecha-menu.png')} // Asegúrate de tener este ícono
-                    style={styles.menuIconImage}
-                  />
-                </TouchableOpacity>
+            {/* Íconos de Tutor en el header */}
+            <View style={styles.headerRight}>
+              <View style={styles.tutorIconBackground}>
+                <FontAwesome name="user-circle-o" size={50.2} color="black" />
               </View>
-
+              {/* Ícono de menú */}
+              <TouchableOpacity onPress={toggleMenu} style={styles.menuIcon}>
+                <MaterialCommunityIcons name="menu-down" size={34} color="white" />
+              </TouchableOpacity>
             </View>
           </View>
 
-          {/* Modal para el menú desplegable */}
+          {/* Menú para opción cerrar sesión */}
           <Modal
             transparent={true}
             visible={menuVisible}
             animationType="none"
             onRequestClose={toggleMenu}
           >
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.menuOverlay}
               activeOpacity={1}
               onPress={toggleMenu}
@@ -191,12 +187,13 @@ const styles = StyleSheet.create({
     padding: 12, //espacio entre el cuadro de Bienvenida y el fondo
   },
   box: {
-    backgroundColor: '#db2024ff', //color caja de texto de Bienvenida 
+    backgroundColor: '#1E2A78', //color caja de texto de Bienvenida 
     borderRadius: 15, //bordes redondeados
     padding: 15, //espacio entre el texto y la caja
     paddingBottom: 27, //espacio inferior
     borderColor: '#000000ff', //color de borde de la caja de Bienvenida
     borderWidth: 1, //ancho del borde de la caja
+    marginTop: 45,
     marginBottom: 30, //separación inferior con la sección de Alumnos
   },
   title: {
@@ -275,10 +272,19 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",        // fila
     alignItems: "center",        // centrado vertical
-    justifyContent: "flex-start",// al inicio
+    justifyContent: "space-between", //separa elementos
     backgroundColor: "#C8102E",
-    paddingLeft: 0,            
+    paddingHorizontal: 10, // margen interno         
   },
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2, // separa tutor de flecha
+},
   logo: {
     width: 105,
     height: 105,
@@ -298,31 +304,15 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 13,
   },
-  blueIconBox: {
-    backgroundColor: '#031666',
-    width: 150,
-    height: 90,
-    flexDirection: 'row',        // 🔹 fila
-    justifyContent: 'space-between', // separa tutor ↔ flecha
-    alignItems: 'center',
-    paddingHorizontal: 10,       // margen interno
-    borderRadius: 8,             // opcional, bordes redondeados
-  },
- // Estilos para el cuadro azul con íconos de Tutor
-  iconTutor: {
-    width: 50,
-    height: 50,
-  },
-  // Estilos para el ícono de menú
   menuIcon: {
     padding: 5,
   },
-  menuIconImage: {
-    width: 24,
-    height: 24,
-    alignItems: 'flex-end',
-  },
-  // Estilos para el menú desplegable
+  tutorIconBackground: {
+    backgroundColor: '#fff',
+    width: 50,
+    height: 50,
+    borderRadius: 70,
+  }, //fondo circular del ícono de Tutor
   menuOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -331,17 +321,6 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingRight: 10,
   },
-  menuContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 10,
-    width: 200,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -349,15 +328,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
-  },
-  menuText: {
-    marginLeft: 10,
-    fontSize: 16,
-    color: '#333',
-  },
-  mainContent: {
-    flex: 1,
-    justifyContent: 'flex-start',
   },
   topSection: {
     backgroundColor: "#1E2A78",
@@ -368,15 +338,15 @@ const styles = StyleSheet.create({
     marginTop: 0,
     marginHorizontal:0,
     paddingTop: 20,
-  },
+  }, 
   footer: {
     alignItems: "center",
     padding: 15,
     backgroundColor: "#1E2A78",
-  },
+  }, //pie de página
   footerText: {
     fontSize: 14,
     color: "#ffffffff",
     marginBottom: 5,
-  }
+  } //texto de pie de página
 });
