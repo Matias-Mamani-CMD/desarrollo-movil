@@ -158,11 +158,12 @@ export default function Home({ navigation }) {
                   <Text style={styles.textYear}>2º AÑO</Text>
               </View>
             </View> 
-          {/* Footer */}
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
-          </View>
         </ScrollView>
+
+        {/* Footer */}
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
+        </View>
       </ImageBackground>
     </SafeAreaView>
   );
@@ -173,7 +174,7 @@ const { width, height } = Dimensions.get('window');
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#1E2A78',
+    padding: 0,
   },
   background: {
     flex: 1,
@@ -193,7 +194,7 @@ const styles = StyleSheet.create({
     paddingBottom: 27, //espacio inferior
     borderColor: '#000000ff', //color de borde de la caja de Bienvenida
     borderWidth: 1, //ancho del borde de la caja
-    marginTop: 45,
+    marginTop: 25,
     marginBottom: 30, //separación inferior con la sección de Alumnos
   },
   title: {
@@ -226,7 +227,7 @@ const styles = StyleSheet.create({
   },
   boxAlumn: {
     margin: 20,
-    marginBottom: 40,
+    marginBottom: 35,
     backgroundColor: '#031666ff', //color de caja para seleccionar Alumno
     borderRadius: 15, //bordes redondeados
     padding: 20, //espaciado entre el texto y la caja
@@ -266,7 +267,7 @@ const styles = StyleSheet.create({
   }, //ícono de cerrar sesión
   grayBackground: {
     backgroundColor: '#bbbbbbb6',
-    paddingTop: 40,
+    paddingTop: 30,
     paddingBottom: 30,
   }, // parte del fondo gris
   header: {
@@ -341,7 +342,7 @@ const styles = StyleSheet.create({
   }, 
   footer: {
     alignItems: "center",
-    padding: 15,
+    padding: 12,
     backgroundColor: "#1E2A78",
   }, //pie de página
   footerText: {
