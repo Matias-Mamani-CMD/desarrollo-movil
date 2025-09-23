@@ -26,14 +26,12 @@ export default function SignUp({ navigation }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
   // Estados para el enfoque de los campos
   const [firstNameFocused, setFirstNameFocused] = useState(false);
   const [lastNameFocused, setLastNameFocused] = useState(false);
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [confirmPasswordFocused, setConfirmPasswordFocused] = useState(false);
-
   // Manejar botón físico de atrás - Siempre va a Welcome
   useEffect(() => {
     const backAction = () => {
@@ -163,20 +161,21 @@ export default function SignUp({ navigation }) {
                 onBlur={() => setEmailFocused(false)}
               />
             </View>
-
             <Text style={styles.label}>Contraseña</Text>
             <View style={[styles.inputContainer, passwordFocused && styles.inputContainerFocused]}>
-              <FontAwesome name="lock" size={20} style={styles.icon}/>
+              <FontAwesome name="lock" size={20} style={styles.icon}/>  
               <TextInput
                 style={styles.input}
-                placeholder="Ingrese su contraseña"
+                placeholder={'Ingrese su contraseña'}
                 placeholderTextColor="#787878ff"
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
-                onFocus={() => setPasswordFocused(true)}
-                onBlur={() => setPasswordFocused(false)}
+                onFocus={() => {setPasswordFocused(true)}}
+                onBlur={() => {setPasswordFocused(false)}}
+                
               />
+            
               <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                 <FontAwesome 
                   name={showPassword ? "eye-slash" : "eye"} 
@@ -184,6 +183,12 @@ export default function SignUp({ navigation }) {
                   style={styles.icon} 
                 />
               </TouchableOpacity>
+              
+            </View>
+            <View style={styles.passwordHintContainer}>
+            <Text style={styles.passwordHint}>
+              Al menos 6 caracteres, incluyendo una mayúscula, una minúscula y un número.
+            </Text>
             </View>
 
             <Text style={styles.label}>Confirmar Contraseña</Text>
@@ -315,6 +320,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#000',
     marginLeft: 8,
+  },
+  passwordHintContainer: {
+  width: '100%',
+  minHeight: 40,       // ocupa un espacio fijo para que no mueva los campos
+  justifyContent: 'center',
+  marginBottom: 15,
+  },
+  passwordHint: {
+  fontSize: 13,
+  color: 'red',
   },
   icon: {
     color: '#333',
