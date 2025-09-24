@@ -116,16 +116,6 @@ export default function Home({ navigation }) {
           contentContainerStyle={styles.container}
           keyboardShouldPersistTaps="handled"
         >
-
-            {/* Botón Cerrar Sesión */}
-            <TouchableOpacity style={styles.button} onPress={handleLogOut}>
-              <Text style={styles.buttonText}>Cerrar sesión </Text>
-              <Image 
-                  source={require('../assets/icon-exit.png')}
-                  style={styles.exitImage}
-              />
-            </TouchableOpacity>
-
             {/* Bienvenida Tutor */}
             <View style={styles.box}>
               <Text style={styles.title}>Bienvenido, Nombre Tutor!</Text>
@@ -327,7 +317,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     paddingHorizontal: 8,
-    borderBottomWidth: 1,
+    borderBottomWidth: 0,
     borderBottomColor: '#f0f0f0',
   },
   topSection: {
