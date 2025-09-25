@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   View, 
@@ -150,4 +151,4 @@ export default function AboutUs({ navigation }) {
       </ImageBackground>
     </SafeAreaView>
   );
-}
+
