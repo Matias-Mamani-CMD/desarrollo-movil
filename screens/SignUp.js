@@ -271,6 +271,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#C8102E",
+    boxShadow: '6px 2px 6px 1px #0000007e',
   },
   logo: {
     width: 105,
