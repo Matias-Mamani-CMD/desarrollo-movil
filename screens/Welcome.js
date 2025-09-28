@@ -15,18 +15,20 @@ export default function Welcome({ navigation }) {
         <View style={styles.header}>
           <Image source={require('../assets/piaget-icon.png')} style={styles.logo} />
           <View>
-            <Text style={styles.headerTitle}>Instituto{"\n"}Jean Piaget <Text style={styles.headerNumber}>N°8048</Text></Text>
+            <Text style={styles.headerTitle}>
+              Instituto{"\n"}Jean Piaget <Text style={styles.headerNumber}>N°8048</Text>
+            </Text>
           </View>
         </View>
 
-        {/* Contenido principal */}
-        <View style={styles.mainContent}>
-          {/* Sección central azul */}
+        {/* Contenedor principal estilo tarjeta */}
+        <View style={styles.card}>
+          {/* Sección azul */}
           <View style={styles.topSection}>
             <Text style={styles.welcomeText}>BIENVENIDOS</Text>
             <View style={styles.separator} />
             <Text style={styles.description}>
-            Accede de manera segura a la información relevante y forma parte de una comunidad educativa conectada.
+              Accede de manera segura a la información relevante y forma parte de una comunidad educativa conectada.
             </Text>
           </View>
 
@@ -34,25 +36,31 @@ export default function Welcome({ navigation }) {
           <View style={styles.bottomSection}>
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Login")}>
               <Text style={styles.buttonText}>Iniciar Sesión</Text>
-              <FontAwesome name="arrow-right" size={16} color="#fff" style={{ marginLeft: 10 }} />
+              <FontAwesome name="arrow-right" size={18} color="#fff" style={{ marginLeft: 10 }} />
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.button, { marginTop: 25 }]} onPress={() => navigation.navigate("SignUp")}>
+            <View style={styles.middleSeparator}>
+              <View style={styles.line} />
+              <Text style={styles.orText}>O puedes registrarte</Text>
+              <View style={styles.line} />
+            </View>
+
+            <TouchableOpacity style={styles.button2} onPress={() => navigation.navigate("SignUp")}>
               <Text style={styles.buttonText}>Registrarse</Text>
-              <FontAwesome name="arrow-right" size={16} color="#fff" style={{ marginLeft: 10 }} />
+              <FontAwesome name="user-plus" size={18} color="#fff" style={{ marginLeft: 10 }} />
+            </TouchableOpacity>
+
+            {/* Botón About Us dentro de la card */}
+            <TouchableOpacity 
+              style={styles.aboutContainer}
+              onPress={() => navigation.navigate("AboutUs")}
+            >
+              <Text style={styles.aboutText}>Sobre nosotros</Text>
+              <FontAwesome name="info-circle" size={18} color="#1E2A78" />
             </TouchableOpacity>
           </View>
         </View>
-        
-        {/* Botón About Us - POSICIÓN CORREGIDA */}
-        <TouchableOpacity 
-          style={styles.aboutContainer}
-          onPress={() => navigation.navigate("AboutUs")}
-        >
-          <Text style={styles.aboutText}>Sobre nosotros</Text>
-          <FontAwesome name="info-circle" size={20} color="#1E2A78" style={styles.aboutIcon} />
-        </TouchableOpacity>
-        
+
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
@@ -62,15 +70,12 @@ export default function Welcome({ navigation }) {
   );
 }
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     padding: 0,
-  },
-  container: {
-    flex: 1,
   },
   background: {
     flex: 1,
@@ -81,9 +86,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-start",
     backgroundColor: "#C8102E",
-    paddingLeft: 0,            
   },
   logo: {
     width: 105,
@@ -95,98 +98,123 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     color: "#fff",
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "800",
-    lineHeight: 28,
+    lineHeight: 26,
     marginLeft: -10,
   },
   headerNumber: {
     color: "#fff",
     fontSize: 13,
   },
-  mainContent: {
-    flex: 1,
-    justifyContent: 'flex-start',
+  card: {
+    flex:1,
+    marginHorizontal: 20,
+    marginTop: 40,
+    marginBottom: 40,
+    backgroundColor: "#ffffff9b",
+    borderRadius: 10,
+    borderColor: '#000000ff',
+    borderWidth: 1,
   },
   topSection: {
+    borderWidth: 1,
+    borderTopLeftRadius:10,
+    borderTopRightRadius:10,
+    marginVertical:-1,
     backgroundColor: "#1E2A78",
-    borderBottomLeftRadius: 50,
-    borderBottomRightRadius: 50,
-    padding: 20,
+    padding: 30,
     alignItems: "center",
-    marginTop: 0,
-    marginHorizontal:0,
-    paddingTop: 20,
   },
   welcomeText: {
-    fontSize: 50,
+    fontSize: 40,
     fontWeight: "bold",
     color: "#fff",
-    marginBottom: 0,
   },
   separator: {
-    width: 280,
-    height: 3,
+    width: 140,
+    height: 2,
     backgroundColor: "#fff",
-    marginVertical: 15,
+    marginVertical: 10,
   },
   description: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: 17,
     textAlign: "center",
     lineHeight: 20,
   },
   bottomSection: {
     alignItems: "center",
-    marginTop:120,
+    padding: 25,
+    marginVertical: 60, // Reducido para dar espacio al nuevo botón
   },
   button: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#C8102E",
-    paddingVertical: 15,
+    justifyContent: "center",
+    backgroundColor: "#1E2A78",
+    paddingVertical: 14,
     paddingHorizontal: 30,
-    borderRadius: 8,
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 2 },
+    borderRadius: 6,
+    elevation: 6,
+    marginBottom: 15,
+  },
+  button2: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#C8102E",
+    paddingVertical: 14,
+    paddingHorizontal: 30,
+    borderRadius: 6,
+    elevation: 6,
+    marginTop: 30,
   },
   buttonText: {
-    color: "#ffffffff",
+    color: "#fff",
     fontWeight: "bold",
     fontSize: 16,
   },
+  middleSeparator: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
+  },
+  line: {
+    width: 80,
+    height: 1,
+    backgroundColor: "#000",
+  },
+  orText: {
+    marginHorizontal: 8,
+    fontSize: 14,
+    color: "#555",
+  },
   aboutContainer: {
-    position: 'absolute',
-    right: 20,
-    bottom: 80,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: '#fff',
     paddingVertical: 10,
     paddingHorizontal: 15,
-    borderRadius: 20,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: '#1E2A78',
+    marginTop: 110,
   },
   aboutText: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#1E2A78",
-    fontWeight: '600',
     marginRight: 8,
-  },
-  aboutIcon: {
-    // El icono ya tiene estilo
+    fontWeight: '500',
   },
   footer: {
     alignItems: "center",
-    padding: 15,
+    padding: 10,
     backgroundColor: "#1E2A78",
   },
   footerText: {
-    fontSize: 14,
-    color: "#ffffffff",
-    marginBottom: 5,
+    fontSize: 13,
+    color: "#fff",
   }
 });
