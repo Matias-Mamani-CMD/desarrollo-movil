@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-=======
 import React, { useState, useEffect } from 'react';
 import { 
   View, 
@@ -320,4 +318,4 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   }
 });
->>>>>>> Stashed changes
+
