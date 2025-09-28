@@ -6,7 +6,6 @@ import {
   StyleSheet, 
   Alert, 
   Image,
-  Dimensions,
   ImageBackground, //imágen de fondo
   ScrollView, // pantalla desplazable
   Modal, // menú cerrar sesión
@@ -15,7 +14,7 @@ import {
 import { signOut } from 'firebase/auth';
 import { auth } from '../src/config/firebaseConfig';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
+import { FontAwesome, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 
 export default function Home({ navigation }) {
   const [menuVisible, setMenuVisible] = useState(false);
@@ -55,7 +54,7 @@ export default function Home({ navigation }) {
       <ImageBackground
         source={require('../assets/background.jpg')}
         style={styles.background}
-        imageStyle = {{opacity: 0.9}} //opacidad
+        resizeMode="cover"
       >
 
         {/* Header con cuenta del tutor */}
@@ -69,14 +68,21 @@ export default function Home({ navigation }) {
             </View>
 
             {/* Íconos de Tutor en el header */}
+            
             <View style={styles.headerRight}>
-              <View style={styles.tutorIconBackground}>
-                <FontAwesome name="user-circle-o" size={50.2} color="black" />
+              <View style={styles.headerBlue}>
+                <View style={styles.iconPlacing}>
+                  {/* Ícono de tutor */}
+                  <MaterialCommunityIcons name="bell" size={19} color="white" paddingTop={18} paddingRight={8}/>
+                  <View style={styles.tutorIconBackground}>
+                    <FontAwesome name="user-circle-o" size={50.2} color="black" />
+                  </View>
+                  {/* Ícono de menú */}
+                  <TouchableOpacity onPress={toggleMenu} style={styles.menuIcon}>
+                    <MaterialCommunityIcons name="menu-down" size={34} color="white" />
+                  </TouchableOpacity>
+                </View>
               </View>
-              {/* Ícono de menú */}
-              <TouchableOpacity onPress={toggleMenu} style={styles.menuIcon}>
-                <MaterialCommunityIcons name="menu-down" size={34} color="white" />
-              </TouchableOpacity>
             </View>
           </View>
 
@@ -106,6 +112,7 @@ export default function Home({ navigation }) {
                   }}
                 >
                   <Text style={styles.buttonText}>Cerrar sesión</Text>
+                  <Ionicons name="exit-outline" size={24} color="white" paddingLeft="5" />
                 </TouchableOpacity>
 
               </Animated.View>
@@ -120,7 +127,7 @@ export default function Home({ navigation }) {
             <View style={styles.box}>
               <Text style={styles.title}>Bienvenido, Nombre Tutor!</Text>
               <Text style={styles.baseText}>
-                Este espacio le permitirá seguir de cerca el progreso escolar de su hijo y mantenerse en contacto con la institución.
+                Este espacio le permitirá seguir de cerca el progreso escolar de su hijo.
               </Text>
             </View>
 
@@ -135,8 +142,9 @@ export default function Home({ navigation }) {
                   </View>
                   <Text style={styles.textAlumnName}>Nombre Alumno</Text>
                   <Text style={styles.textYear}>1º AÑO</Text>
-                  
               </View>
+            </View>
+            <View style={styles.grayBackground}>
               <View style={styles.boxAlumn}>
                 <View style={styles.circleBackground}>
                   <Image 
@@ -147,13 +155,16 @@ export default function Home({ navigation }) {
                   <Text style={styles.textAlumnName}>Nombre Alumno</Text>
                   <Text style={styles.textYear}>2º AÑO</Text>
               </View>
-            </View> 
-        </ScrollView>
+            </View>
 
-        {/* Footer */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
-        </View>
+            {/* Espacio adicional para asegurar que el footer se vea */}
+            <View style={styles.spacer} />
+
+            {/* Footer */}
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
+            </View>
+        </ScrollView>
       </ImageBackground>
     </SafeAreaView>
   );
@@ -163,6 +174,7 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     padding: 0,
+    backgroundColor: '#000000c6',
   },
   background: {
     flex: 1,
@@ -170,67 +182,74 @@ const styles = StyleSheet.create({
     height: '100%',
   }, //mostrar fondo
   container: {
-    flex: 1,
-    justifyContent: 'center',
+    flexGrow: 1,
     alignItems: 'center',
-    padding: 12, //espacio entre el cuadro de Bienvenida y el fondo
+    marginTop: 49,
+    padding: 20, //espacio entre el cuadro de Bienvenida y el fondo
+    paddingBottom: 0,
   },
   box: {
-    backgroundColor: '#1E2A78', //color caja de texto de Bienvenida 
-    borderRadius: 15, //bordes redondeados
+    backgroundColor: '#DB2024', //color caja de texto de Bienvenida 
+    borderRadius: 10, //bordes redondeados
     padding: 15, //espacio entre el texto y la caja
     paddingBottom: 27, //espacio inferior
     borderColor: '#000000ff', //color de borde de la caja de Bienvenida
-    borderWidth: 1, //ancho del borde de la caja
-    marginTop: 55,
-    marginBottom: 30, //separación inferior con la sección de Alumnos
+    borderWidth: 0.5, //ancho del borde de la caja
+    marginBottom: 60, //separación inferior con la sección de Alumnos
+    boxShadow: '1px 2px 6px 1px #0000007e',
   },
   title: {
     color: '#fff', //color de fuente en el título de Bienvenida
-    fontSize: 24,
+    fontSize: 21,
     fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center', //centrar texto principal de Bienvenida a Tutor
+    marginBottom: 21,
+    textAlign: 'left', //texto principal de Bienvenida a Tutor
   },
   baseText:{
     color: '#fff',
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: 'regular',
     marginBottom: 15,
   },
   button: {
     flexDirection: 'row',
-    backgroundColor: '#031666ff', // color del botón
+    backgroundColor: '#252861', // color del botón de cerrar sesion
     paddingVertical: 8, 
-    paddingHorizontal: 15,
+    paddingHorizontal: 4,
+    borderColor: '#000',
+    borderWidth: 0.9,
     borderRadius: 5, //bordes redondeados
-    marginTop: 18, 
-    marginBottom: 6,
-    alignSelf: 'flex-end'
+    marginTop: 18,
+    alignSelf: 'flex-end',
+    marginRight: -13,
   },
   buttonText: {
     color: '#fff',
     fontSize: 15,
-    fontWeight: 'bold',
+    fontWeight: '450',
+    borderBottomWidth: 1,
+    borderBottomColor: '#fff',
+    paddingBottom: 3,
   },
   boxAlumn: {
-    margin: 20,
-    marginBottom: 35,
-    backgroundColor: '#031666ff', //color de caja para seleccionar Alumno
+    margin: 10,
+    marginBottom: 10,
+    backgroundColor: '#252861', //color de caja para seleccionar Alumno
     borderRadius: 15, //bordes redondeados
     padding: 20, //espaciado entre el texto y la caja
-    width: 385,
+    width: 350,
     alignItems: 'center', //centra horizontalmente
     justifyContent: 'center', //centra verticalmente
   },
   textAlumnName: {
     color: '#fff',
-    fontSize: 20,
+    fontSize: 16.5,
     fontWeight: 'bold',
+    paddingTop: 4,
   }, // nombre del alumno
   textYear: {
     color: '#fff',
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: 'regular',
     textAlign: 'center',
   }, //año que cursa el alumno
@@ -244,21 +263,23 @@ const styles = StyleSheet.create({
   }, //fondo circular del ícono del alumno
   alumnImage: {
     marginHorizontal: 5,
-    width: 92,
-    height: 92,
+    width: 90,
+    height: 90,
     marginBottom: 8,
   }, //íconos de alumnos
   grayBackground: {
-    backgroundColor: '#bbbbbbb6',
-    paddingTop: 30,
-    paddingBottom: 30,
+    backgroundColor: '#bdbdbdab',
+    paddingVertical: 10,
+    width: '110%',          // ocupa todo el ancho
+    alignItems: 'center',
+    marginBottom: 30,
   }, // parte del fondo gris
   header: {
     flexDirection: "row",        // fila
     alignItems: "center",        // centrado vertical
-    justifyContent: "space-between", //separa elementos
-    backgroundColor: "#C8102E",
-    paddingHorizontal: 10, // margen interno         
+    justifyContent: "space-between", // separa elementos
+    backgroundColor: "#C81B1E",
+    boxShadow: '6px 2px 6px 1px #0000007e',
   },
   headerLeft: {
     flexDirection: "row",
@@ -268,6 +289,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 2, // separa tutor de flecha
+},
+  headerBlue: {
+    backgroundColor: "#252861",
+    alignItems: 'flex-end',
+    width: '140',
+    height:'80',
 },
   logo: {
     width: 105,
@@ -286,10 +313,14 @@ const styles = StyleSheet.create({
   },
   headerNumber: {
     color: "#fff",
-    fontSize: 13,
+    fontSize: 13,      
   },
   menuIcon: {
-    padding: 5,
+    paddingTop: 28,
+  },
+  iconPlacing: {
+    padding: 10,
+    flexDirection: 'row',   // ícono y flecha en línea
   },
   tutorIconBackground: {
     backgroundColor: '#fff',
@@ -313,10 +344,18 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0,
     borderBottomColor: '#f0f0f0',
   },
+  spacer: {
+    height: 20, // Espacio entre el último elemento y el footer
+  },
   footer: {
     alignItems: "center",
-    padding: 10,
+    paddingTop: 15,
+    paddingBottom: 60,
+    width: '111%',
     backgroundColor: "#1E2A78",
+    borderTopColor: "#FFD900",
+    borderTopWidth: 2,
+    marginTop: 'auto',
   },
   footerText: {
     fontSize: 13,
