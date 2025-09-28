@@ -288,12 +288,11 @@ const styles = StyleSheet.create({
   },
   footer: {
     alignItems: "center",
-    padding: 15,
+    padding: 10,
     backgroundColor: "#1E2A78",
   },
   footerText: {
-    fontSize: 14,
-    color: "#ffffffff",
-    marginBottom: 5,
-  },
+    fontSize: 13,
+    color: "#fff",
+  }
 });

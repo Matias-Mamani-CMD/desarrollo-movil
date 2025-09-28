@@ -315,12 +315,11 @@ const styles = StyleSheet.create({
   },
   footer: {
     alignItems: "center",
-    padding: 12,
+    padding: 10,
     backgroundColor: "#1E2A78",
-  }, //pie de página
+  },
   footerText: {
-    fontSize: 14,
-    color: "#ffffffff",
-    marginBottom: 5,
-  } //texto de pie de página
+    fontSize: 13,
+    color: "#fff",
+  }
 });
