@@ -279,7 +279,8 @@ const styles = StyleSheet.create({
   padding: 20,
 },
 
-   /* position:'absolute',
+   /*Etilo anterior
+    position:'absolute',
     flexDirection: 'row',
     alignItems: 'center',
     /*justifyContent: 'center',
