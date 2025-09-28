@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   View, 
@@ -13,7 +12,8 @@ import {
   KeyboardAvoidingView, 
   Platform,
   BackHandler,
-  ActivityIndicator
+  ActivityIndicator,
+  Dimensions
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { auth } from '../src/config/firebaseConfig';
@@ -91,103 +91,111 @@ export default function ForgotPassword({ navigation }) {
     }
   };
 
-  return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-      <ImageBackground
-        source={require('../assets/background.jpg')}
-        style={styles.background}
-        resizeMode="cover"
+return (
+  <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+    <ImageBackground
+      source={require('../assets/background.jpg')}
+      style={styles.background}
+      resizeMode="cover"
+    >
+      {/* Header */}
+      <View style={styles.header}>
+        <Image source={require('../assets/piaget-icon.png')} style={styles.logo} />
+        <View>
+          <Text style={styles.headerTitle}>
+            Instituto{"\n"}Jean Piaget <Text style={styles.headerNumber}>N°8048</Text>
+          </Text>
+        </View>
+      </View>
+
+      {/* Contenido + scroll */}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.keyboardAvoidingView}
       >
-        {/* Header rojo */}
-        <View style={styles.header}>
-          <Image source={require('../assets/piaget-icon.png')} style={styles.logo} />
-          <View>
-            <Text style={styles.headerTitle}>Instituto{"\n"}Jean Piaget <Text style={styles.headerNumber}>N°8048</Text></Text>
-          </View>
-        </View>
-        
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={{ flex: 1, width: '100%' }}
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={true}
         >
-          <ScrollView
-            contentContainerStyle={styles.container}
-            keyboardShouldPersistTaps="handled"
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={() => navigation.replace('Login')}
+            disabled={isLoading}
           >
-            <Image source={require('../assets/restablecerContraseña.png')} style={styles.iconSign} />
+            <FontAwesome name="arrow-left" size={25} color="#031666ff" />
+            <Text style={styles.backButtonText}>Volver</Text>
+          </TouchableOpacity>
 
-            <Text style={styles.title}>Restablecer contraseña</Text>
-            <Text style={styles.subtitle}>Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.</Text>
+          <Image source={require('../assets/restablecerContraseña.png')} style={styles.iconSign} />
 
-            <Text style={styles.label}>Correo electrónico</Text>
-            <View style={[styles.inputContainer, emailFocused && styles.inputContainerFocused]}>
-              <FontAwesome name="envelope" size={20} style={styles.icon} />
-              <TextInput
-                style={styles.input}
-                placeholder="Ingrese su correo electrónico"
-                placeholderTextColor="#787878ff"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                onFocus={() => setEmailFocused(true)}
-                onBlur={() => setEmailFocused(false)}
-                editable={!isLoading}
-              />
-            </View>
+          <Text style={styles.title}>Restablecer contraseña</Text>
+          <Text style={styles.subtitle}>
+            Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
+          </Text>
 
-            <TouchableOpacity 
-              style={[styles.button, isLoading && styles.buttonDisabled]} 
-              onPress={handleResetPassword}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.buttonText}>Enviar enlace</Text>
-              )}
-            </TouchableOpacity>
+          <Text style={styles.label}>Correo electrónico</Text>
+          <View style={[styles.inputContainer, emailFocused && styles.inputContainerFocused]}>
+            <FontAwesome name="envelope" size={20} style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Ingrese su correo electrónico"
+              placeholderTextColor="#787878ff"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              onFocus={() => setEmailFocused(true)}
+              onBlur={() => setEmailFocused(false)}
+              editable={!isLoading}
+            />
+          </View>
 
-            {/* Botón para volver a Login */}
-            <TouchableOpacity 
-              style={styles.backButton}
-              onPress={() => navigation.replace('Login')}
-              disabled={isLoading}
-            >
-              <FontAwesome name="arrow-left" size={30} color="#031666ff" />
-              <Text style={styles.backButtonText}>Volver</Text>
-            </TouchableOpacity>
-          </ScrollView>
-        </KeyboardAvoidingView>
-        
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
-        </View>
-      </ImageBackground>
-    </SafeAreaView>
-  );
+          <TouchableOpacity 
+            style={[styles.button, isLoading && styles.buttonDisabled]} 
+            onPress={handleResetPassword}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Enviar enlace</Text>
+            )}
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
+
+      {/* Footer fijo */}
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
+      </View>
+    </ImageBackground>
+  </SafeAreaView>
+);
 }
+
+const { width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     padding: 0,
-  },
-  inputContainerFocused: {
-    borderColor: "#1E2A78",
-    borderWidth: 2,
+    backgroundColor: '#000000c6',
   },
   background: {
     flex: 1,
     width: '100%',
     height: '100%',
   },
+  keyboardAvoidingView: {
+    flex: 1,
+    width: '100%',
+  },
+  // Header corregido - igual que en Welcome
   header: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-start",
     backgroundColor: "#C8102E",
-    paddingLeft: 0,
   },
   logo: {
     width: 105,
@@ -197,28 +205,40 @@ const styles = StyleSheet.create({
     marginBottom: -10,
     marginLeft: -15,
   },
-  iconSign: {
-    width: 140,
-    height: 140,
-    marginTop: -100,
-    marginBottom: 10,
-  },
   headerTitle: {
     color: "#fff",
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "800",
-    lineHeight: 28,
+    lineHeight: 26,
     marginLeft: -10,
   },
   headerNumber: {
     color: "#fff",
     fontSize: 13,
   },
-  container: {
+  scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     padding: 20,
+    paddingBottom: 40, // Espacio extra al final
+  },
+  backButton: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 5,
+    marginBottom: 20,
+  },
+  backButtonText: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#031666ff',
+    marginLeft: 8,
+  },
+  iconSign: {
+    width: 140,
+    height: 140,
+    alignSelf: 'center',
+    marginBottom: 20,
   },
   title: {
     fontSize: 28,
@@ -252,36 +272,18 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: '100%',
   },
+  inputContainerFocused: {
+    borderColor: "#1E2A78",
+    borderWidth: 2,
+  },
   input: {
     flex: 10,
     fontSize: 16,
     color: '#000',
     marginLeft: 8,
-    
   },
   icon: {
     color: '#333',
-  },
-  // estilos para el botón de volver
-  backButton: {
-  position: 'absolute',
-  top: -2,     // distancia desde el borde superior
-  left: 5,    // distancia desde el borde izquierdo
-  flexDirection: 'row',
-  alignItems: 'center',
-  padding: 20,
-},
-  
-    /*flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 15,
-    marginBottom: 10,*/
-
-  backButtonText: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#031666ff',
-    marginLeft: 8,
   },
   button: {
     backgroundColor: '#031666ff',
@@ -293,6 +295,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     height: 50,
+    alignSelf: 'center',
   },
   buttonDisabled: {
     backgroundColor: '#6c757d',
@@ -302,19 +305,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  signUpText: {
-    fontSize: 14,
-    fontWeight: 600,
-    marginTop: 20,
-    color: '#136dffff',
+    flexSpacer: {
+    flex: 1,
+    minHeight: 0, // Espacio mínimo para asegurar que el footer quede fuera de la vista inicial
   },
-  footer: {
-    alignItems: "center",
-    padding: 10,
-    backgroundColor: "#1E2A78",
-  },
-  footerText: {
-    fontSize: 13,
-    color: "#fff",
-  }
+footer: {
+  width: '100%',
+  alignItems: "center",
+  padding: 15,
+  backgroundColor: "#1E2A78",
+  borderTopColor: "#FFD900",
+  borderTopWidth: 1.5,
+},
+footerText: {
+  fontSize: 13,
+  color: "#fff",
+},
 });

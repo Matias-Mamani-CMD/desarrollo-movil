@@ -11,7 +11,8 @@ import {
    ScrollView,
    KeyboardAvoidingView,
    Platform,
-   BackHandler
+   BackHandler,
+   Dimensions
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { auth } from '../src/config/firebaseConfig';
@@ -32,6 +33,7 @@ export default function SignUp({ navigation }) {
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [confirmPasswordFocused, setConfirmPasswordFocused] = useState(false);
+  
   // Manejar botón físico de atrás - Siempre va a Welcome
   useEffect(() => {
     const backAction = () => {
@@ -98,170 +100,179 @@ export default function SignUp({ navigation }) {
         style={styles.background}
         resizeMode="cover"
       >
-        {/* Header rojo */}
+        {/* Header corregido */}
         <View style={styles.header}>
-          <Image source={require('../assets/piaget-icon.png')} style={styles.logoHeader} />
+          <Image source={require('../assets/piaget-icon.png')} style={styles.logo} />
           <View>
-            <Text style={styles.headerTitle}>Instituto{"\n"}Jean Piaget <Text style={styles.headerNumber}>N°8048</Text></Text>
+            <Text style={styles.headerTitle}>
+              Instituto{"\n"}Jean Piaget <Text style={styles.headerNumber}>N°8048</Text>
+            </Text>
           </View>
-        </View>
-        
+        </View>        
+
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={{ flex: 1, width: '100%' }}
+          style={styles.keyboardAvoidingView}
         >
-          <ScrollView
-            contentContainerStyle={styles.container}
-            keyboardShouldPersistTaps="handled"
-          >
-            <Image source={require('../assets/logo.png')} style={styles.iconSign}/>
-
-            <Text style={styles.title}>Regístrate</Text>
-
-            <Text style={styles.label}>Nombre</Text>
-            <View style={[styles.inputContainer, firstNameFocused && styles.inputContainerFocused]}>
-              <FontAwesome name="user" size={20} style={styles.icon}/>
-              <TextInput
-                style={styles.input}
-                placeholder="Ingrese su nombre"
-                placeholderTextColor="#787878ff"
-                value={firstName}
-                onChangeText={setFirstName}
-                onFocus={() => setFirstNameFocused(true)}
-                onBlur={() => setFirstNameFocused(false)}
-              />
-            </View>
-
-            <Text style={styles.label}>Apellido</Text>
-            <View style={[styles.inputContainer, lastNameFocused && styles.inputContainerFocused]}>
-              <FontAwesome name="user" size={20} style={styles.icon}/>
-              <TextInput
-                style={styles.input}
-                placeholder="Ingrese su apellido"
-                placeholderTextColor="#787878ff"
-                value={lastName}
-                onChangeText={setLastName}
-                onFocus={() => setLastNameFocused(true)}
-                onBlur={() => setLastNameFocused(false)}
-              />
-            </View>
-
-            <Text style={styles.label}>Correo</Text>
-            <View style={[styles.inputContainer, emailFocused && styles.inputContainerFocused]}>
-              <FontAwesome name="envelope" size={20} style={styles.icon}/>
-              <TextInput
-                style={styles.input}
-                placeholder="Ingrese su correo"
-                placeholderTextColor="#787878ff"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                onFocus={() => setEmailFocused(true)}
-                onBlur={() => setEmailFocused(false)}
-              />
-            </View>
-            <Text style={styles.label}>Contraseña</Text>
-            <View style={[styles.inputContainer, passwordFocused && styles.inputContainerFocused]}>
-              <FontAwesome name="lock" size={20} style={styles.icon}/>  
-              <TextInput
-                style={styles.input}
-                placeholder={'Ingrese su contraseña'}
-                placeholderTextColor="#787878ff"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-                onFocus={() => {setPasswordFocused(true)}}
-                onBlur={() => {setPasswordFocused(false)}}
-                
-              />
+          <ScrollView>
+            <View style={styles.contentWrapper}>
+              <TouchableOpacity 
+                style={styles.backButton}
+                onPress={() => navigation.replace('Welcome')}
+              >
+                <FontAwesome name="arrow-left" size={25} color="#031666ff" />
+                <Text style={styles.backButtonText}>Volver</Text>
+              </TouchableOpacity>
             
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <FontAwesome 
-                  name={showPassword ? "eye-slash" : "eye"} 
-                  size={20} 
-                  style={styles.icon} 
-                />
-              </TouchableOpacity>
+              {/* Card translúcida */}
+              <View style={styles.card}>
+                <View style={styles.topSection}>
+                  <Text style={styles.title}>Regístrate</Text>
+                </View>
+                
+                {/* Nombre */}
+                <Text style={styles.label}>Nombre</Text>
+                <View style={[styles.inputContainer, firstNameFocused && styles.inputContainerFocused]}>
+                  <FontAwesome name="user" size={20} style={styles.icon}/>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Ingrese su nombre"
+                    placeholderTextColor="#787878ff"
+                    value={firstName}
+                    onChangeText={setFirstName}
+                    onFocus={() => setFirstNameFocused(true)}
+                    onBlur={() => setFirstNameFocused(false)}
+                  />
+                </View>
+
+                {/* Apellido */}
+                <Text style={styles.label}>Apellido</Text>
+                <View style={[styles.inputContainer, lastNameFocused && styles.inputContainerFocused]}>
+                  <FontAwesome name="user" size={20} style={styles.icon}/>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Ingrese su apellido"
+                    placeholderTextColor="#787878ff"
+                    value={lastName}
+                    onChangeText={setLastName}
+                    onFocus={() => setLastNameFocused(true)}
+                    onBlur={() => setLastNameFocused(false)}
+                  />
+                </View>
+
+                {/* Correo */}
+                <Text style={styles.label}>Correo</Text>
+                <View style={[styles.inputContainer, emailFocused && styles.inputContainerFocused]}>
+                  <FontAwesome name="envelope" size={20} style={styles.icon}/>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Ingrese su correo"
+                    placeholderTextColor="#787878ff"
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    onFocus={() => setEmailFocused(true)}
+                    onBlur={() => setEmailFocused(false)}
+                  />
+                </View>
+
+                {/* Contraseña */}
+                <Text style={styles.label}>Contraseña</Text>
+                <View style={[styles.inputContainer, passwordFocused && styles.inputContainerFocused]}>
+                  <FontAwesome name="lock" size={20} style={styles.icon}/>  
+                  <TextInput
+                    style={styles.input}
+                    placeholder={'Ingrese su contraseña'}
+                    placeholderTextColor="#787878ff"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={!showPassword}
+                    onFocus={() => setPasswordFocused(true)}
+                    onBlur={() => setPasswordFocused(false)}
+                  />
+                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                    <FontAwesome 
+                      name={showPassword ? "eye-slash" : "eye"} 
+                      size={20} 
+                      style={styles.icon} 
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.passwordHintContainer}>
+                  <Text style={styles.passwordHint}>
+                    Al menos 6 caracteres, incluyendo una mayúscula, una minúscula y un número.
+                  </Text>
+                </View>
+
+                {/* Confirmar Contraseña */}
+                <Text style={styles.label}>Confirmar Contraseña</Text>
+                <View style={[styles.inputContainer, confirmPasswordFocused && styles.inputContainerFocused]}>
+                  <FontAwesome name="lock" size={20} style={styles.icon} />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Confirme su contraseña"
+                    placeholderTextColor="#787878ff"
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    secureTextEntry={!showConfirmPassword}
+                    onFocus={() => setConfirmPasswordFocused(true)}
+                    onBlur={() => setConfirmPasswordFocused(false)}
+                  />
+                  <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+                    <FontAwesome 
+                      name={showConfirmPassword ? "eye-slash" : "eye"} 
+                      size={20} 
+                      style={styles.icon} 
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+                  <Text style={styles.buttonText}>Registrarse</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => navigation.replace('Login')}>
+                  <Text style={styles.signUpText}>¿Ya tienes cuenta? Inicia sesión</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Espacio flexible que empuja el footer hacia abajo */}
+              <View style={styles.flexSpacer} />
               
+              {/* Footer que solo se ve al hacer scroll hasta el final */}
+              <View style={styles.footer}>
+                <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
+              </View>
             </View>
-            <View style={styles.passwordHintContainer}>
-            <Text style={styles.passwordHint}>
-              Al menos 6 caracteres, incluyendo una mayúscula, una minúscula y un número.
-            </Text>
-            </View>
-
-            <Text style={styles.label}>Confirmar Contraseña</Text>
-            <View style={[styles.inputContainer, confirmPasswordFocused && styles.inputContainerFocused]}>
-              <FontAwesome name="lock" size={20} style={styles.icon} />
-              <TextInput
-                style={styles.input}
-                placeholder="Confirme su contraseña"
-                placeholderTextColor="#787878ff"
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                secureTextEntry={!showConfirmPassword}
-                onFocus={() => setConfirmPasswordFocused(true)}
-                onBlur={() => setConfirmPasswordFocused(false)}
-              />
-              <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-                <FontAwesome 
-                  name={showConfirmPassword ? "eye-slash" : "eye"} 
-                  size={20} 
-                  style={styles.icon} 
-                />
-              </TouchableOpacity>
-            </View>
-
-            <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-              <Text style={styles.buttonText}>Registrarse</Text>
-            </TouchableOpacity>
-
-            {/* Botón para volver a Welcome */}
-            <TouchableOpacity 
-              style={styles.backButton}
-              onPress={() => navigation.replace('Welcome')}
-            >
-              <FontAwesome name="arrow-left" size={16} color="#031666ff" />
-              <Text style={styles.backButtonText}>Volver al inicio</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => navigation.replace('Login')}>
-              <Text style={styles.signUpText}>¿Ya tienes cuenta? Inicia sesión</Text>
-            </TouchableOpacity>
           </ScrollView>
         </KeyboardAvoidingView>
-        
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
-        </View>
       </ImageBackground>
     </SafeAreaView>
   );
 }
 
+const { height, width } = Dimensions.get('window');
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     padding: 0,
-  },
-  inputContainerFocused: {
-    borderColor: "#1E2A78",
-    borderWidth: 2,
+    backgroundColor: '#000000c6',
   },
   background: {
     flex: 1,
     width: '100%',
     height: '100%',
   },
+  // Header corregido - igual que en Welcome
   header: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-start",
     backgroundColor: "#C8102E",
-    paddingLeft: 0,
   },
-  logoHeader: {
+  logo: {
     width: 105,
     height: 105,
     resizeMode: "cover",
@@ -269,40 +280,53 @@ const styles = StyleSheet.create({
     marginBottom: -10,
     marginLeft: -15,
   },
-  iconSign: {
-    width: 140,
-    height: 140,
-    marginTop: 20,
-    marginBottom: 10,
-  },
   headerTitle: {
     color: "#fff",
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "800",
-    lineHeight: 28,
+    lineHeight: 26,
     marginLeft: -10,
   },
   headerNumber: {
     color: "#fff",
     fontSize: 13,
   },
-  container: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
+  keyboardAvoidingView: {
+    flex: 1,
+    width: '100%',
+  },
+  card: {
+    width: '100%',
+    maxWidth: 400,
+    backgroundColor: "#ffffffd1",
+    borderRadius: 10,
+    borderColor: '#000000ff',
+    borderWidth: 1,
+    alignSelf: 'center',
+    marginTop:10,
+  },
+  topSection: {
+    borderWidth: 1,
+    borderTopLeftRadius:10,
+    borderTopRightRadius:10,
+    marginVertical:-1,
+    backgroundColor: "#1E2A78",
+    padding: 10,
+    alignItems: "center",
   },
   title: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 20,
-    color: '#2f2f2fff',
+    fontSize: 25,
+    fontWeight: '600',
+    marginBottom: 0,
+    textAlign: 'center',
+    color: '#ffffffff',
   },
   label: {
+    marginLeft:16,
     alignSelf: 'flex-start',
-    fontSize: 16,
-    fontWeight: '600',
-    marginTop: 10,
+    fontSize: 18,
+    fontWeight: 'condensed',
+    marginTop: 15,
     color: '#000000ff',
   },
   inputContainer: {
@@ -310,70 +334,89 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
     borderRadius: 12,
-    paddingHorizontal: 10,
+    borderColor: '#000000ff',
+    borderWidth: 0.3,
+    paddingHorizontal: 15,
     paddingVertical: 8,
     marginBottom: 15,
-    width: '100%',
+    marginLeft:8,
+    marginRight:8,
+    width: '95%',
+  },
+  inputContainerFocused: {
+    borderColor: "#1E2A78",
+    borderWidth: 2,
   },
   input: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 14,
     color: '#000',
     marginLeft: 8,
-  },
-  passwordHintContainer: {
-  width: '100%',
-  minHeight: 40,       // ocupa un espacio fijo para que no mueva los campos
-  justifyContent: 'center',
-  marginBottom: 15,
-  },
-  passwordHint: {
-  fontSize: 13,
-  color: 'red',
   },
   icon: {
     color: '#333',
   },
-  // Nuevos estilos para el botón de volver
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 15,
-    marginBottom: 10,
+  passwordHintContainer: {
+    width: '95%',
+    minHeight: 40,
+    justifyContent: 'center',
+    marginBottom: 1,
+    marginLeft:15,
   },
-  backButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#031666ff',
-    marginLeft: 8,
+  passwordHint: {
+    fontSize: 13,
+    color: 'red',
   },
   button: {
     backgroundColor: '#031666ff',
     paddingVertical: 10,
-    paddingHorizontal: 40,
-    borderRadius: 5,
-    marginTop: 20,
-    width: '100%',
+    borderRadius: 8,
+    marginVertical:15,
+    width: '95%',
     alignItems: 'center',
+    alignSelf: 'center',
   },
   buttonText: {
     color: '#ffffffff',
     fontSize: 16,
     fontWeight: 'bold',
   },
+  backButton: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 5,
+    marginHorizontal:10,
+    marginVertical:10,
+  },
+  backButtonText: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#031666ff',
+    marginLeft: 8,
+  },
   signUpText: {
     fontSize: 14,
-    fontWeight: 600,
+    fontWeight: "600",
     marginTop: 20,
+    marginBottom: 15,
     color: '#136dffff',
+    textAlign: 'center',
+  },
+  flexSpacer: {
+    flex: 1,
+    minHeight: 30, // Espacio mínimo para asegurar que el footer quede fuera de la vista inicial
   },
   footer: {
+    width: width,
     alignItems: "center",
-    padding: 10,
+    padding: 15,
     backgroundColor: "#1E2A78",
+    borderTopColor: "#FFD900",
+    borderTopWidth: 1.5,
   },
   footerText: {
     fontSize: 13,
     color: "#fff",
-  }
+  },
 });

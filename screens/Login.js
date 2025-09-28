@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
+import {
+  View,
   Text,
-  TextInput, 
-  TouchableOpacity, 
-  StyleSheet, 
-  Alert, 
-  Image, 
-  ImageBackground, 
-  ScrollView, 
-  KeyboardAvoidingView, 
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  Image,
+  ImageBackground,
+  ScrollView,
+  KeyboardAvoidingView,
   Platform,
   Switch,
-  BackHandler
+  BackHandler,
+  Dimensions
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { signInWithEmailAndPassword } from 'firebase/auth';
@@ -28,20 +29,30 @@ export default function Login({ navigation }) {
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
 
-  // Manejar botón físico de atrás - Siempre va a Welcome
+  // Manejar botón físico de atrás
   useEffect(() => {
     const backAction = () => {
       navigation.replace('Welcome');
-      return true; // Previene el comportamiento por defecto
+      return true;
     };
-
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
       backAction
     );
-
     return () => backHandler.remove();
   }, [navigation]);
+
+  // Cargar email guardado
+  useEffect(() => {
+    const loadEmail = async () => {
+      const savedEmail = await AsyncStorage.getItem("userEmail");
+      if (savedEmail) {
+        setEmail(savedEmail);
+        setRememberMe(true);
+      }
+    };
+    loadEmail();
+  }, []);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -55,11 +66,11 @@ export default function Login({ navigation }) {
       if (rememberMe) {
         await AsyncStorage.setItem("userEmail", email);
       } else {
-        await AsyncStorage.removeItem("userEmail"); 
+        await AsyncStorage.removeItem("userEmail");
       }
 
       Alert.alert("Login exitoso", "Has iniciado sesión correctamente.");
-      navigation.reset({ index: 0, routes: [{ name: 'Home' }] }); 
+      navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
     } catch (error) {
       let errorMessage = "Hubo un problema al iniciar sesión.";
       switch (error.code) {
@@ -80,17 +91,6 @@ export default function Login({ navigation }) {
     }
   };
 
-  useEffect(() => { 
-    const loadEmail = async () => { 
-      const savedEmail = await AsyncStorage.getItem("userEmail"); 
-      if (savedEmail) { 
-        setEmail(savedEmail); 
-        setRememberMe(true); 
-      }
-    }; 
-    loadEmail(); 
-  }, []);
-
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <ImageBackground
@@ -98,100 +98,117 @@ export default function Login({ navigation }) {
         style={styles.background}
         resizeMode="cover"
       >
-        {/* Header rojo */}
+        {/* Header */}
         <View style={styles.header}>
           <Image source={require('../assets/piaget-icon.png')} style={styles.logo} />
           <View>
-            <Text style={styles.headerTitle}>Instituto{"\n"}Jean Piaget <Text style={styles.headerNumber}>N°8048</Text></Text>
+            <Text style={styles.headerTitle}>
+              Instituto{"\n"}Jean Piaget <Text style={styles.headerNumber}>N°8048</Text>
+            </Text>
           </View>
         </View>
+
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={{ flex: 1, width: '100%' }}
+          style={styles.keyboardAvoidingView}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
         >
           <ScrollView
-            contentContainerStyle={styles.container}
+            contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            keyboardDismissMode="on-drag"
           >
-            <Image source={require('../assets/logo.png')} style={styles.iconSign} />
-
-            <Text style={styles.title}>Iniciar sesión</Text>
-
-            <Text style={styles.label}>Correo</Text>
-            <View style={[styles.inputContainer, emailFocused && styles.inputContainerFocused]}>
-              <FontAwesome name="envelope" size={20} style={styles.icon} />
-              <TextInput
-                style={styles.input}
-                placeholder="Ingrese su correo"
-                placeholderTextColor="#787878ff"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                onFocus={() => setEmailFocused(true)}
-                onBlur={() => setEmailFocused(false)}
-              />
-            </View>
-
-            <Text style={styles.label}>Contraseña</Text>
-            <View style={[styles.inputContainer, passwordFocused && styles.inputContainerFocused]}>
-              <FontAwesome name="lock" size={20} style={styles.icon} />
-              <TextInput
-                style={styles.input}
-                placeholder="Ingrese su contraseña"
-                placeholderTextColor="#787878ff"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-                onFocus={() => setPasswordFocused(true)}
-                onBlur={() => setPasswordFocused(false)}
-              />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <FontAwesome 
-                  name={showPassword ? "eye-slash" : "eye"} 
-                  size={20} 
-                  style={styles.icon} 
-                />
-              </TouchableOpacity>
-            </View>
-
-            {/* Enlace para olvidar contraseña */}
-            <TouchableOpacity 
-              style={styles.forgotPasswordContainer}
-              onPress={() => navigation.navigate('ForgotPassword')}
-            >
-              <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
-            </TouchableOpacity>
-
-            <View style={styles.switchContainer}>
-              <Text style={styles.label}>Recordarme</Text> 
-              <Switch 
-                value={rememberMe} 
-                onValueChange={setRememberMe}
-                trackColor={{ false: "#ccc", true: "#0317668f" }}
-                thumbColor={rememberMe ? "#031666ff" : "#f4f3f4"}
-              /> 
-            </View>
-
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
-              <Text style={styles.buttonText}>Ingresar</Text>
-            </TouchableOpacity>
-
-            {/* Botón para volver a Welcome */}
+            {/* Back Button */}
             <TouchableOpacity 
               style={styles.backButton}
               onPress={() => navigation.replace('Welcome')}
             >
-              <FontAwesome name="arrow-left" size={16} color="#031666ff" />
-              <Text style={styles.backButtonText}>Volver al inicio</Text>
+              <FontAwesome name="arrow-left" size={25} color="#031666ff" />
+              <Text style={styles.backButtonText}>Volver</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.replace('SignUp')}>
-              <Text style={styles.signUpText}>¿No tienes cuenta aún? Regístrate</Text>
-            </TouchableOpacity>
+            {/* Card login */}
+            <View style={styles.card}>
+              <View style={styles.topSection}>
+                <Text style={styles.title}>Iniciar Sesión</Text>
+              </View>
+
+              {/* Email */}
+              <Text style={styles.label}>Correo</Text>
+              <View style={[styles.inputContainer, emailFocused && styles.inputContainerFocused]}>
+                <FontAwesome name="envelope" size={20} style={styles.icon}/>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Ingrese su correo"
+                  placeholderTextColor="#787878ff"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  onFocus={() => setEmailFocused(true)}
+                  onBlur={() => setEmailFocused(false)}
+                />
+              </View>
+
+              {/* Password */}
+              <Text style={styles.label}>Contraseña</Text>
+              <View style={[styles.inputContainer, passwordFocused && styles.inputContainerFocused]}>
+                <FontAwesome name="lock" size={20} style={styles.icon}/>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Ingrese su contraseña"
+                  placeholderTextColor="#787878ff"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                  onFocus={() => setPasswordFocused(true)}
+                  onBlur={() => setPasswordFocused(false)}
+                />
+                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                  <FontAwesome 
+                    name={showPassword ? "eye-slash" : "eye"} 
+                    size={20} 
+                    style={styles.icon} 
+                  />
+                </TouchableOpacity>
+              </View>
+
+              {/* Contenedor para Recordarme y Olvidé contraseña */}
+              <View style={styles.optionsContainer}>
+                {/* Recordarme a la izquierda */}
+                <View style={styles.rememberContainer}>
+                  <Switch
+                    value={rememberMe}
+                    onValueChange={setRememberMe}
+                    trackColor={{ false: "#ccc", true: "#0317668f" }}
+                    thumbColor={rememberMe ? "#031666ff" : "#f4f3f4"}
+                  />
+                  <Text style={styles.rememberText}>Recordarme</Text>
+                </View>
+
+                {/* Olvidé contraseña a la derecha */}
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('ForgotPassword')}
+                >
+                  <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Login Button */}
+              <TouchableOpacity style={styles.button} onPress={handleLogin}>
+                <Text style={styles.buttonText}>Ingresar</Text>
+              </TouchableOpacity>
+
+              {/* Go to SignUp */}
+              <TouchableOpacity onPress={() => navigation.replace('SignUp')}>
+                <Text style={styles.signUpText}>¿No tienes cuenta aún? Regístrate</Text>
+              </TouchableOpacity>
+            </View>
           </ScrollView>
         </KeyboardAvoidingView>
-        
+
+        {/* Footer fijo */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
         </View>
@@ -200,26 +217,30 @@ export default function Login({ navigation }) {
   );
 }
 
+const { width, height } = Dimensions.get('window');
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    padding: 0,
-  },
-  inputContainerFocused: {
-    borderColor: "#1E2A78",
-    borderWidth: 2,
+    backgroundColor: '#000000c6',
   },
   background: {
     flex: 1,
     width: '100%',
     height: '100%',
   },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    padding: 20,
+    minHeight: height - 150, // Altura mínima para evitar desplazamientos excesivos
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-start",
     backgroundColor: "#C8102E",
-    paddingLeft: 0,            
   },
   logo: {
     width: 105,
@@ -229,40 +250,60 @@ const styles = StyleSheet.create({
     marginBottom: -10,
     marginLeft: -15,
   },
-  iconSign: {
-    width: 140,
-    height: 140,
-    marginTop: 20,
-    marginBottom: 10,
-  },
   headerTitle: {
     color: "#fff",
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "800",
-    lineHeight: 28,
+    lineHeight: 26,
     marginLeft: -10,
   },
   headerNumber: {
     color: "#fff",
     fontSize: 13,
   },
-  container: {
-    flexGrow: 1,
-    justifyContent: 'center',
+  backButton: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
+    padding: 5,
+    marginBottom: 20,
+  },
+  backButtonText: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#031666ff',
+    marginLeft: 8,
+  },
+  card: {
+    width: '100%',
+    maxWidth: 400,
+    backgroundColor: "#ffffffd1",
+    borderRadius: 10,
+    borderColor: '#000000ff',
+    borderWidth: 1,
+    alignSelf: 'center',
+    paddingBottom: 15,
+  },
+  topSection: {
+    borderWidth: 1,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    marginVertical: -1,
+    backgroundColor: "#1E2A78",
+    padding: 10,
+    alignItems: "center",
   },
   title: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 20,
-    color: '#2f2f2fff',
+    fontSize: 25,
+    fontWeight: '600',
+    textAlign: 'center',
+    color: '#ffffffff',
   },
   label: {
+    marginLeft: 16,
     alignSelf: 'flex-start',
-    fontSize: 16,
-    fontWeight: '600',
-    marginTop: 10,
+    fontSize: 18,
+    marginTop: 15,
     color: '#000000ff',
   },
   inputContainer: {
@@ -270,51 +311,57 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
     borderRadius: 12,
-    paddingHorizontal: 10,
+    borderColor: '#000000ff',
+    borderWidth: 0.3,
+    paddingHorizontal: 15,
     paddingVertical: 8,
     marginBottom: 15,
-    width: '100%',
+    marginLeft: 8,
+    marginRight: 8,
+    width: '95%',
+  },
+  inputContainerFocused: {
+    borderColor: "#1E2A78",
+    borderWidth: 2,
   },
   input: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 14,
     color: '#000',
     marginLeft: 8,
   },
   icon: {
     color: '#333',
   },
-  // Estilo para el contenedor del enlace "Olvidé contraseña"
-  forgotPasswordContainer: {
-    alignSelf: 'flex-end',
-    marginBottom: 15,
+  optionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginHorizontal: 16,
+    marginBottom: 20,
+  },
+  rememberContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  rememberText: {
+    fontSize: 14,
+    color: '#000000ff',
+    marginLeft: 8,
   },
   forgotPasswordText: {
     fontSize: 14,
-    fontWeight: 600,
+    fontWeight: "600",
     color: '#136dffff',
-  },
-  // Nuevos estilos para el botón de volver
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 15,
-    marginBottom: 10,
-  },
-  backButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#031666ff',
-    marginLeft: 8,
   },
   button: {
     backgroundColor: '#031666ff',
     paddingVertical: 10,
-    paddingHorizontal: 40,
-    borderRadius: 5,
-    marginTop: 20,
-    width: '100%',
+    borderRadius: 8,
+    marginVertical: 15,
+    width: '95%',
     alignItems: 'center',
+    alignSelf: 'center',
   },
   buttonText: {
     color: '#ffffffff',
@@ -323,25 +370,21 @@ const styles = StyleSheet.create({
   },
   signUpText: {
     fontSize: 14,
-    fontWeight: 600,
+    fontWeight: "600",
     marginTop: 20,
     color: '#136dffff',
-  },
-  switchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    width: '100%',
-    marginTop: 10,
-    marginBottom: 20,
+    textAlign: 'center',
   },
   footer: {
+    width: width,
     alignItems: "center",
-    padding: 10,
+    padding: 15,
     backgroundColor: "#1E2A78",
+    borderTopColor: "#FFD900",
+    borderTopWidth: 1.5,
   },
   footerText: {
     fontSize: 13,
     color: "#fff",
-  }
+  },
 });

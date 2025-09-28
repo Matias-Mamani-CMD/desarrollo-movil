@@ -76,6 +76,7 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     padding: 0,
+    backgroundColor: '#000000c6',
   },
   background: {
     flex: 1,
@@ -108,20 +109,17 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   card: {
+    marginTop: 10,
     flex:1,
-    marginHorizontal: 20,
-    marginTop: 40,
-    marginBottom: 40,
+    marginHorizontal: 2,
+    marginVertical: 2,
     backgroundColor: "#ffffff9b",
-    borderRadius: 10,
-    borderColor: '#000000ff',
-    borderWidth: 1,
   },
   topSection: {
     borderWidth: 1,
-    borderTopLeftRadius:10,
-    borderTopRightRadius:10,
-    marginVertical:-1,
+    borderRadius: 30,
+    marginTop: 30,
+    marginHorizontal:10,
     backgroundColor: "#1E2A78",
     padding: 30,
     alignItems: "center",
@@ -194,10 +192,8 @@ const styles = StyleSheet.create({
   aboutContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    marginTop: 130,
-    marginLeft:175,
+    marginTop: 170,
+    marginLeft: 240,
   },
   aboutText: {
     fontSize: 15,
@@ -205,13 +201,20 @@ const styles = StyleSheet.create({
     marginRight: 8,
     fontWeight: '500',
   },
+  flexSpacer: {
+    flex: 1,
+    minHeight: 30, // Espacio mínimo para asegurar que el footer quede fuera de la vista inicial
+  },
   footer: {
+    width: width,
     alignItems: "center",
-    padding: 10,
+    padding: 15,
     backgroundColor: "#1E2A78",
+    borderTopColor: "#FFD900",
+    borderTopWidth: 1.5,
   },
   footerText: {
     fontSize: 13,
     color: "#fff",
-  }
+  },
 });
