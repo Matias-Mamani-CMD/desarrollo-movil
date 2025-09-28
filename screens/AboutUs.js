@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   View, 
@@ -139,7 +140,7 @@ export default function AboutUs({ navigation }) {
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
-            <FontAwesome name="arrow-left" size={16} color="#031666ff" />
+            <FontAwesome name="arrow-left" size={30} color="#031666ff" />
             <Text style={styles.backButtonText}>Volver</Text>
           </TouchableOpacity>
         </ScrollView>
@@ -198,6 +199,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: '#2f2f2fff',
     textAlign: 'center',
+    marginTop: '30',
   },
   description: {
     fontSize: 16,
@@ -221,7 +223,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 12,
     marginBottom: 15,
-    borderLeftWidth: 4,
+    borderLeftWidth: 15,
     borderLeftColor: '#1E2A78',
   },
   cardTitle: {
@@ -243,7 +245,7 @@ const styles = StyleSheet.create({
   valueItem: {
     width: '48%',
     alignItems: 'center',
-    backgroundColor: '#f0f4ff',
+    backgroundColor: '#cfd9f7ff',
     padding: 15,
     borderRadius: 8,
     marginBottom: 10,
@@ -268,18 +270,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
+ 
   backButton: {
+  position: 'absolute',
+  top: -2,     // distancia desde el borde superior
+  left: 5,    // distancia desde el borde izquierdo
+  flexDirection: 'row',
+  alignItems: 'center',
+  padding: 20,
+},
+
+   /*Etilo anterior
+    position:'absolute',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    /*justifyContent: 'center',
     marginTop: 20,
     marginBottom: 10,
     padding: 15,
-    backgroundColor: '#fff',
-    borderRadius: 8,
+    /*backgroundColor: '#fff',*/
+    /*borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#031666ff',
-  },
+    borderColor: '#031666ff',*/
+
   backButtonText: {
     fontSize: 16,
     fontWeight: '600',
@@ -288,11 +301,12 @@ const styles = StyleSheet.create({
   },
   footer: {
     alignItems: "center",
-    padding: 10,
+    padding: 15,
     backgroundColor: "#1E2A78",
   },
   footerText: {
-    fontSize: 13,
-    color: "#fff",
-  }
+    fontSize: 14,
+    color: "#ffffffff",
+    marginBottom: 5,
+  },
 });
