@@ -5,7 +5,6 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   Image,
   ImageBackground,
   ScrollView,
@@ -13,7 +12,8 @@ import {
   Platform,
   Switch,
   BackHandler,
-  Dimensions
+  Dimensions,
+  Modal,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { signInWithEmailAndPassword } from 'firebase/auth';
@@ -28,6 +28,20 @@ export default function Login({ navigation }) {
   const [rememberMe, setRememberMe] = useState(false);
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalMessage, setModalMessage] = useState("");
+  const [onConfirmAction, setOnConfirmAction] = useState(() => () => {});
+  const [modalType, setModalType] = useState("error"); // "success" o "error"
+
+  const showCustomAlert = (title, message, onConfirm, type = "error") => {
+    setModalTitle(title);
+    setModalMessage(message);
+    setOnConfirmAction(() => onConfirm);
+    setModalType(type); // <-- esto define success o error
+    setShowModal(true);
+  };
+
 
   // Manejar botón físico de atrás
   useEffect(() => {
@@ -56,40 +70,66 @@ export default function Login({ navigation }) {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert("Error", "Por favor ingrese ambos campos.");
+      showCustomAlert(
+        "Error",
+        "Por favor ingrese ambos campos.",
+        () => setShowModal(false),
+        "error" // tipo rojo
+      );
       return;
     }
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
 
+      // Guardar email si activaste "Recordarme"
       if (rememberMe) {
         await AsyncStorage.setItem("userEmail", email);
       } else {
         await AsyncStorage.removeItem("userEmail");
       }
 
-      Alert.alert("Login exitoso", "Has iniciado sesión correctamente.");
-      navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
-    } catch (error) {
-      let errorMessage = "Hubo un problema al iniciar sesión.";
-      switch (error.code) {
-        case 'auth/invalid-email':
-          errorMessage = "El formato del correo electrónico no es válido.";
-          break;
-        case 'auth/wrong-password':
-          errorMessage = "La contraseña es incorrecta.";
-          break;
-        case 'auth/user-not-found':
-          errorMessage = "No se encontró un usuario con este correo.";
-          break;
-        case 'auth/network-request-failed':
-          errorMessage = "Error de conexión, por favor intenta más tarde.";
-          break;
+      // Modal de éxito
+      showCustomAlert(
+        "Login exitoso",
+        "Has iniciado sesión correctamente.",
+        () => {
+          setShowModal(false);
+          navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
+        },
+        "success" // tipo azul
+      );
+
+      } 
+      catch (error) {
+        let errorMessage = "Ocurrió un error inesperado.";
+
+        switch (error.code) {
+          case 'auth/invalid-email':
+            errorMessage = "El formato del correo electrónico no es válido.";
+            break;
+          case 'auth/wrong-password':
+            errorMessage = "La contraseña es incorrecta.";
+            break;
+          case 'auth/user-not-found':
+            errorMessage = "No se encontró un usuario con este correo.";
+            break;
+          case 'auth/network-request-failed':
+            errorMessage = "Error de conexión, por favor intenta más tarde.";
+            break;
+          case 'auth/invalid-credential':
+            errorMessage = "Las credenciales proporcionadas no son válidas.";
+            break;
+          case 'auth/too-many-requests':
+            errorMessage = "Demasiados intentos. Por favor espera antes de intentar nuevamente.";
+            break;
+        }
+
+        showCustomAlert("Error", errorMessage, () => setShowModal(false), "error");
       }
-      Alert.alert("Error", errorMessage);
-    }
-  };
+
+    };
+
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
@@ -212,6 +252,34 @@ export default function Login({ navigation }) {
         <View style={styles.footer}>
           <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
         </View>
+
+        <Modal
+          visible={showModal}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setShowModal(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={[styles.modalContainer, modalType === "success" ? styles.modalContainerSuccess : styles.modalContainerError]}>
+              <View style={[styles.modalDetail, modalType === "success" ? styles.modalDetailSuccess : styles.modalDetailError]}>
+                <Text style={styles.modalTitle}>{modalTitle}</Text>
+              </View>
+              <Text style={styles.modalMessage}>{modalMessage}</Text>
+              <View style={styles.modalButtons}>
+                <TouchableOpacity
+                  style={[styles.modalButton]}
+                  onPress={() => {
+                    setShowModal(false);
+                    onConfirmAction();
+                  }}
+                >
+                  <Text style={styles.modalButtonText}>Aceptar</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+
       </ImageBackground>
     </SafeAreaView>
   );
@@ -389,4 +457,73 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#fff",
   },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContainer: {
+    borderTopColor: '#C81B1E',
+    borderTopWidth: 10,
+    width: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    paddingBottom: 20,
+    elevation: 5,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: "#252861",
+  },
+  modalDetail: {
+    backgroundColor: '#C81B1E',
+    paddingHorizontal: 130,
+    paddingVertical: 15,
+    width: '100%',
+  },
+  modalTitle: { 
+    fontSize: 18, 
+    fontWeight: "bold",
+    color: "#ffffffff",
+    textAlign: 'center',
+  },
+  modalMessage: {
+    fontSize: 15,
+    color: '#333',
+    marginTop: 18,
+    marginBottom: 18,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  modalButton: {
+    backgroundColor: '#252861',
+    borderWidth: 2.5,
+    borderColor: '#252861',
+    flex: 1,
+    marginHorizontal: 82,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#ffffffff',
+  },
+  modalContainerSuccess: {
+    borderTopColor: '#252861', // azul
+  },
+  modalContainerError: {
+    borderTopColor: '#C81B1E', // rojo
+  },
+  modalDetailSuccess: {
+    backgroundColor: '#252861', // azul
+  },
+  modalDetailError: {
+    backgroundColor: '#C81B1E', // rojo
+  },
+
 });

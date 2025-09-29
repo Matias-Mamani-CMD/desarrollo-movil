@@ -19,16 +19,38 @@ import { FontAwesome, MaterialCommunityIcons, Ionicons } from '@expo/vector-icon
 export default function Home({ navigation }) {
   const [menuVisible, setMenuVisible] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertTitle, setAlertTitle] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
+  const [onConfirm, setOnConfirm] = useState(() => () => {});
+
+  const showCustomAlert = (title, message, confirmAction) => {
+    setAlertTitle(title);
+    setAlertMessage(message);
+    setOnConfirm(() => confirmAction);
+    setShowAlert(true);
+  };
 
   const handleLogOut = async () => {
     try {
       await signOut(auth);  
-      Alert.alert("Sesión cerrada", "Has cerrado sesión correctamente.");
-      navigation.replace('Login');  
+      showCustomAlert(
+        "¿Confirmas que quieres cerrar sesión?",
+        "Se cerrará tu sesión actual.",
+        () => {
+          setShowAlert(false);
+          navigation.replace('Login');
+        }
+      );
     } catch (error) {
-      Alert.alert("Error", "Hubo un problema al cerrar sesión.");
+      showCustomAlert(
+        "Error",
+        "Ha ocurrido un problema.",
+        () => setShowAlert(false)
+      );
     }
   };
+
 
   const toggleMenu = () => {
     if (menuVisible) {
@@ -164,6 +186,41 @@ export default function Home({ navigation }) {
             <View style={styles.footer}>
               <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
             </View>
+            {/* Modal de Alertas */}
+            <Modal
+              visible={showAlert}
+              transparent
+              animationType="fade"
+              onRequestClose={() => setShowAlert(false)}
+            >
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalContainer}>
+                  <View style={styles.modalDetail}>
+                    <Text style={styles.modalTitle}>{alertTitle}</Text>
+                  </View>
+                  <Text style={styles.modalMessage}>{alertMessage}</Text>
+                  
+                  <View style={styles.modalButtons}>
+                    <TouchableOpacity
+                      style={[styles.modalButton]}
+                      onPress={() => setShowAlert(false)}
+                    >
+                      <Text style={[styles.modalButtonText, { borderColor: "#252861" }]}>Cancelar</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={[styles.modalButton, { backgroundColor: "#DB2024", borderWidth: 0 }]}
+                      onPress={() => {
+                        onConfirm();
+                      }}
+                    >
+                      <Text style={[styles.modalButtonText, { color: "#fff",}]}>Aceptar</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </Modal>
+
         </ScrollView>
       </ImageBackground>
     </SafeAreaView>
@@ -212,6 +269,9 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   button: {
+    position: 'absolute',
+    top: 60,
+    right: 10,
     flexDirection: 'row',
     backgroundColor: '#252861', // color del botón de cerrar sesión
     paddingVertical: 7,
@@ -360,5 +420,61 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 13,
     color: "#fff",
-  }
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    borderTopColor: '#C81B1E',
+    borderTopWidth: 10,
+    width: '85%',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    paddingBottom: 20,
+    elevation: 5,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: "#252861",
+  },
+  modalDetail: {
+    backgroundColor: '#C81B1E',
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    width: '100%',
+  },
+  modalTitle: {
+    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#ffffffff",
+  },
+  modalMessage: {
+    fontSize: 16,
+    marginTop: 20,
+    marginBottom: 20,
+    textAlign: "center",
+    color: "#333",
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  modalButton: {
+    flex: 1,
+    backgroundColor: "#ffffffff",
+    borderWidth: 2.5,
+    marginHorizontal: 12,
+    padding: 12,
+    borderRadius: 6,
+    alignItems: "center",
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });

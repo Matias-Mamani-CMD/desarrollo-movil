@@ -4,15 +4,15 @@ import {
    Text, 
    TextInput, 
    TouchableOpacity, 
-   StyleSheet, 
-   Alert, 
+   StyleSheet,
    Image,
    ImageBackground,
    ScrollView,
    KeyboardAvoidingView,
    Platform,
    BackHandler,
-   Dimensions
+   Dimensions,
+   Modal,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { auth } from '../src/config/firebaseConfig';
@@ -33,7 +33,18 @@ export default function SignUp({ navigation }) {
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [confirmPasswordFocused, setConfirmPasswordFocused] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertTitle, setAlertTitle] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
+  const [onConfirm, setOnConfirm] = useState(() => () => {});
   
+  const showCustomAlert = (title, message, confirmAction) => {
+    setAlertTitle(title);
+    setAlertMessage(message);
+    setOnConfirm(() => confirmAction || (() => setShowAlert(false)));
+    setShowAlert(true);
+  };
+
   // Manejar botón físico de atrás - Siempre va a Welcome
   useEffect(() => {
     const backAction = () => {
@@ -51,28 +62,21 @@ export default function SignUp({ navigation }) {
 
   const handleSignUp = async () => {
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      Alert.alert("Error", "Todos los campos son obligatorios.");
+      showCustomAlert("Error", "Todos los campos son obligatorios.");
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert("Error", "Las contraseñas no coinciden.");
-      return;
-    }
-
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,}$/;
-    if (!passwordRegex.test(password)) {
-      Alert.alert(
-        "Error",
-        "La contraseña debe tener al menos 6 caracteres, incluyendo una letra mayúscula, una minúscula y un número."
-      );
+      showCustomAlert("Error", "Las contraseñas no coinciden.");
       return;
     }
 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      Alert.alert("Registro exitoso", "Usuario registrado con éxito.");
-      navigation.reset({ index: 0, routes: [{ name: 'Login' }] }); 
+      showCustomAlert("Registro exitoso", "Usuario registrado con éxito.", () => {
+        setShowAlert(false);
+        navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+      });
     } catch (error) {
       let errorMessage = "Hubo un problema al registrar el usuario.";
       switch (error.code) {
@@ -89,7 +93,7 @@ export default function SignUp({ navigation }) {
           errorMessage = "Error de conexión, por favor intenta más tarde.";
           break;
       }
-      Alert.alert("Error", errorMessage);
+      showCustomAlert("Error", errorMessage);
     }
   };
 
@@ -246,6 +250,34 @@ export default function SignUp({ navigation }) {
                 <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
               </View>
             </View>
+
+            <Modal
+              visible={showAlert}
+              transparent
+              animationType="fade"
+              onRequestClose={() => setShowAlert(false)}
+            >
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalContainer}>
+                  <View style={styles.modalDetail}>
+                    <Text style={styles.modalTitle}>{alertTitle}</Text>
+                  </View>
+                  <Text style={styles.modalMessage}>{alertMessage}</Text>
+                  
+                  <View style={styles.modalButtons}>
+                    <TouchableOpacity
+                      style={[styles.modalButton, { backgroundColor: "#252861"}]}
+                      onPress={() => {
+                        onConfirm();
+                      }}
+                    >
+                      <Text style={[styles.modalButtonText, { color: "#fff" }]}>Aceptar</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </Modal>
+
           </ScrollView>
         </KeyboardAvoidingView>
       </ImageBackground>
@@ -419,5 +451,58 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 13,
     color: "#fff",
+  },
+    modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    borderTopColor: '#C81B1E',
+    borderTopWidth: 10,
+    width: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    paddingBottom: 20,
+    elevation: 5,
+    alignItems: 'center',
+  },
+  modalDetail: {
+    backgroundColor: '#C81B1E',
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    width: '100%',
+  },
+  modalTitle: {
+    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#ffffffff",
+  },
+  modalMessage: {
+    fontSize: 16,
+    marginTop: 20,
+    marginBottom: 20,
+    textAlign: "center",
+    color: "#333",
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "65%",
+  },
+  modalButton: {
+    flex: 1,
+    backgroundColor: "#ffffffff",
+    marginHorizontal: 13,
+    padding: 13,
+    borderRadius: 6,
+    alignItems: "center",
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
