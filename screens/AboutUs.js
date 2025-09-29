@@ -138,12 +138,14 @@ export default function AboutUs({ navigation }) {
                 </TouchableOpacity>
               </View>
             </View>
-          </ScrollView>
-
+            
           {/* Footer fijo */}
           <View style={styles.footer}>
             <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
           </View>
+
+          </ScrollView>
+
         </View>
       </ImageBackground>
     </SafeAreaView>
@@ -291,6 +293,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#1E2A78",
     borderTopColor: "#FFD900",
     borderTopWidth: 1.5,
+    marginBottom: -20,
   },
   footerText: {
     fontSize: 13,
