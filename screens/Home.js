@@ -19,16 +19,38 @@ import { FontAwesome, MaterialCommunityIcons, Ionicons } from '@expo/vector-icon
 export default function Home({ navigation }) {
   const [menuVisible, setMenuVisible] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertTitle, setAlertTitle] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
+  const [onConfirm, setOnConfirm] = useState(() => () => {});
+
+  const showCustomAlert = (title, message, confirmAction) => {
+    setAlertTitle(title);
+    setAlertMessage(message);
+    setOnConfirm(() => confirmAction);
+    setShowAlert(true);
+  };
 
   const handleLogOut = async () => {
     try {
       await signOut(auth);  
-      Alert.alert("Sesión cerrada", "Has cerrado sesión correctamente.");
-      navigation.replace('Login');  
+      showCustomAlert(
+        "¿Confirmas que quieres cerrar sesión?",
+        "Se cerrará tu sesión actual.",
+        () => {
+          setShowAlert(false);
+          navigation.replace('Login');
+        }
+      );
     } catch (error) {
-      Alert.alert("Error", "Hubo un problema al cerrar sesión.");
+      showCustomAlert(
+        "Error",
+        "Ha ocurrido un problema.",
+        () => setShowAlert(false)
+      );
     }
   };
+
 
   const toggleMenu = () => {
     if (menuVisible) {
@@ -73,13 +95,13 @@ export default function Home({ navigation }) {
               <View style={styles.headerBlue}>
                 <View style={styles.iconPlacing}>
                   {/* Ícono de tutor */}
-                  <MaterialCommunityIcons name="bell" size={19} color="white" paddingTop={18} paddingRight={8}/>
+                  <MaterialCommunityIcons name="bell" size={17} color="white" paddingTop={18} paddingRight={8}/>
                   <View style={styles.tutorIconBackground}>
-                    <FontAwesome name="user-circle-o" size={50.2} color="black" />
+                    <FontAwesome name="user-circle-o" size={45} color="black" style={styles.tutorIcon} />
                   </View>
                   {/* Ícono de menú */}
                   <TouchableOpacity onPress={toggleMenu} style={styles.menuIcon}>
-                    <MaterialCommunityIcons name="menu-down" size={34} color="white" />
+                    <MaterialCommunityIcons name="menu-down" size={32} color="white" />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -112,7 +134,7 @@ export default function Home({ navigation }) {
                   }}
                 >
                   <Text style={styles.buttonText}>Cerrar sesión</Text>
-                  <Ionicons name="exit-outline" size={24} color="white" paddingLeft="5" />
+                  <Ionicons name="exit-outline" size={22} color="white" paddingLeft="5" />
                 </TouchableOpacity>
 
               </Animated.View>
@@ -164,6 +186,41 @@ export default function Home({ navigation }) {
             <View style={styles.footer}>
               <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
             </View>
+            {/* Modal de Alertas */}
+            <Modal
+              visible={showAlert}
+              transparent
+              animationType="fade"
+              onRequestClose={() => setShowAlert(false)}
+            >
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalContainer}>
+                  <View style={styles.modalDetail}>
+                    <Text style={styles.modalTitle}>{alertTitle}</Text>
+                  </View>
+                  <Text style={styles.modalMessage}>{alertMessage}</Text>
+                  
+                  <View style={styles.modalButtons}>
+                    <TouchableOpacity
+                      style={[styles.modalButton]}
+                      onPress={() => setShowAlert(false)}
+                    >
+                      <Text style={[styles.modalButtonText, { borderColor: "#252861" }]}>Cancelar</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={[styles.modalButton, { backgroundColor: "#DB2024", borderWidth: 0 }]}
+                      onPress={() => {
+                        onConfirm();
+                      }}
+                    >
+                      <Text style={[styles.modalButtonText, { color: "#fff",}]}>Aceptar</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </Modal>
+
         </ScrollView>
       </ImageBackground>
     </SafeAreaView>
@@ -184,18 +241,18 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     alignItems: 'center',
-    marginTop: 49,
-    padding: 20, //espacio entre el cuadro de Bienvenida y el fondo
+    marginTop: 40,
+    padding: 15, //espacio entre el cuadro de Bienvenida y el fondo
     paddingBottom: 0,
   },
   box: {
     backgroundColor: '#DB2024', //color caja de texto de Bienvenida 
     borderRadius: 10, //bordes redondeados
-    padding: 15, //espacio entre el texto y la caja
+    padding: 14, //espacio entre el texto y la caja
     paddingBottom: 27, //espacio inferior
     borderColor: '#000000ff', //color de borde de la caja de Bienvenida
     borderWidth: 0.5, //ancho del borde de la caja
-    marginBottom: 60, //separación inferior con la sección de Alumnos
+    marginBottom: 50, //separación inferior con la sección de Alumnos
     boxShadow: '1px 2px 6px 1px #0000007e',
   },
   title: {
@@ -212,16 +269,19 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   button: {
+    position: 'absolute',
+    top: 60,
+    right: 10,
     flexDirection: 'row',
-    backgroundColor: '#252861', // color del botón de cerrar sesion
-    paddingVertical: 8, 
-    paddingHorizontal: 4,
+    backgroundColor: '#252861', // color del botón de cerrar sesión
+    paddingVertical: 7,
     borderColor: '#000',
     borderWidth: 0.9,
     borderRadius: 5, //bordes redondeados
     marginTop: 18,
     alignSelf: 'flex-end',
     marginRight: -13,
+    
   },
   buttonText: {
     color: '#fff',
@@ -255,8 +315,8 @@ const styles = StyleSheet.create({
   }, //año que cursa el alumno
   circleBackground: {
     backgroundColor: '#fff',
-    width: 105,
-    height: 105,
+    width: 102,
+    height: 102,
     borderRadius: 70,
     justifyContent: 'center',
     alignItems: 'center',
@@ -288,12 +348,12 @@ const styles = StyleSheet.create({
   headerRight: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 2, // separa tutor de flecha
 },
   headerBlue: {
     backgroundColor: "#252861",
     alignItems: 'flex-end',
-    width: '140',
+    paddingTop: 4,
+    width: '130',
     height:'80',
 },
   logo: {
@@ -319,13 +379,13 @@ const styles = StyleSheet.create({
     paddingTop: 28,
   },
   iconPlacing: {
-    padding: 10,
+    padding: 7.6,
     flexDirection: 'row',   // ícono y flecha en línea
   },
   tutorIconBackground: {
     backgroundColor: '#fff',
-    width: 50,
-    height: 50,
+    width: 45.3,
+    height: 45.3,
     borderRadius: 70,
   }, //fondo circular del ícono de Tutor
   menuOverlay: {
@@ -350,7 +410,7 @@ const styles = StyleSheet.create({
   footer: {
     alignItems: "center",
     paddingTop: 15,
-    paddingBottom: 60,
+    paddingBottom: 55,
     width: '111%',
     backgroundColor: "#1E2A78",
     borderTopColor: "#FFD900",
@@ -360,5 +420,61 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 13,
     color: "#fff",
-  }
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    borderTopColor: '#C81B1E',
+    borderTopWidth: 10,
+    width: '85%',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    paddingBottom: 20,
+    elevation: 5,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: "#252861",
+  },
+  modalDetail: {
+    backgroundColor: '#C81B1E',
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    width: '100%',
+  },
+  modalTitle: {
+    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#ffffffff",
+  },
+  modalMessage: {
+    fontSize: 16,
+    marginTop: 20,
+    marginBottom: 20,
+    textAlign: "center",
+    color: "#333",
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  modalButton: {
+    flex: 1,
+    backgroundColor: "#ffffffff",
+    borderWidth: 2.5,
+    marginHorizontal: 12,
+    padding: 12,
+    borderRadius: 6,
+    alignItems: "center",
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });

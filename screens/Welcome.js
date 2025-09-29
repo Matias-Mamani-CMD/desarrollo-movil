@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   topSection: {
     borderWidth: 1,
     borderRadius: 30,
-    marginTop: 30,
+    marginTop: 40,
     marginHorizontal:10,
     backgroundColor: "#1E2A78",
     padding: 30,

@@ -4,8 +4,7 @@ import {
   Text,
   TextInput, 
   TouchableOpacity, 
-  StyleSheet, 
-  Alert, 
+  StyleSheet,
   Image, 
   ImageBackground, 
   ScrollView, 
@@ -13,7 +12,8 @@ import {
   Platform,
   BackHandler,
   ActivityIndicator,
-  Dimensions
+  Dimensions,
+  Modal,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { auth } from '../src/config/firebaseConfig';
@@ -24,6 +24,22 @@ export default function ForgotPassword({ navigation }) {
   const [email, setEmail] = useState('');
   const [emailFocused, setEmailFocused] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [customAlertVisible, setCustomAlertVisible] = useState(false);
+  const [alertType, setAlertType] = useState("error"); // "success" o "error"
+  const [alertTitle, setAlertTitle] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
+
+  const showCustomAlert = (type, title, message, onClose = null) => {
+  setAlertType(type);
+  setAlertTitle(title);
+  setAlertMessage(message);
+  setCustomAlertVisible(true);
+
+  // Acción opcional al cerrar
+  if (onClose) {
+    setTimeout(() => onClose(), 5000); // espera a que cierre
+  }
+};
 
   // Manejar botón físico de atrás - Va a Login (no a Welcome)
   useEffect(() => {
@@ -42,14 +58,18 @@ export default function ForgotPassword({ navigation }) {
 
   const handleResetPassword = async () => {
     if (!email) {
-      Alert.alert("Error", "Por favor ingrese su correo electrónico.");
-      return;
-    }
+      showCustomAlert(
+      "error",
+      "Error",
+      "Por favor ingrese su correo electrónico."
+    );
+    return;
+  }
 
     // Validación básica de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      Alert.alert("Error", "Por favor ingrese un correo electrónico válido.");
+    if (!email) {
+      showCustomAlert("Error", "Por favor ingrese un correo electrónico válido.");
       return;
     }
 
@@ -57,15 +77,11 @@ export default function ForgotPassword({ navigation }) {
     
     try {
       await sendPasswordResetEmail(auth, email);
-      Alert.alert(
-        "Correo enviado", 
+      showCustomAlert(
+        "success",
+        "Correo enviado",
         "Se ha enviado un enlace para restablecer tu contraseña a tu correo electrónico.",
-        [
-          {
-            text: "OK",
-            onPress: () => navigation.replace('Login')
-          }
-        ]
+        () => navigation.replace('Login')
       );
     } catch (error) {
       let errorMessage = "Hubo un problema al enviar el correo de restablecimiento.";
@@ -85,7 +101,7 @@ export default function ForgotPassword({ navigation }) {
         default:
           errorMessage = `Error: ${error.code}. ${error.message}`;
       }
-      Alert.alert("Error", errorMessage);
+      showCustomAlert("error", "Error", errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -123,7 +139,7 @@ return (
             onPress={() => navigation.replace('Login')}
             disabled={isLoading}
           >
-            <FontAwesome name="arrow-left" size={25} color="#031666ff" />
+            <FontAwesome name="arrow-left" size={25} color="#252861" />
             <Text style={styles.backButtonText}>Volver</Text>
           </TouchableOpacity>
 
@@ -169,6 +185,29 @@ return (
       <View style={styles.footer}>
         <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
       </View>
+      <Modal
+        visible={customAlertVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setCustomAlertVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.alertBox, alertType === "success" ? styles.alertSuccess : styles.alertError]}>
+            <Text style={[styles.alertTitle, alertType === "success" ? styles.alertTitleSuccess : styles.alertTitleError]}>
+              {alertTitle}
+            </Text>
+
+            <Text style={styles.alertMessage}>{alertMessage}</Text>
+
+            <TouchableOpacity
+              style={styles.alertButton}
+              onPress={() => setCustomAlertVisible(false)}
+            >
+              <Text style={styles.alertButtonText}>Aceptar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ImageBackground>
   </SafeAreaView>
 );
@@ -232,7 +271,7 @@ const styles = StyleSheet.create({
   backButtonText: {
     fontSize: 22,
     fontWeight: '900',
-    color: '#031666ff',
+    color: '#252861',
     marginLeft: 8,
   },
   iconSign: {
@@ -287,7 +326,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   button: {
-    backgroundColor: '#031666ff',
+    backgroundColor: '#252861',
     paddingVertical: 15,
     paddingHorizontal: 40,
     borderRadius: 5,
@@ -310,16 +349,103 @@ const styles = StyleSheet.create({
     flex: 1,
     minHeight: 0, // Espacio mínimo para asegurar que el footer quede fuera de la vista inicial
   },
-footer: {
-  width: '100%',
-  alignItems: "center",
-  padding: 15,
-  backgroundColor: "#1E2A78",
-  borderTopColor: "#FFD900",
-  borderTopWidth: 1.5,
-},
-footerText: {
-  fontSize: 13,
-  color: "#fff",
-},
+  footer: {
+    width: '100%',
+    alignItems: "center",
+    padding: 15,
+    backgroundColor: "#1E2A78",
+    borderTopColor: "#FFD900",
+    borderTopWidth: 1.5,
+  },
+  footerText: {
+    fontSize: 13,
+    color: "#fff",
+  },
+  modalOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+  },
+  modalDetail: {
+    paddingHorizontal: 5,
+    paddingVertical: 12,
+    width: '103.3%',
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+  },
+  modalHeaderSuccess: {
+    backgroundColor: "#1E2A78", // azul
+    borderTopWidth: 5,
+    borderTopColor: "#1E2A78",
+  },
+  modalHeaderError: {
+    backgroundColor: "#DB2024", // rojo
+    borderTopWidth: 5,
+    borderTopColor: "#DB2024",
+  },
+  alertBox: {
+    width: "80%",
+    borderRadius: 12,
+    padding: 0,
+    paddingBottom: 20,
+    paddingLeft: 5,
+    paddingRight: 5,
+    alignItems: "center",
+    elevation: 5,
+    borderWidth: 2,
+    borderColor: "#252861",
+    backgroundColor: "#fff",
+  },
+  alertSuccess: {
+    borderTopColor: '#252861',
+    borderTopWidth: 10,
+  },
+  alertError: {
+    borderTopColor: '#DB2024',
+    borderTopWidth: 10,
+  },
+  alertTitleSuccess: {
+    backgroundColor: "#252861",
+    width: '103%',
+    padding: 10,
+    color: "#ffffffff", // texto azul
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  alertTitleError: {
+    backgroundColor: "#DB2024",
+    width: '103%',
+    padding: 10,
+    color: "#ffffffff", // texto rojo
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  alertMessage: {
+    fontSize: 16,
+    paddingTop: 18,
+    marginBottom: 18,
+    textAlign: "center",
+  },
+  alertButton: {
+    backgroundColor: "#252861",
+    paddingHorizontal: 50,
+    paddingVertical: 13,
+    borderRadius: 5,
+  },
+  alertButtonText: {
+    fontSize: 16,
+    color: "#fff",
+    fontWeight: "bold",
+  },
+
 });
