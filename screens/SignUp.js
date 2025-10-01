@@ -27,6 +27,8 @@ export default function SignUp({ navigation }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  //Validadores
+  const validadorcaracteres = /^[A-Za-z]+$/
   // Estados para el enfoque de los campos
   const [firstNameFocused, setFirstNameFocused] = useState(false);
   const [lastNameFocused, setLastNameFocused] = useState(false);
@@ -68,7 +70,13 @@ export default function SignUp({ navigation }) {
       showCustomAlert("Error", "Todos los campos son obligatorios.", null, "error");
       return;
     }
+    let validname = validadorcaracteres.test(firstName)
+    let validsurname = validadorcaracteres.test(lastName)
 
+    if (!validname || !validsurname) {
+      showCustomAlert("Error", "Los nombres solo deben contener caracteres", null, "error")
+      return;
+    }
     if (password !== confirmPassword) {
       showCustomAlert("Error", "Las contraseñas no coinciden.", null, "error");
       return;
@@ -165,6 +173,7 @@ export default function SignUp({ navigation }) {
                   <FontAwesome name="user" size={20} style={styles.icon}/>
                   <TextInput
                     style={styles.input}
+                    keyboardType=""
                     placeholder="Ingrese su apellido"
                     placeholderTextColor="#787878ff"
                     value={lastName}
