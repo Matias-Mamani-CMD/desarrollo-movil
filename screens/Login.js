@@ -351,8 +351,8 @@ const styles = StyleSheet.create({
     borderColor: '#000000ff',
     borderWidth: 1,
     alignSelf: 'center',
-    paddingBottom: 15,
-    marginTop: 40,
+    paddingBottom: 20,
+    marginTop: 45,
   },
   topSection: {
     borderWidth: 1,
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     alignSelf: 'flex-start',
     fontSize: 18,
-    marginTop: 15,
+    marginTop: 18,
     color: '#000000ff',
   },
   inputContainer: {
@@ -385,7 +385,8 @@ const styles = StyleSheet.create({
     borderWidth: 0.3,
     paddingHorizontal: 15,
     paddingVertical: 8,
-    marginBottom: 15,
+    marginTop: 18,
+    marginBottom: 18,
     marginLeft: 8,
     marginRight: 8,
     width: '95%',
@@ -413,6 +414,7 @@ const styles = StyleSheet.create({
   rememberContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 5,
   },
   rememberText: {
     fontSize: 14,
@@ -423,6 +425,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     color: '#136dffff',
+    marginTop: 5,
   },
   button: {
     backgroundColor: '#031666ff',
@@ -432,6 +435,7 @@ const styles = StyleSheet.create({
     width: '95%',
     alignItems: 'center',
     alignSelf: 'center',
+    marginBottom: 18,
   },
   buttonText: {
     color: '#ffffffff',
@@ -470,8 +474,9 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     elevation: 5,
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: "#252861",
+    borderWidth: 1.5,
+    borderColor: "#000000ff",
+    boxShadow: '1px 1px 7px 3px #2727277e',
   },
   modalDetail: {
     paddingHorizontal: 10,
@@ -500,8 +505,6 @@ const styles = StyleSheet.create({
   },
   modalButton: {
     backgroundColor: '#252861',
-    borderWidth: 2.5,
-    borderColor: '#252861',
     flex: 1,
     marginHorizontal: 82,
     paddingVertical: 10,

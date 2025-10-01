@@ -485,7 +485,9 @@ const styles = StyleSheet.create({
     elevation: 5,
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: "#252861",
+    borderWidth: 1.5,
+    borderColor: "#000000ff",
+    boxShadow: '1px 1px 7px 3px #2727277e',
   },
   modalDetail: {
     paddingHorizontal: 10,
@@ -512,8 +514,6 @@ const styles = StyleSheet.create({
   },
   modalButton: {
     backgroundColor: '#252861',
-    borderWidth: 2.5,
-    borderColor: '#252861',
     flex: 1,
     marginHorizontal: 82,
     paddingVertical: 10,
