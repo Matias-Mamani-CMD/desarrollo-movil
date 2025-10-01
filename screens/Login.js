@@ -56,12 +56,14 @@ export default function Login({ navigation }) {
     return () => backHandler.remove();
   }, [navigation]);
 
-  // Cargar email guardado
+  // Cargar email y contraseña guardado
   useEffect(() => {
     const loadEmail = async () => {
       const savedEmail = await AsyncStorage.getItem("userEmail");
+      const savedPassword = await AsyncStorage.getItem("userPassword");
       if (savedEmail) {
         setEmail(savedEmail);
+        setPassword(savedPassword);
         setRememberMe(true);
       }
     };
@@ -85,8 +87,10 @@ export default function Login({ navigation }) {
       // Guardar email si activaste "Recordarme"
       if (rememberMe) {
         await AsyncStorage.setItem("userEmail", email);
+        await AsyncStorage.setItem("userPassword", password);
       } else {
         await AsyncStorage.removeItem("userEmail");
+        await AsyncStorage.removeItem("userPassword");
       }
 
       // Modal de éxito
