@@ -202,10 +202,10 @@ export default function Home({ navigation }) {
                   
                   <View style={styles.modalButtons}>
                     <TouchableOpacity
-                      style={[styles.modalButton]}
+                      style={[styles.modalButton, {borderColor: "#252861"}]}
                       onPress={() => setShowAlert(false)}
                     >
-                      <Text style={[styles.modalButtonText, { borderColor: "#252861" }]}>Cancelar</Text>
+                      <Text style={[styles.modalButtonText, {color: "#252861"}]}>Cancelar</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -281,7 +281,6 @@ const styles = StyleSheet.create({
     marginTop: 18,
     alignSelf: 'flex-end',
     marginRight: -13,
-    
   },
   buttonText: {
     color: '#fff',
@@ -428,8 +427,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modalContainer: {
-    borderTopColor: '#C81B1E',
-    borderTopWidth: 10,
     width: '85%',
     backgroundColor: '#fff',
     borderRadius: 12,
@@ -444,12 +441,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 10,
     width: '100%',
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
   },
   modalTitle: {
     textAlign: 'center',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 10,
+    margin: 8,
     color: "#ffffffff",
   },
   modalMessage: {

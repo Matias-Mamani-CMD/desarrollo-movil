@@ -37,13 +37,16 @@ export default function SignUp({ navigation }) {
   const [alertTitle, setAlertTitle] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
   const [onConfirm, setOnConfirm] = useState(() => () => {});
+  const [alertType, setAlertType] = useState("error"); // "error" o "success"
   
-  const showCustomAlert = (title, message, confirmAction) => {
+  const showCustomAlert = (title, message, confirmAction, type = "error") => {
     setAlertTitle(title);
     setAlertMessage(message);
     setOnConfirm(() => confirmAction || (() => setShowAlert(false)));
+    setAlertType(type);
     setShowAlert(true);
   };
+
 
   // Manejar botón físico de atrás - Siempre va a Welcome
   useEffect(() => {
@@ -62,21 +65,27 @@ export default function SignUp({ navigation }) {
 
   const handleSignUp = async () => {
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      showCustomAlert("Error", "Todos los campos son obligatorios.");
+      showCustomAlert("Error", "Todos los campos son obligatorios.", null, "error");
       return;
     }
 
     if (password !== confirmPassword) {
-      showCustomAlert("Error", "Las contraseñas no coinciden.");
+      showCustomAlert("Error", "Las contraseñas no coinciden.", null, "error");
       return;
     }
 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      showCustomAlert("Registro exitoso", "Usuario registrado con éxito.", () => {
-        setShowAlert(false);
-        navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
-      });
+      
+      showCustomAlert(
+        "Registro exitoso",
+        "Usuario registrado con éxito.",
+        () => {
+          setShowAlert(false);
+          navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+        },
+        "success" // 👈 este define que se muestre azul
+      );
     } catch (error) {
       let errorMessage = "Hubo un problema al registrar el usuario.";
       switch (error.code) {
@@ -93,7 +102,8 @@ export default function SignUp({ navigation }) {
           errorMessage = "Error de conexión, por favor intenta más tarde.";
           break;
       }
-      showCustomAlert("Error", errorMessage);
+
+      showCustomAlert("Error", errorMessage, null, "error");
     }
   };
 
@@ -259,24 +269,33 @@ export default function SignUp({ navigation }) {
             >
               <View style={styles.modalOverlay}>
                 <View style={styles.modalContainer}>
-                  <View style={styles.modalDetail}>
+                  
+                  {/* Header que cambia según el tipo */}
+                  <View
+                    style={[
+                      styles.modalDetail,
+                      alertType === "success" ? styles.modalDetailSuccess : styles.modalDetailError
+                    ]}
+                  >
                     <Text style={styles.modalTitle}>{alertTitle}</Text>
                   </View>
+
                   <Text style={styles.modalMessage}>{alertMessage}</Text>
-                  
+
                   <View style={styles.modalButtons}>
                     <TouchableOpacity
-                      style={[styles.modalButton, { backgroundColor: "#252861"}]}
-                      onPress={() => {
-                        onConfirm();
-                      }}
+                      style={styles.modalButton}
+                      onPress={onConfirm}
                     >
-                      <Text style={[styles.modalButtonText, { color: "#fff" }]}>Aceptar</Text>
+                      <Text style={styles.modalButtonText}>
+                        Aceptar
+                      </Text>
                     </TouchableOpacity>
                   </View>
                 </View>
               </View>
             </Modal>
+
 
           </ScrollView>
         </KeyboardAvoidingView>
@@ -452,57 +471,64 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#fff",
   },
-    modalOverlay: {
+  modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContainer: {
-    borderTopColor: '#C81B1E',
-    borderTopWidth: 10,
     width: '80%',
     backgroundColor: '#fff',
     borderRadius: 12,
     paddingBottom: 20,
     elevation: 5,
     alignItems: 'center',
+    borderWidth: 2,
+    borderColor: "#252861",
   },
   modalDetail: {
-    backgroundColor: '#C81B1E',
     paddingHorizontal: 10,
     paddingVertical: 10,
     width: '100%',
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
   },
   modalTitle: {
-    textAlign: 'center',
-    fontSize: 20,
+    fontSize: 18, 
     fontWeight: "bold",
-    marginBottom: 10,
     color: "#ffffffff",
+    textAlign: 'center',
   },
   modalMessage: {
     fontSize: 16,
     marginTop: 20,
     marginBottom: 20,
-    textAlign: "center",
-    color: "#333",
   },
   modalButtons: {
     flexDirection: "row",
     justifyContent: "space-between",
-    width: "65%",
+    width: "100%",
   },
   modalButton: {
+    backgroundColor: '#252861',
+    borderWidth: 2.5,
+    borderColor: '#252861',
     flex: 1,
-    backgroundColor: "#ffffffff",
-    marginHorizontal: 13,
-    padding: 13,
-    borderRadius: 6,
-    alignItems: "center",
+    marginHorizontal: 82,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
   },
   modalButtonText: {
     fontSize: 16,
     fontWeight: "bold",
+    color: '#ffffffff',
+  },
+  modalDetailSuccess: {
+    backgroundColor: '#252861', // azul
+  },
+  modalDetailError: {
+    backgroundColor: '#C81B1E', // rojo
   },
 });

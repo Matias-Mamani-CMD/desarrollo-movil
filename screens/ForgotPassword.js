@@ -188,7 +188,7 @@ return (
       <Modal
         visible={customAlertVisible}
         transparent
-        animationType="fade"
+        animationType="none"
         onRequestClose={() => setCustomAlertVisible(false)}
       >
         <View style={styles.modalOverlay}>
@@ -362,22 +362,10 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   modalOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.6)",
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 999,
-  },
-  modalDetail: {
-    paddingHorizontal: 5,
-    paddingVertical: 12,
-    width: '103.3%',
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalHeaderSuccess: {
     backgroundColor: "#1E2A78", // azul
@@ -390,29 +378,19 @@ const styles = StyleSheet.create({
     borderTopColor: "#DB2024",
   },
   alertBox: {
-    width: "80%",
+    width: '85%',
+    backgroundColor: '#fff',
     borderRadius: 12,
-    padding: 0,
     paddingBottom: 20,
-    paddingLeft: 5,
-    paddingRight: 5,
-    alignItems: "center",
     elevation: 5,
+    alignItems: 'center',
     borderWidth: 2,
     borderColor: "#252861",
-    backgroundColor: "#fff",
-  },
-  alertSuccess: {
-    borderTopColor: '#252861',
-    borderTopWidth: 10,
-  },
-  alertError: {
-    borderTopColor: '#DB2024',
-    borderTopWidth: 10,
+    overflow: 'hidden', // mantiene el borde redondeado del alert
   },
   alertTitleSuccess: {
     backgroundColor: "#252861",
-    width: '103%',
+    width: '100%',
     padding: 10,
     color: "#ffffffff", // texto azul
     fontSize: 20,
@@ -422,7 +400,7 @@ const styles = StyleSheet.create({
   },
   alertTitleError: {
     backgroundColor: "#DB2024",
-    width: '103%',
+    width: '100%',
     padding: 10,
     color: "#ffffffff", // texto rojo
     fontSize: 20,
@@ -447,5 +425,4 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
-
 });
