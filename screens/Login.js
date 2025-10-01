@@ -260,7 +260,7 @@ export default function Login({ navigation }) {
           onRequestClose={() => setShowModal(false)}
         >
           <View style={styles.modalOverlay}>
-            <View style={[styles.modalContainer, modalType === "success" ? styles.modalContainerSuccess : styles.modalContainerError]}>
+            <View style={styles.modalContainer}>
               <View style={[styles.modalDetail, modalType === "success" ? styles.modalDetailSuccess : styles.modalDetailError]}>
                 <Text style={styles.modalTitle}>{modalTitle}</Text>
               </View>
@@ -351,8 +351,8 @@ const styles = StyleSheet.create({
     borderColor: '#000000ff',
     borderWidth: 1,
     alignSelf: 'center',
-    paddingBottom: 15,
-    marginTop: 40,
+    paddingBottom: 20,
+    marginTop: 45,
   },
   topSection: {
     borderWidth: 1,
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     alignSelf: 'flex-start',
     fontSize: 18,
-    marginTop: 15,
+    marginTop: 18,
     color: '#000000ff',
   },
   inputContainer: {
@@ -385,7 +385,8 @@ const styles = StyleSheet.create({
     borderWidth: 0.3,
     paddingHorizontal: 15,
     paddingVertical: 8,
-    marginBottom: 15,
+    marginTop: 18,
+    marginBottom: 18,
     marginLeft: 8,
     marginRight: 8,
     width: '95%',
@@ -413,6 +414,7 @@ const styles = StyleSheet.create({
   rememberContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 5,
   },
   rememberText: {
     fontSize: 14,
@@ -423,6 +425,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     color: '#136dffff',
+    marginTop: 5,
   },
   button: {
     backgroundColor: '#031666ff',
@@ -432,6 +435,7 @@ const styles = StyleSheet.create({
     width: '95%',
     alignItems: 'center',
     alignSelf: 'center',
+    marginBottom: 18,
   },
   buttonText: {
     color: '#ffffffff',
@@ -464,22 +468,22 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalContainer: {
-    borderTopColor: '#C81B1E',
-    borderTopWidth: 10,
     width: '80%',
     backgroundColor: '#fff',
     borderRadius: 12,
     paddingBottom: 20,
     elevation: 5,
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: "#252861",
+    borderWidth: 1.5,
+    borderColor: "#000000ff",
+    boxShadow: '1px 1px 7px 3px #2727277e',
   },
   modalDetail: {
-    backgroundColor: '#C81B1E',
-    paddingHorizontal: 130,
-    paddingVertical: 15,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
     width: '100%',
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
   },
   modalTitle: { 
     fontSize: 18, 
@@ -488,10 +492,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   modalMessage: {
-    fontSize: 15,
+    fontSize: 16,
+    marginTop: 20,
+    marginBottom: 20,
+    textAlign: "center",
     color: '#333',
-    marginTop: 18,
-    marginBottom: 18,
   },
   modalButtons: {
     flexDirection: 'row',
@@ -500,8 +505,6 @@ const styles = StyleSheet.create({
   },
   modalButton: {
     backgroundColor: '#252861',
-    borderWidth: 2.5,
-    borderColor: '#252861',
     flex: 1,
     marginHorizontal: 82,
     paddingVertical: 10,
@@ -510,14 +513,8 @@ const styles = StyleSheet.create({
   },
   modalButtonText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: 'bold',
     color: '#ffffffff',
-  },
-  modalContainerSuccess: {
-    borderTopColor: '#252861', // azul
-  },
-  modalContainerError: {
-    borderTopColor: '#C81B1E', // rojo
   },
   modalDetailSuccess: {
     backgroundColor: '#252861', // azul
@@ -525,5 +522,4 @@ const styles = StyleSheet.create({
   modalDetailError: {
     backgroundColor: '#C81B1E', // rojo
   },
-
 });
