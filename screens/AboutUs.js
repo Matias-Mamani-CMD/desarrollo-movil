@@ -107,7 +107,7 @@ export default function AboutUs({ navigation }) {
                   </View>
                   <View style={styles.valueItem}>
                     <FontAwesome name="lightbulb-o" size={20} color="#031666" />
-                    <Text style={styles.valueText}>Innovación</Text>
+                    <Text style={styles.valueText}>Compromiso</Text>
                   </View>
                 </View>
               </View>
