@@ -1,50 +1,59 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text,
-  TextInput, 
-  TouchableOpacity, 
-  StyleSheet,
-  Image, 
-  ImageBackground, 
-  ScrollView, 
-  KeyboardAvoidingView, 
-  Platform,
-  BackHandler,
-  ActivityIndicator,
-  Dimensions,
-  Modal,
+import {
+   View,
+   Text, 
+   TextInput, 
+   TouchableOpacity, 
+   StyleSheet,
+   Image,
+   ImageBackground,
+   ScrollView,
+   KeyboardAvoidingView,
+   Platform,
+   BackHandler,
+   Dimensions,
+   Modal,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { auth } from '../src/config/firebaseConfig';
-import { sendPasswordResetEmail } from 'firebase/auth';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function ForgotPassword({ navigation }) {
+export default function SignUp({ navigation }) {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  //Validadores
+  const validadorcaracteres = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+$/;
+  // Estados para el enfoque de los campos
+  const [firstNameFocused, setFirstNameFocused] = useState(false);
+  const [lastNameFocused, setLastNameFocused] = useState(false);
   const [emailFocused, setEmailFocused] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [customAlertVisible, setCustomAlertVisible] = useState(false);
-  const [alertType, setAlertType] = useState("error"); // "success" o "error"
+  const [passwordFocused, setPasswordFocused] = useState(false);
+  const [confirmPasswordFocused, setConfirmPasswordFocused] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
   const [alertTitle, setAlertTitle] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
+  const [onConfirm, setOnConfirm] = useState(() => () => {});
+  const [alertType, setAlertType] = useState("error"); // "error" o "success"
+  
+  const showCustomAlert = (title, message, confirmAction, type = "error") => {
+    setAlertTitle(title);
+    setAlertMessage(message);
+    setOnConfirm(() => confirmAction || (() => setShowAlert(false)));
+    setAlertType(type);
+    setShowAlert(true);
+  };
 
-  const showCustomAlert = (type, title, message, onClose = null) => {
-  setAlertType(type);
-  setAlertTitle(title);
-  setAlertMessage(message);
-  setCustomAlertVisible(true);
 
-  // Acción opcional al cerrar
-  if (onClose) {
-    setTimeout(() => onClose(), 5000); // espera a que cierre
-  }
-};
-
-  // Manejar botón físico de atrás - Va a Login (no a Welcome)
+  // Manejar botón físico de atrás - Siempre va a Welcome
   useEffect(() => {
     const backAction = () => {
-      navigation.replace('Login');
+      navigation.replace('Welcome');
       return true; // Previene el comportamiento por defecto
     };
 
@@ -56,164 +65,255 @@ export default function ForgotPassword({ navigation }) {
     return () => backHandler.remove();
   }, [navigation]);
 
-  const handleResetPassword = async () => {
-    if (!email) {
-      showCustomAlert(
-      "error",
-      "Error",
-      "Por favor ingrese su correo electrónico."
-    );
-    return;
-  }
+  const handleSignUp = async () => {
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
+      showCustomAlert("Error", "Todos los campos son obligatorios.", null, "error");
+      return;
+    }
+    let validname = validadorcaracteres.test(firstName)
+    let validsurname = validadorcaracteres.test(lastName)
 
-    // Validación básica de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) {
-      showCustomAlert("Error", "Por favor ingrese un correo electrónico válido.");
+    if (!validname || !validsurname) {
+      showCustomAlert("Error", "Los nombres solo deben contener caracteres", null, "error")
+      return;
+    }
+    if (password !== confirmPassword) {
+      showCustomAlert("Error", "Las contraseñas no coinciden.", null, "error");
       return;
     }
 
-    setIsLoading(true);
-    
     try {
-      await sendPasswordResetEmail(auth, email);
+      await createUserWithEmailAndPassword(auth, email, password);
+      
       showCustomAlert(
-        "success",
-        "Correo enviado",
-        "Se ha enviado un enlace para restablecer tu contraseña a tu correo electrónico.",
-        () => navigation.replace('Login')
+        "Registro exitoso",
+        "Usuario registrado con éxito.",
+        () => {
+          setShowAlert(false);
+          navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+        },
+        "success" // 👈 este define que se muestre azul
       );
     } catch (error) {
-      let errorMessage = "Hubo un problema al enviar el correo de restablecimiento.";
+      let errorMessage = "Hubo un problema al registrar el usuario.";
       switch (error.code) {
+        case 'auth/email-already-in-use':
+          errorMessage = "El correo electrónico ya está en uso.";
+          break;
         case 'auth/invalid-email':
           errorMessage = "El formato del correo electrónico no es válido.";
           break;
-        case 'auth/user-not-found':
-          errorMessage = "No se encontró un usuario con este correo.";
+        case 'auth/weak-password':
+          errorMessage = "La contraseña es demasiado débil.";
           break;
         case 'auth/network-request-failed':
           errorMessage = "Error de conexión, por favor intenta más tarde.";
           break;
-        case 'auth/too-many-requests':
-          errorMessage = "Demasiados intentos. Por favor espera antes de intentar nuevamente.";
-          break;
-        default:
-          errorMessage = `Error: ${error.code}. ${error.message}`;
       }
-      showCustomAlert("error", "Error", errorMessage);
-    } finally {
-      setIsLoading(false);
+
+      showCustomAlert("Error", errorMessage, null, "error");
     }
   };
 
-return (
-  <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-    <ImageBackground
-      source={require('../assets/background.jpg')}
-      style={styles.background}
-      resizeMode="cover"
-    >
-      {/* Header */}
-      <View style={styles.header}>
-        <Image source={require('../assets/piaget-icon.png')} style={styles.logo} />
-        <View>
-          <Text style={styles.headerTitle}>
-            Instituto{"\n"}Jean Piaget <Text style={styles.headerNumber}>N°8048</Text>
-          </Text>
-        </View>
-      </View>
-
-      {/* Contenido + scroll */}
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.keyboardAvoidingView}
+  return (
+    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+      <ImageBackground
+        source={require('../assets/background.jpg')}
+        style={styles.background}
+        resizeMode="cover"
       >
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={true}
-        >
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => navigation.replace('Login')}
-            disabled={isLoading}
-          >
-            <FontAwesome name="arrow-left" size={25} color="#252861" />
-            <Text style={styles.backButtonText}>Volver</Text>
-          </TouchableOpacity>
-
-          <Image source={require('../assets/restablecerContraseña.png')} style={styles.iconSign} />
-
-          <Text style={styles.title}>Restablecer contraseña</Text>
-          <Text style={styles.subtitle}>
-            Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
-          </Text>
-
-          <Text style={styles.label}>Correo electrónico</Text>
-          <View style={[styles.inputContainer, emailFocused && styles.inputContainerFocused]}>
-            <FontAwesome name="envelope" size={20} style={styles.icon} />
-            <TextInput
-              style={styles.input}
-              placeholder="Ingrese su correo electrónico"
-              placeholderTextColor="#787878ff"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              onFocus={() => setEmailFocused(true)}
-              onBlur={() => setEmailFocused(false)}
-              editable={!isLoading}
-            />
-          </View>
-
-          <TouchableOpacity 
-            style={[styles.button, isLoading && styles.buttonDisabled]} 
-            onPress={handleResetPassword}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Enviar enlace</Text>
-            )}
-          </TouchableOpacity>
-        </ScrollView>
-      </KeyboardAvoidingView>
-
-      {/* Footer fijo */}
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
-      </View>
-      <Modal
-        visible={customAlertVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setCustomAlertVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={[styles.alertBox, alertType === "success" ? styles.alertSuccess : styles.alertError]}>
-            <Text style={[styles.alertTitle, alertType === "success" ? styles.alertTitleSuccess : styles.alertTitleError]}>
-              {alertTitle}
+        {/* Header corregido */}
+        <View style={styles.header}>
+          <Image source={require('../assets/piaget-icon.png')} style={styles.logo} />
+          <View>
+            <Text style={styles.headerTitle}>
+              Instituto{"\n"}Jean Piaget <Text style={styles.headerNumber}>N°8048</Text>
             </Text>
-
-            <Text style={styles.alertMessage}>{alertMessage}</Text>
-
-            <TouchableOpacity
-              style={styles.alertButton}
-              onPress={() => setCustomAlertVisible(false)}
-            >
-              <Text style={styles.alertButtonText}>Aceptar</Text>
-            </TouchableOpacity>
           </View>
-        </View>
-      </Modal>
-    </ImageBackground>
-  </SafeAreaView>
-);
+        </View>        
+
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.keyboardAvoidingView}
+        >
+          <ScrollView>
+            <View style={styles.contentWrapper}>
+              <TouchableOpacity 
+                style={styles.backButton}
+                onPress={() => navigation.replace('Welcome')}
+              >
+                <FontAwesome name="arrow-left" size={25} color="#031666ff" />
+                <Text style={styles.backButtonText}>Volver</Text>
+              </TouchableOpacity>
+            
+              {/* Card translúcida */}
+              <View style={styles.card}>
+                <View style={styles.topSection}>
+                  <Text style={styles.title}>Regístrate</Text>
+                </View>
+                
+                {/* Nombre */}
+                <Text style={styles.label}>Nombre</Text>
+                <View style={[styles.inputContainer, firstNameFocused && styles.inputContainerFocused]}>
+                  <FontAwesome name="user" size={20} style={styles.icon}/>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Ingrese su nombre"
+                    placeholderTextColor="#787878ff"
+                    value={firstName}
+                    onChangeText={setFirstName}
+                    onFocus={() => setFirstNameFocused(true)}
+                    onBlur={() => setFirstNameFocused(false)}
+                  />
+                </View>
+
+                {/* Apellido */}
+                <Text style={styles.label}>Apellido</Text>
+                <View style={[styles.inputContainer, lastNameFocused && styles.inputContainerFocused]}>
+                  <FontAwesome name="user" size={20} style={styles.icon}/>
+                  <TextInput
+                    style={styles.input}
+                    keyboardType=""
+                    placeholder="Ingrese su apellido"
+                    placeholderTextColor="#787878ff"
+                    value={lastName}
+                    onChangeText={setLastName}
+                    onFocus={() => setLastNameFocused(true)}
+                    onBlur={() => setLastNameFocused(false)}
+                  />
+                </View>
+
+                {/* Correo */}
+                <Text style={styles.label}>Correo</Text>
+                <View style={[styles.inputContainer, emailFocused && styles.inputContainerFocused]}>
+                  <FontAwesome name="envelope" size={20} style={styles.icon}/>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Ingrese su correo"
+                    placeholderTextColor="#787878ff"
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    onFocus={() => setEmailFocused(true)}
+                    onBlur={() => setEmailFocused(false)}
+                  />
+                </View>
+
+                {/* Contraseña */}
+                <Text style={styles.label}>Contraseña</Text>
+                <View style={[styles.inputContainer, passwordFocused && styles.inputContainerFocused]}>
+                  <FontAwesome name="lock" size={20} style={styles.icon}/>  
+                  <TextInput
+                    style={styles.input}
+                    placeholder={'Ingrese su contraseña'}
+                    placeholderTextColor="#787878ff"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={!showPassword}
+                    onFocus={() => setPasswordFocused(true)}
+                    onBlur={() => setPasswordFocused(false)}
+                  />
+                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                    <FontAwesome 
+                      name={showPassword ? "eye-slash" : "eye"} 
+                      size={20} 
+                      style={styles.icon} 
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.passwordHintContainer}>
+                  <Text style={styles.passwordHint}>
+                    Al menos 6 caracteres, incluyendo una mayúscula, una minúscula y un número.
+                  </Text>
+                </View>
+
+                {/* Confirmar Contraseña */}
+                <Text style={styles.label}>Confirmar Contraseña</Text>
+                <View style={[styles.inputContainer, confirmPasswordFocused && styles.inputContainerFocused]}>
+                  <FontAwesome name="lock" size={20} style={styles.icon} />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Confirme su contraseña"
+                    placeholderTextColor="#787878ff"
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    secureTextEntry={!showConfirmPassword}
+                    onFocus={() => setConfirmPasswordFocused(true)}
+                    onBlur={() => setConfirmPasswordFocused(false)}
+                  />
+                  <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+                    <FontAwesome 
+                      name={showConfirmPassword ? "eye-slash" : "eye"} 
+                      size={20} 
+                      style={styles.icon} 
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+                  <Text style={styles.buttonText}>Registrarse</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => navigation.replace('Login')}>
+                  <Text style={styles.signUpText}>¿Ya tienes cuenta? Inicia sesión</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Espacio flexible que empuja el footer hacia abajo */}
+              <View style={styles.flexSpacer} />
+              
+              {/* Footer que solo se ve al hacer scroll hasta el final */}
+              <View style={styles.footer}>
+                <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
+              </View>
+            </View>
+
+            <Modal
+              visible={showAlert}
+              transparent
+              animationType="fade"
+              onRequestClose={() => setShowAlert(false)}
+            >
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalContainer}>
+                  
+                  {/* Header que cambia según el tipo */}
+                  <View
+                    style={[
+                      styles.modalDetail,
+                      alertType === "success" ? styles.modalDetailSuccess : styles.modalDetailError
+                    ]}
+                  >
+                    <Text style={styles.modalTitle}>{alertTitle}</Text>
+                  </View>
+
+                  <Text style={styles.modalMessage}>{alertMessage}</Text>
+
+                  <View style={styles.modalButtons}>
+                    <TouchableOpacity
+                      style={styles.modalButton}
+                      onPress={onConfirm}
+                    >
+                      <Text style={styles.modalButtonText}>
+                        Aceptar
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </Modal>
+
+
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </ImageBackground>
+    </SafeAreaView>
+  );
 }
 
-const { width } = Dimensions.get('window');
+const { height, width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -225,10 +325,6 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     height: '100%',
-  },
-  keyboardAvoidingView: {
-    flex: 1,
-    width: '100%',
   },
   // Header corregido - igual que en Welcome
   header: {
@@ -256,101 +352,124 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 13,
   },
-  scrollContent: {
-    flexGrow: 1,
-    padding: 20,
-    paddingBottom: 40, // Espacio extra al final
+  keyboardAvoidingView: {
+    flex: 1,
+    width: '100%',
   },
-  backButton: {
-    alignSelf: 'flex-start',
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 5,
-    marginBottom: 20,
-  },
-  backButtonText: {
-    fontSize: 22,
-    fontWeight: '900',
-    color: '#252861',
-    marginLeft: 8,
-  },
-  iconSign: {
-    width: 140,
-    height: 140,
+  card: {
+    width: '100%',
+    maxWidth: 400,
+    backgroundColor: "#ffffffd1",
+    borderRadius: 10,
+    borderColor: '#000000ff',
+    borderWidth: 1,
     alignSelf: 'center',
-    marginBottom: 20,
+    marginTop:10,
+  },
+  topSection: {
+    borderWidth: 1,
+    borderTopLeftRadius:10,
+    borderTopRightRadius:10,
+    marginVertical:-1,
+    backgroundColor: "#1E2A78",
+    padding: 10,
+    alignItems: "center",
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
-    marginBottom: 15,
-    color: '#2f2f2fff',
+    fontSize: 25,
+    fontWeight: '600',
+    marginBottom: 0,
     textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    marginBottom: 25,
-    color: '#555',
-    textAlign: 'center',
-    paddingHorizontal: 10,
+    color: '#ffffffff',
   },
   label: {
+    marginLeft:16,
     alignSelf: 'flex-start',
-    fontSize: 16,
-    fontWeight: '600',
-    marginTop: 20,
+    fontSize: 18,
+    fontWeight: 'condensed',
+    marginTop: 15,
     color: '#000000ff',
-    padding: 8,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
     borderRadius: 12,
-    paddingHorizontal: 10,
+    borderColor: '#000000ff',
+    borderWidth: 0.3,
+    paddingHorizontal: 15,
     paddingVertical: 8,
-    marginBottom: 20,
-    width: '100%',
+    marginBottom: 15,
+    marginLeft:8,
+    marginRight:8,
+    width: '95%',
   },
   inputContainerFocused: {
     borderColor: "#1E2A78",
     borderWidth: 2,
   },
   input: {
-    flex: 10,
-    fontSize: 16,
+    flex: 1,
+    fontSize: 14,
     color: '#000',
     marginLeft: 8,
   },
   icon: {
     color: '#333',
   },
-  button: {
-    backgroundColor: '#252861',
-    paddingVertical: 15,
-    paddingHorizontal: 40,
-    borderRadius: 5,
-    marginTop: 10,
-    width: '50%',
-    alignItems: 'center',
+  passwordHintContainer: {
+    width: '95%',
+    minHeight: 40,
     justifyContent: 'center',
-    height: 50,
-    alignSelf: 'center',
+    marginBottom: 1,
+    marginLeft:15,
   },
-  buttonDisabled: {
-    backgroundColor: '#6c757d',
+  passwordHint: {
+    fontSize: 13,
+    color: 'red',
+  },
+  button: {
+    backgroundColor: '#031666ff',
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginVertical:15,
+    width: '95%',
+    alignItems: 'center',
+    alignSelf: 'center',
   },
   buttonText: {
     color: '#ffffffff',
     fontSize: 16,
     fontWeight: 'bold',
   },
-    flexSpacer: {
+  backButton: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 5,
+    marginHorizontal:10,
+    marginVertical:10,
+  },
+  backButtonText: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#031666ff',
+    marginLeft: 8,
+  },
+  signUpText: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginTop: 20,
+    marginBottom: 15,
+    color: '#136dffff',
+    textAlign: 'center',
+  },
+  flexSpacer: {
     flex: 1,
-    minHeight: 0, // Espacio mínimo para asegurar que el footer quede fuera de la vista inicial
+    minHeight: 30, // Espacio mínimo para asegurar que el footer quede fuera de la vista inicial
   },
   footer: {
-    width: '100%',
+    width: width,
     alignItems: "center",
     padding: 15,
     backgroundColor: "#1E2A78",
@@ -367,18 +486,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.5)",
   },
-  modalHeaderSuccess: {
-    backgroundColor: "#1E2A78", // azul
-    borderTopWidth: 5,
-    borderTopColor: "#1E2A78",
-  },
-  modalHeaderError: {
-    backgroundColor: "#DB2024", // rojo
-    borderTopWidth: 5,
-    borderTopColor: "#DB2024",
-  },
-  alertBox: {
-    width: '85%',
+  modalContainer: {
+    width: '80%',
     backgroundColor: '#fff',
     borderRadius: 12,
     paddingBottom: 20,
@@ -388,43 +497,47 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: "#000000ff",
     boxShadow: '1px 1px 7px 3px #2727277e',
-    overflow: 'hidden', // mantiene el borde redondeado del alert
   },
-  alertTitleSuccess: {
-    backgroundColor: "#252861",
+  modalDetail: {
+    paddingHorizontal: 10,
+    paddingVertical: 10,
     width: '100%',
-    padding: 10,
-    color: "#ffffffff", // texto azul
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 10,
-    textAlign: "center",
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
   },
-  alertTitleError: {
-    backgroundColor: "#DB2024",
-    width: '100%',
-    padding: 10,
-    color: "#ffffffff", // texto rojo
-    fontSize: 20,
+  modalTitle: {
+    fontSize: 18, 
     fontWeight: "bold",
-    marginBottom: 10,
-    textAlign: "center",
+    color: "#ffffffff",
+    textAlign: 'center',
   },
-  alertMessage: {
+  modalMessage: {
     fontSize: 16,
-    paddingTop: 18,
-    marginBottom: 18,
-    textAlign: "center",
+    marginTop: 20,
+    marginBottom: 20,
   },
-  alertButton: {
-    backgroundColor: "#252861",
-    paddingHorizontal: 50,
-    paddingVertical: 13,
-    borderRadius: 5,
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
   },
-  alertButtonText: {
+  modalButton: {
+    backgroundColor: '#252861',
+    flex: 1,
+    marginHorizontal: 82,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  modalButtonText: {
     fontSize: 16,
-    color: "#fff",
     fontWeight: "bold",
+    color: '#ffffffff',
+  },
+  modalDetailSuccess: {
+    backgroundColor: '#252861', // azul
+  },
+  modalDetailError: {
+    backgroundColor: '#C81B1E', // rojo
   },
 });

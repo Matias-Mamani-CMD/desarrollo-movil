@@ -29,6 +29,7 @@ export default function SignUp({ navigation }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   //Validadores
   const validadorcaracteres = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+$/;
+  const validadorEmail = /^[a-zA-Z0-9,._-]+@(gmail|hotmail|outlook|yahoo)\.com$/;
   // Estados para el enfoque de los campos
   const [firstNameFocused, setFirstNameFocused] = useState(false);
   const [lastNameFocused, setLastNameFocused] = useState(false);
@@ -77,6 +78,10 @@ export default function SignUp({ navigation }) {
       showCustomAlert("Error", "Los nombres solo deben contener caracteres", null, "error")
       return;
     }
+    if (!validadorEmail.test(email)) {
+      showCustomAlert("Error", "El formato del correo electrónico no es válido.", null, "error");
+      return;
+    }
     if (password !== confirmPassword) {
       showCustomAlert("Error", "Las contraseñas no coinciden.", null, "error");
       return;
@@ -92,7 +97,7 @@ export default function SignUp({ navigation }) {
           setShowAlert(false);
           navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
         },
-        "success" // 👈 este define que se muestre azul
+        "success" // este define que se muestre azul
       );
     } catch (error) {
       let errorMessage = "Hubo un problema al registrar el usuario.";
