@@ -85,7 +85,7 @@ export default function SignUp({ navigation }) {
     let validsurname = validadorcaracteres.test(lastName)
 
     if (!validname || !validsurname) {
-      showCustomAlert("Error", "Los nombres solo deben contener caracteres", null, "error")
+      showCustomAlert("Error", "Los nombres solo deben contener carácteres", null, "error")
       return;
     }
     if (!validadorEmail.test(email)) {
@@ -249,7 +249,7 @@ export default function SignUp({ navigation }) {
                     <Text
                       style={[styles.validationText, validations.length && styles.valid]}
                     >
-                    • 6 caracteres
+                    • 6 carácteres
                     </Text>
                     <Text
                       style={[styles.validationText, validations.upper && styles.valid]}
