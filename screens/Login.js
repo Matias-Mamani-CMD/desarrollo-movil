@@ -247,8 +247,8 @@ export default function Login({ navigation }) {
               {/* Go to SignUp */}
               <TouchableOpacity onPress={() => navigation.replace('SignUp')}>
                 <View style={styles.signUpTextContainer}>
-                  <Text style={styles.signUpText}>¿No tienes cuenta aún?</Text>
-                  <Text style={styles.underlinedSignUp}>Registrarse</Text>
+                  <Text style={styles.signUpText}>¿No tenés cuenta aún?</Text>
+                  <Text style={styles.boldSignUp}>Registrate</Text>
                 </View>
               </TouchableOpacity>
             </View>
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
   },
   forgotPasswordText: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "300",
     color: '#136dffff',
     marginTop: 5,
   },
@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     marginVertical: 15,
-    width: '48%',
+    width: '43%',
     height: '10%',
     alignItems: 'center',
     alignSelf: 'center',
@@ -465,19 +465,18 @@ const styles = StyleSheet.create({
   },
   signUpText: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "400",
     marginTop: 20,
     color: '#136dffff',
     textAlign: 'center',
     paddingRight: 5,
   },
-  underlinedSignUp: {
+  boldSignUp: {
     fontSize: 14,
     fontWeight: "600",
     marginTop: 20,
     color: '#136dffff',
     textAlign: 'center',
-    textDecorationLine: 'underline',
   },
   footer: {
     width: width,

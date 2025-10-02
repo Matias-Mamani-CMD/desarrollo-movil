@@ -29,6 +29,9 @@ export default function ForgotPassword({ navigation }) {
   const [alertTitle, setAlertTitle] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
 
+  //Validador del formato de correos permitidos
+  const validadorEmail = /^[a-zA-Z0-9._-]+@(gmail|hotmail|outlook|yahoo|live|msn|icloud|me|aol|protonmail|proton|mail|zoho|yandex|gmx|terra|arnet|speedy|fibertel|ciudad)\.com$/;
+
   const showCustomAlert = (type, title, message, onClose = null) => {
     setAlertType(type);
     setAlertTitle(title);
@@ -36,7 +39,7 @@ export default function ForgotPassword({ navigation }) {
     setCustomAlertVisible(true);
 
     if (onClose) {
-      setTimeout(() => onClose(), 5000);
+      setTimeout(() => onClose(), 10000);
     }
   };
 
@@ -77,12 +80,11 @@ export default function ForgotPassword({ navigation }) {
     }
 
     // Validación de formato de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!validadorEmail.test(email)) {
       showCustomAlert(
         "error",
         "Error",
-        "Por favor ingrese un correo electrónico válido."
+        "El correo electrónico no tiene un formato válido. Por favor, verifica e inténtalo nuevamente."
       );
       return;
     }
@@ -96,7 +98,7 @@ export default function ForgotPassword({ navigation }) {
         showCustomAlert(
           "error",
           "Usuario no encontrado",
-          "El correo no está registrado."
+          "El correo ingresado no está registrado en el sistema."
         );
         setIsLoading(false);
         return;
@@ -107,7 +109,7 @@ export default function ForgotPassword({ navigation }) {
       showCustomAlert(
         "success",
         "Correo enviado",
-        "Se ha enviado un enlace para restablecer su contraseña a su correo electrónico. Por favor revise su bandeja de entrada y spam.",
+        "Hemos enviado un enlace para restablecer su contraseña a su correo electrónico. Revise la bandeja de entrada y la carpeta de spam.",
         () => navigation.replace('Login')
       );
     } catch (error) {
@@ -123,16 +125,16 @@ export default function ForgotPassword({ navigation }) {
           errorMessage = "No se encontró un usuario con este correo electrónico.";
           break;
         case 'auth/user-disabled':
-          errorMessage = "Esta cuenta ha sido deshabilitada. Contacte al administrador.";
+          errorMessage = "Esta cuenta ha sido deshabilitada. Contacta al administrador.";
           break;
         case 'auth/network-request-failed':
-          errorMessage = "Error de conexión, por favor intente más tarde.";
+          errorMessage = "Error de conexión, por favor intenta más tarde.";
           break;
         case 'auth/too-many-requests':
-          errorMessage = "Demasiados intentos. Por favor espere unos minutos antes de intentar nuevamente.";
+          errorMessage = "Demasiados intentos. Por favor espera unos minutos antes de intentar nuevamente.";
           break;
         default:
-          errorMessage = "Ocurrió un error inesperado. Por favor intente más tarde.";
+          errorMessage = "Ocurrió un error inesperado. Por favor intenta más tarde.";
       }
       
       showCustomAlert("error", "Error", errorMessage);
@@ -369,7 +371,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   button: {
-    backgroundColor: '#031666ff',
+    backgroundColor: '#252861',
     paddingVertical: 15,
     paddingHorizontal: 40,
     borderRadius: 5,

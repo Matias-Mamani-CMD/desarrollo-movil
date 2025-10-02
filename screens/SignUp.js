@@ -29,7 +29,7 @@ export default function SignUp({ navigation }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   //Validadores
   const validadorcaracteres = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+$/;
-  const validadorEmail = /^[a-zA-Z0-9,._-]+@(gmail|hotmail|outlook|yahoo)\.com$/;
+  const validadorEmail = /^[a-zA-Z0-9._%+-]+@(gmail|hotmail|outlook|yahoo)\.[a-zA-Z]{2,}$/;
   // Estados para el enfoque de los campos
   const [firstNameFocused, setFirstNameFocused] = useState(false);
   const [lastNameFocused, setLastNameFocused] = useState(false);
@@ -70,7 +70,6 @@ export default function SignUp({ navigation }) {
     upper: /[A-Z]/.test(password),
     lower: /[a-z]/.test(password),
     number: /[0-9]/.test(password),
-    hasSpecialChar: /[!@#$%^&*]/.test(password),
   };
 
   const passwordsMatch =
@@ -176,12 +175,14 @@ export default function SignUp({ navigation }) {
                   <FontAwesome name="user" size={20} style={styles.icon}/>
                   <TextInput
                     style={styles.input}
-                    placeholder="Ingrese su nombre"
-                    placeholderTextColor="#787878ff"
+                    placeholder="Nombre"
                     value={firstName}
-                    onChangeText={setFirstName}
-                    onFocus={() => setFirstNameFocused(true)}
-                    onBlur={() => setFirstNameFocused(false)}
+                    onChangeText={(text) => {
+                      const filtered = text.replace(/[^a-zA-ZÀ-ÿ\s]/g, "");
+                      setFirstName(filtered);
+                    }}
+                    keyboardType="default"
+                    autoCapitalize="words" 
                   />
                 </View>
 
@@ -191,13 +192,14 @@ export default function SignUp({ navigation }) {
                   <FontAwesome name="user" size={20} style={styles.icon}/>
                   <TextInput
                     style={styles.input}
-                    keyboardType=""
-                    placeholder="Ingrese su apellido"
-                    placeholderTextColor="#787878ff"
+                    placeholder="Apellido"
                     value={lastName}
-                    onChangeText={setLastName}
-                    onFocus={() => setLastNameFocused(true)}
-                    onBlur={() => setLastNameFocused(false)}
+                    onChangeText={(text) => {
+                      const filtered = text.replace(/[^a-zA-ZÀ-ÿ\s]/g, "");
+                      setLastName(filtered);
+                    }}
+                    keyboardType="default"
+                    autoCapitalize="words"
                   />
                 </View>
 
@@ -217,6 +219,18 @@ export default function SignUp({ navigation }) {
                     onBlur={() => setEmailFocused(false)}
                   />
                 </View>
+
+                {/* Mensaje de validación en tiempo real */}
+                {email.length > 0 && (
+                  <Text style={[styles.validationText, 
+                    validadorEmail.test(email) ? styles.valid : styles.invalid,
+                    { marginLeft: 22, marginBottom: 3,}
+                  ]}>
+                    {validadorEmail.test(email) 
+                      ? "Correo válido"
+                      : "Formato de correo incorrecto"}
+                  </Text>
+                )}
 
                 {/* Contraseña */}
                 <Text style={styles.label}>Contraseña</Text>
@@ -269,11 +283,6 @@ export default function SignUp({ navigation }) {
                       style={[styles.validationText, validations.number && styles.valid]}
                     >
                     • Un número
-                    </Text>
-                    <Text
-                      style={[styles.validationText, validations.hasSpecialChar && styles.valid]}
-                    >
-                    • Un carácter especial (´!@#$%^&*)
                     </Text>
                   </View>
                 )}
@@ -329,7 +338,7 @@ export default function SignUp({ navigation }) {
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => navigation.replace('Login')}>
-                  <Text style={styles.signUpText}>¿Ya tienes cuenta? <Text style={styles.underlinedSignUp}>Inicia sesión</Text></Text>
+                  <Text style={styles.signUpText}>¿Ya tenés cuenta? <Text style={styles.boldSignUp}>Iniciá sesión</Text></Text>
                 </TouchableOpacity>
               </View>
 
@@ -537,7 +546,7 @@ const styles = StyleSheet.create({
   },
   signUpText: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "400",
     marginTop: 20,
     marginBottom: 15,
     color: '#136dffff',
@@ -547,13 +556,12 @@ const styles = StyleSheet.create({
     flex: 1,
     minHeight: 30, // Espacio mínimo para asegurar que el footer quede fuera de la vista inicial
   },
-    underlinedSignUp: {
+    boldSignUp: {
     fontSize: 14,
     fontWeight: "600",
     marginTop: 20,
     color: '#136dffff',
     textAlign: 'center',
-    textDecorationLine: 'underline',
   },
   footer: {
     width: width,
