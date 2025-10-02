@@ -3,8 +3,7 @@ import {
   View, 
   Text, 
   TouchableOpacity, 
-  StyleSheet, 
-  Alert, 
+  StyleSheet,
   Image,
   ImageBackground, //imágen de fondo
   ScrollView, // pantalla desplazable
@@ -35,8 +34,8 @@ export default function Home({ navigation }) {
     try {
       await signOut(auth);  
       showCustomAlert(
-        "¿Confirmas que quieres cerrar sesión?",
-        "Se cerrará tu sesión actual.",
+        "¿Confirma que quiere cerrar sesión?",
+        "Se cerrará su sesión actual.",
         () => {
           setShowAlert(false);
           navigation.replace('Login');
