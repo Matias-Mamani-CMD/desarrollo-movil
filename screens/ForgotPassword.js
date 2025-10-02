@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { auth } from '../src/config/firebaseConfig';
-import { sendPasswordResetEmail } from 'firebase/auth';
+import { sendPasswordResetEmail, fetchSignInMethodsForEmail } from 'firebase/auth';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ForgotPassword({ navigation }) {
@@ -25,27 +25,25 @@ export default function ForgotPassword({ navigation }) {
   const [emailFocused, setEmailFocused] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [customAlertVisible, setCustomAlertVisible] = useState(false);
-  const [alertType, setAlertType] = useState("error"); // "success" o "error"
+  const [alertType, setAlertType] = useState("error");
   const [alertTitle, setAlertTitle] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
 
   const showCustomAlert = (type, title, message, onClose = null) => {
-  setAlertType(type);
-  setAlertTitle(title);
-  setAlertMessage(message);
-  setCustomAlertVisible(true);
+    setAlertType(type);
+    setAlertTitle(title);
+    setAlertMessage(message);
+    setCustomAlertVisible(true);
 
-  // Acción opcional al cerrar
-  if (onClose) {
-    setTimeout(() => onClose(), 5000); // espera a que cierre
-  }
-};
+    if (onClose) {
+      setTimeout(() => onClose(), 5000);
+    }
+  };
 
-  // Manejar botón físico de atrás - Va a Login (no a Welcome)
   useEffect(() => {
     const backAction = () => {
       navigation.replace('Login');
-      return true; // Previene el comportamiento por defecto
+      return true;
     };
 
     const backHandler = BackHandler.addEventListener(
@@ -56,164 +54,209 @@ export default function ForgotPassword({ navigation }) {
     return () => backHandler.remove();
   }, [navigation]);
 
-  const handleResetPassword = async () => {
-    if (!email) {
-      showCustomAlert(
-      "error",
-      "Error",
-      "Por favor ingrese su correo electrónico."
-    );
-    return;
-  }
+  const checkIfUserExists = async (email) => {
+    try {
+      const signInMethods = await fetchSignInMethodsForEmail(auth, email);
+      return signInMethods.length > 0;
+    } catch (error) {
+      console.error('Error verificando usuario:', error);
+      return true;
+    }
+  };
 
-    // Validación básica de email
+
+  const handleResetPassword = async () => {
+    // Validación de campo vacío
+    if (!email.trim()) {
+      showCustomAlert(
+        "error",
+        "Error",
+        "Por favor ingrese su correo electrónico."
+      );
+      return;
+    }
+
+    // Validación de formato de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) {
-      showCustomAlert("Error", "Por favor ingrese un correo electrónico válido.");
+    if (!emailRegex.test(email)) {
+      showCustomAlert(
+        "error",
+        "Error",
+        "Por favor ingrese un correo electrónico válido."
+      );
       return;
     }
 
     setIsLoading(true);
     
     try {
+      const userExists = await checkIfUserExists(email);
+      
+      if (!userExists) {
+        showCustomAlert(
+          "error",
+          "Usuario no encontrado",
+          "El correoo no está registrado."
+        );
+        setIsLoading(false);
+        return;
+      }
+
       await sendPasswordResetEmail(auth, email);
+      
       showCustomAlert(
         "success",
         "Correo enviado",
-        "Se ha enviado un enlace para restablecer tu contraseña a tu correo electrónico.",
+        "Se ha enviado un enlace para restablecer tu contraseña a tu correo electrónico. Por favor revisa tu bandeja de entrada y spam.",
         () => navigation.replace('Login')
       );
     } catch (error) {
+      console.error('Error en restablecimiento de contraseña:', error);
+      
       let errorMessage = "Hubo un problema al enviar el correo de restablecimiento.";
+      
       switch (error.code) {
         case 'auth/invalid-email':
           errorMessage = "El formato del correo electrónico no es válido.";
           break;
         case 'auth/user-not-found':
-          errorMessage = "No se encontró un usuario con este correo.";
+          errorMessage = "No se encontró un usuario con este correo electrónico.";
+          break;
+        case 'auth/user-disabled':
+          errorMessage = "Esta cuenta ha sido deshabilitada. Contacta al administrador.";
           break;
         case 'auth/network-request-failed':
           errorMessage = "Error de conexión, por favor intenta más tarde.";
           break;
         case 'auth/too-many-requests':
-          errorMessage = "Demasiados intentos. Por favor espera antes de intentar nuevamente.";
+          errorMessage = "Demasiados intentos. Por favor espera unos minutos antes de intentar nuevamente.";
           break;
         default:
-          errorMessage = `Error: ${error.code}. ${error.message}`;
+          errorMessage = "Ocurrió un error inesperado. Por favor intenta más tarde.";
       }
+      
       showCustomAlert("error", "Error", errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
-return (
-  <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-    <ImageBackground
-      source={require('../assets/background.jpg')}
-      style={styles.background}
-      resizeMode="cover"
-    >
-      {/* Header */}
-      <View style={styles.header}>
-        <Image source={require('../assets/piaget-icon.png')} style={styles.logo} />
-        <View>
-          <Text style={styles.headerTitle}>
-            Instituto{"\n"}Jean Piaget <Text style={styles.headerNumber}>N°8048</Text>
-          </Text>
-        </View>
-      </View>
-
-      {/* Contenido + scroll */}
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.keyboardAvoidingView}
+  return (
+    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+      <ImageBackground
+        source={require('../assets/background.jpg')}
+        style={styles.background}
+        resizeMode="cover"
       >
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={true}
-        >
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => navigation.replace('Login')}
-            disabled={isLoading}
-          >
-            <FontAwesome name="arrow-left" size={25} color="#252861" />
-            <Text style={styles.backButtonText}>Volver</Text>
-          </TouchableOpacity>
-
-          <Image source={require('../assets/restablecerContraseña.png')} style={styles.iconSign} />
-
-          <Text style={styles.title}>Restablecer contraseña</Text>
-          <Text style={styles.subtitle}>
-            Ingrese su correo electrónico y le enviaremos un enlace para restablecer tu contraseña.
-          </Text>
-
-          <Text style={styles.label}>Correo electrónico</Text>
-          <View style={[styles.inputContainer, emailFocused && styles.inputContainerFocused]}>
-            <FontAwesome name="envelope" size={20} style={styles.icon} />
-            <TextInput
-              style={styles.input}
-              placeholder="Ingrese su correo electrónico"
-              placeholderTextColor="#787878ff"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              onFocus={() => setEmailFocused(true)}
-              onBlur={() => setEmailFocused(false)}
-              editable={!isLoading}
-            />
+        {/* Header */}
+        <View style={styles.header}>
+          <Image source={require('../assets/piaget-icon.png')} style={styles.logo} />
+          <View>
+            <Text style={styles.headerTitle}>
+              Instituto{"\n"}Jean Piaget <Text style={styles.headerNumber}>N°8048</Text>
+            </Text>
           </View>
+        </View>
 
-          <TouchableOpacity 
-            style={[styles.button, isLoading && styles.buttonDisabled]} 
-            onPress={handleResetPassword}
-            disabled={isLoading}
+        {/* Contenido + scroll */}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.keyboardAvoidingView}
+        >
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={true}
           >
-            {isLoading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Enviar enlace</Text>
-            )}
-          </TouchableOpacity>
-        </ScrollView>
-      </KeyboardAvoidingView>
+            <TouchableOpacity 
+              style={styles.backButton}
+              onPress={() => navigation.replace('Login')}
+              disabled={isLoading}
+            >
+              <FontAwesome name="arrow-left" size={25} color="#252861" />
+              <Text style={styles.backButtonText}>Volver</Text>
+            </TouchableOpacity>
 
-      {/* Footer fijo */}
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
-      </View>
-      <Modal
-        visible={customAlertVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setCustomAlertVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={[styles.alertBox, alertType === "success" ? styles.alertSuccess : styles.alertError]}>
-            <Text style={[styles.alertTitle, alertType === "success" ? styles.alertTitleSuccess : styles.alertTitleError]}>
-              {alertTitle}
+            <Image source={require('../assets/restablecerContraseña.png')} style={styles.iconSign} />
+
+            <Text style={styles.title}>Restablecer contraseña</Text>
+            <Text style={styles.subtitle}>
+              Ingrese su correo electrónico y le enviaremos un enlace para restablecer tu contraseña.
             </Text>
 
-            <Text style={styles.alertMessage}>{alertMessage}</Text>
+            <Text style={styles.label}>Correo electrónico</Text>
+            <View style={[styles.inputContainer, emailFocused && styles.inputContainerFocused]}>
+              <FontAwesome name="envelope" size={20} style={styles.icon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Ingrese su correo electrónico"
+                placeholderTextColor="#787878ff"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                onFocus={() => setEmailFocused(true)}
+                onBlur={() => setEmailFocused(false)}
+                editable={!isLoading}
+              />
+            </View>
 
-            <TouchableOpacity
-              style={styles.alertButton}
-              onPress={() => setCustomAlertVisible(false)}
+            <TouchableOpacity 
+              style={[styles.button, isLoading && styles.buttonDisabled]} 
+              onPress={handleResetPassword}
+              disabled={isLoading}
             >
-              <Text style={styles.alertButtonText}>Aceptar</Text>
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Enviar enlace</Text>
+              )}
             </TouchableOpacity>
-          </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+
+        {/* Footer fijo */}
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
         </View>
-      </Modal>
-    </ImageBackground>
-  </SafeAreaView>
-);
+
+        {/* Modal de alertas */}
+        <Modal
+          visible={customAlertVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setCustomAlertVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={[
+              styles.alertBox, 
+              alertType === "success" ? styles.alertSuccess : styles.alertError
+            ]}>
+              <Text style={[
+                styles.alertTitle, 
+                alertType === "success" ? styles.alertTitleSuccess : styles.alertTitleError
+              ]}>
+                {alertTitle}
+              </Text>
+
+              <Text style={styles.alertMessage}>{alertMessage}</Text>
+
+              <TouchableOpacity
+                style={styles.alertButton}
+                onPress={() => setCustomAlertVisible(false)}
+              >
+                <Text style={styles.alertButtonText}>Aceptar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      </ImageBackground>
+    </SafeAreaView>
+  );
 }
 
 const { width } = Dimensions.get('window');
+
 
 const styles = StyleSheet.create({
   safeArea: {
