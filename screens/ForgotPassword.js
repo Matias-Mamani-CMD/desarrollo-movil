@@ -96,7 +96,7 @@ export default function ForgotPassword({ navigation }) {
         showCustomAlert(
           "error",
           "Usuario no encontrado",
-          "El correoo no está registrado."
+          "El correo no está registrado."
         );
         setIsLoading(false);
         return;
@@ -107,7 +107,7 @@ export default function ForgotPassword({ navigation }) {
       showCustomAlert(
         "success",
         "Correo enviado",
-        "Se ha enviado un enlace para restablecer tu contraseña a tu correo electrónico. Por favor revisa tu bandeja de entrada y spam.",
+        "Se ha enviado un enlace para restablecer su contraseña a su correo electrónico. Por favor revise su bandeja de entrada y spam.",
         () => navigation.replace('Login')
       );
     } catch (error) {
@@ -123,16 +123,16 @@ export default function ForgotPassword({ navigation }) {
           errorMessage = "No se encontró un usuario con este correo electrónico.";
           break;
         case 'auth/user-disabled':
-          errorMessage = "Esta cuenta ha sido deshabilitada. Contacta al administrador.";
+          errorMessage = "Esta cuenta ha sido deshabilitada. Contacte al administrador.";
           break;
         case 'auth/network-request-failed':
-          errorMessage = "Error de conexión, por favor intenta más tarde.";
+          errorMessage = "Error de conexión, por favor intente más tarde.";
           break;
         case 'auth/too-many-requests':
-          errorMessage = "Demasiados intentos. Por favor espera unos minutos antes de intentar nuevamente.";
+          errorMessage = "Demasiados intentos. Por favor espere unos minutos antes de intentar nuevamente.";
           break;
         default:
-          errorMessage = "Ocurrió un error inesperado. Por favor intenta más tarde.";
+          errorMessage = "Ocurrió un error inesperado. Por favor intente más tarde.";
       }
       
       showCustomAlert("error", "Error", errorMessage);
@@ -181,7 +181,7 @@ export default function ForgotPassword({ navigation }) {
 
             <Text style={styles.title}>Restablecer contraseña</Text>
             <Text style={styles.subtitle}>
-              Ingrese su correo electrónico y le enviaremos un enlace para restablecer tu contraseña.
+              Ingrese su correo electrónico y le enviaremos un enlace para restablecer su contraseña.
             </Text>
 
             <Text style={styles.label}>Correo electrónico</Text>
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   button: {
-    backgroundColor: '#252861',
+    backgroundColor: '#031666ff',
     paddingVertical: 15,
     paddingHorizontal: 40,
     borderRadius: 5,

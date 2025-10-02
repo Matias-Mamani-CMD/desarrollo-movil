@@ -107,6 +107,7 @@ export default function SignUp({ navigation }) {
           setShowAlert(false);
           navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
         },
+        "success"
       );
     } catch (error) {
       let errorMessage = "Hubo un problema al registrar el usuario.";
@@ -150,7 +151,10 @@ export default function SignUp({ navigation }) {
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={styles.keyboardAvoidingView}
         >
-          <ScrollView>
+          <ScrollView contentContainerStyle={{
+            flexGrow: 1, 
+            justifyContent: 'space-between'
+          }}>
             <View style={styles.contentWrapper}>
               <TouchableOpacity 
                 style={styles.backButton}
@@ -498,11 +502,10 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#031666ff',
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderRadius: 8,
-    marginVertical:15,
-    width: '43%',
-    height: '7%',
+    marginVertical: 15,
+    width: '48%',
     alignItems: 'center',
     alignSelf: 'center',
   },
@@ -527,6 +530,7 @@ const styles = StyleSheet.create({
   },
   buttonText2: {
     paddingTop: 4,
+    marginBottom: 3,
     color: '#ffffffff',
     fontSize: 17,
     fontWeight: 'bold',

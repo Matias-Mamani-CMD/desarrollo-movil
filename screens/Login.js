@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     marginVertical: 15,
-    width: '43%',
+    width: '48%',
     height: '10%',
     alignItems: 'center',
     alignSelf: 'center',

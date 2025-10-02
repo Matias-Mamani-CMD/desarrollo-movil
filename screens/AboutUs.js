@@ -12,7 +12,7 @@ import {
   Dimensions
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
+import { FontAwesome, MaterialIcons, } from '@expo/vector-icons';
 
 export default function AboutUs({ navigation }) {
   React.useEffect(() => {
@@ -59,11 +59,10 @@ export default function AboutUs({ navigation }) {
                 <FontAwesome name="arrow-left" size={25} color="#031666ff" />
                 <Text style={styles.backButtonText}>Volver</Text>
               </TouchableOpacity>
-
               <Text style={styles.title}>Sobre Nosotros</Text>
               <Text style={styles.description}>
                 El Instituto Jean Piaget es una institución educativa comprometida con la excelencia 
-                académica y la formación integral de nuestros estudiantes. Fundado en [año de fundación], 
+                académica y la formación integral de nuestros estudiantes. Fundado en 1989, 
                 nos enorgullece ofrecer una educación de calidad que combina tradición e innovación.
               </Text>
 
@@ -107,7 +106,7 @@ export default function AboutUs({ navigation }) {
                   </View>
                   <View style={styles.valueItem}>
                     <FontAwesome name="lightbulb-o" size={20} color="#031666" />
-                    <Text style={styles.valueText}>Compromiso</Text>
+                    <Text style={styles.valueText}>Perseverancia</Text>
                   </View>
                 </View>
               </View>
@@ -122,6 +121,13 @@ export default function AboutUs({ navigation }) {
                   <FontAwesome name="phone" size={20} color="#1E2A78" />
                   <Text style={styles.contactText}>+54 387 1234-5678</Text>
                 </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.contactItem}
+                  onPress={() => handleOpenLink('https://wa.me/5438756781234')}>
+
+                  <FontAwesome name="whatsapp" size={20} color="#1E2A78" />
+                  <Text style={styles.contactText}>+54 387 5678-1234</Text>
+                </TouchableOpacity>
                 <TouchableOpacity 
                   style={styles.contactItem}
                   onPress={() => handleOpenLink('mailto:info@jeanpiaget.edu.ar')}
@@ -133,8 +139,15 @@ export default function AboutUs({ navigation }) {
                   style={styles.contactItem}
                   onPress={() => handleOpenLink('https://maps.app.goo.gl/...')}
                 >
-                  <FontAwesome name="map-marker" size={20} color="#1E2A78" />
+                  <FontAwesome name="map-marker" size={20} color="#1E2A78" paddingLeft={3} />
                   <Text style={styles.contactText}>Calle 123, Salta</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.contactItem}
+                  onPress={() => handleOpenLink('https://facebook.com/...')}
+                >
+                  <FontAwesome name="facebook-square" size={20} color="#1E2A78"/>
+                  <Text style={styles.contactText}>Instituto Jean Piaget</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -299,4 +312,36 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#fff",
   },
+  authoritiesContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",      // 🔹 Permite varias filas
+    justifyContent: "space-between",
+    marginTop: 10,
+  },
+  valueItemAuthorities: {
+    width: 110,
+    height: 110,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#d3d3d3ff',
+    borderRadius: 60,
+    marginBottom: 8, 
+  },
+  itemAuthorities: {
+    width: "50%",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  valueTextAuthorities: {
+    marginTop: 8,
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1E2A78',
+    textAlign: 'center',
+ },
+  sectionAuthorities: {
+    backgroundColor: '#94949404',
+    width: '100%',
+    paddingBottom: 30,
+  }
 });
