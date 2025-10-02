@@ -29,7 +29,7 @@ export default function SignUp({ navigation }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   //Validadores
   const validadorcaracteres = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+$/;
-  const validadorEmail = /^[a-zA-Z0-9,._-]+@(gmail|hotmail|outlook|yahoo)\.com$/;
+  const validadorEmail = /^[a-zA-Z0-9._-]+@(gmail|hotmail|outlook|yahoo|live|msn|icloud|me|aol|protonmail|proton|mail|zoho|yandex|gmx|terra|arnet|speedy|fibertel|ciudad)\.com$/;
   // Estados para el enfoque de los campos
   const [firstNameFocused, setFirstNameFocused] = useState(false);
   const [lastNameFocused, setLastNameFocused] = useState(false);
