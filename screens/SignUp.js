@@ -239,37 +239,36 @@ export default function SignUp({ navigation }) {
                 </View>
 
                 {/* Validación de contraseña */}
-                <View style={styles.validationBox}>
-                  <Text style={styles.validationText}>La contraseña debe tener al menos: </Text>
-                  <Text
-                    style={[
-                      styles.validationText,
-                      validations.length && styles.valid,
-                    ]}
-                  >
-                  • 6 caracteres
-                  </Text>
-                  <Text
-                    style={[styles.validationText, validations.upper && styles.valid]}
-                  >
-                  • Una mayúscula
-                  </Text>
-                  <Text
-                    style={[styles.validationText, validations.lower && styles.valid]}
-                  >
-                  • Una minúscula
-                  </Text>
-                  <Text
-                    style={[styles.validationText, validations.number && styles.valid]}
-                  >
-                  • Un número
-                  </Text>
-                  <Text
-                    style={[styles.validationText, validations.hasSpecialChar && styles.valid]}
-                  >
-                  • Un carácter especial (´!@#$%^&*)
-                  </Text>
-                </View>
+                {(passwordFocused || password.length > 0) && (
+                  <View style={styles.validationBox}>
+                    <Text style={styles.validationText}>La contraseña debe tener al menos: </Text>
+                    <Text
+                      style={[styles.validationText, validations.length && styles.valid]}
+                    >
+                    • 6 caracteres
+                    </Text>
+                    <Text
+                      style={[styles.validationText, validations.upper && styles.valid]}
+                    >
+                    • Una mayúscula
+                    </Text>
+                    <Text
+                      style={[styles.validationText, validations.lower && styles.valid]}
+                    >
+                    • Una minúscula
+                    </Text>
+                    <Text
+                      style={[styles.validationText, validations.number && styles.valid]}
+                    >
+                    • Un número
+                    </Text>
+                    <Text
+                      style={[styles.validationText, validations.hasSpecialChar && styles.valid]}
+                    >
+                    • Un carácter especial (´!@#$%^&*)
+                    </Text>
+                  </View>
+                )}
 
                   {/* Confirmar Contraseña */}
                   <Text style={styles.label}>Confirmar Contraseña</Text>
