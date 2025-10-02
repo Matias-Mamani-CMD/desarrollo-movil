@@ -29,6 +29,7 @@ export default function SignUp({ navigation }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   //Validadores
   const validadorcaracteres = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+$/;
+  const validadorEmail = /^[a-zA-Z0-9,._-]+@(gmail|hotmail|outlook|yahoo)\.com$/;
   // Estados para el enfoque de los campos
   const [firstNameFocused, setFirstNameFocused] = useState(false);
   const [lastNameFocused, setLastNameFocused] = useState(false);
@@ -40,7 +41,6 @@ export default function SignUp({ navigation }) {
   const [alertMessage, setAlertMessage] = useState("");
   const [onConfirm, setOnConfirm] = useState(() => () => {});
   const [alertType, setAlertType] = useState("error"); // "error" o "success"
-  
   
   const showCustomAlert = (title, message, confirmAction, type = "error") => {
     setAlertTitle(title);
@@ -78,6 +78,10 @@ export default function SignUp({ navigation }) {
       showCustomAlert("Error", "Los nombres solo deben contener caracteres", null, "error")
       return;
     }
+    if (!validadorEmail.test(email)) {
+      showCustomAlert("Error", "El formato del correo electrónico no es válido.", null, "error");
+      return;
+    }
     if (password !== confirmPassword) {
       showCustomAlert("Error", "Las contraseñas no coinciden.", null, "error");
       return;
@@ -93,7 +97,7 @@ export default function SignUp({ navigation }) {
           setShowAlert(false);
           navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
         },
-        "success" // 👈 este define que se muestre azul
+        "success" // este define que se muestre azul
       );
     } catch (error) {
       let errorMessage = "Hubo un problema al registrar el usuario.";
@@ -258,10 +262,7 @@ export default function SignUp({ navigation }) {
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => navigation.replace('Login')}>
-                  <View style={styles.loginTextContainer}>
-                    <Text style={styles.loginText}>¿Ya tiene cuenta?</Text>
-                    <Text style={styles.underlinedLogin}>Iniciar sesión</Text>
-                  </View>
+                  <Text style={styles.signUpText}>¿Ya tienes cuenta? Inicia sesión</Text>
                 </TouchableOpacity>
               </View>
 
@@ -437,16 +438,14 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     marginVertical:15,
-    width: '70%',
+    width: '95%',
     alignItems: 'center',
     alignSelf: 'center',
-    boxShadow: '1px 3px 6px 1px #999999c5',
   },
   buttonText: {
     color: '#ffffffff',
     fontSize: 16,
     fontWeight: 'bold',
-    textDecorationLine: 'underline',
   },
   backButton: {
     alignSelf: 'flex-start',
@@ -462,28 +461,13 @@ const styles = StyleSheet.create({
     color: '#031666ff',
     marginLeft: 8,
   },
-  loginTextContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  underlinedLogin: {
+  signUpText: {
     fontSize: 14,
     fontWeight: "600",
     marginTop: 20,
     marginBottom: 15,
     color: '#136dffff',
     textAlign: 'center',
-    textDecorationLine: 'underline',
-  },
-  loginText: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginTop: 20,
-    marginBottom: 15,
-    color: '#136dffff',
-    textAlign: 'center',
-    paddingRight: 5,
   },
   flexSpacer: {
     flex: 1,
