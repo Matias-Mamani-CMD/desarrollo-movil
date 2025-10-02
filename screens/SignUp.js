@@ -107,8 +107,6 @@ export default function SignUp({ navigation }) {
           setShowAlert(false);
           navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
         },
-        "success" //
-        "success" // este define que se muestre azul
       );
     } catch (error) {
       let errorMessage = "Hubo un problema al registrar el usuario.";
@@ -165,7 +163,7 @@ export default function SignUp({ navigation }) {
               {/* Card translúcida */}
               <View style={styles.card}>
                 <View style={styles.topSection}>
-                  <Text style={styles.title}>Regístrate</Text>
+                  <Text style={styles.title}>Registro</Text>
                 </View>
                 
                 {/* Nombre */}
@@ -323,11 +321,11 @@ export default function SignUp({ navigation }) {
                 </View>
 
                 <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-                  <Text style={styles.buttonText}>Registrarse</Text>
+                  <Text style={styles.buttonText2}>Registrarse</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => navigation.replace('Login')}>
-                  <Text style={styles.signUpText}>¿Ya tienes cuenta? Inicia sesión</Text>
+                  <Text style={styles.signUpText}>¿Ya tienes cuenta? <Text style={styles.underlinedSignUp}>Inicia sesión</Text></Text>
                 </TouchableOpacity>
               </View>
 
@@ -503,7 +501,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     marginVertical:15,
-    width: '95%',
+    width: '43%',
+    height: '7%',
     alignItems: 'center',
     alignSelf: 'center',
   },
@@ -526,6 +525,12 @@ const styles = StyleSheet.create({
     color: '#031666ff',
     marginLeft: 8,
   },
+  buttonText2: {
+    paddingTop: 4,
+    color: '#ffffffff',
+    fontSize: 17,
+    fontWeight: 'bold',
+  },
   signUpText: {
     fontSize: 14,
     fontWeight: "600",
@@ -537,6 +542,14 @@ const styles = StyleSheet.create({
   flexSpacer: {
     flex: 1,
     minHeight: 30, // Espacio mínimo para asegurar que el footer quede fuera de la vista inicial
+  },
+    underlinedSignUp: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginTop: 20,
+    color: '#136dffff',
+    textAlign: 'center',
+    textDecorationLine: 'underline',
   },
   footer: {
     width: width,

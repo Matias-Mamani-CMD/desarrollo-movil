@@ -241,13 +241,13 @@ export default function Login({ navigation }) {
 
               {/* Login Button */}
               <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                <Text style={styles.buttonText}>Ingresar</Text>
+                <Text style={styles.buttonText2}>Ingresar</Text>
               </TouchableOpacity>
 
               {/* Go to SignUp */}
               <TouchableOpacity onPress={() => navigation.replace('SignUp')}>
                 <View style={styles.signUpTextContainer}>
-                  <Text style={styles.signUpText}>¿No tiene cuenta aún?</Text>
+                  <Text style={styles.signUpText}>¿No tienes cuenta aún?</Text>
                   <Text style={styles.underlinedSignUp}>Registrarse</Text>
                 </View>
               </TouchableOpacity>
@@ -439,16 +439,24 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     marginVertical: 15,
-    width: '70%',
+    width: '43%',
+    height: '10%',
     alignItems: 'center',
     alignSelf: 'center',
     marginBottom: 18,
   },
   buttonText: {
+    paddingTop: 10,
     color: '#ffffffff',
     fontSize: 16,
     fontWeight: 'bold',
     textDecorationLine: 'underline',
+  },
+    buttonText2: {
+    paddingTop: 4,
+    color: '#ffffffff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   signUpTextContainer: {
     flexDirection: 'row',
