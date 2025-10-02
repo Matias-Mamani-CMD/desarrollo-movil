@@ -39,6 +39,7 @@ export default function SignUp({ navigation }) {
   const [onConfirm, setOnConfirm] = useState(() => () => {});
   const [alertType, setAlertType] = useState("error"); // "error" o "success"
   
+  
   const showCustomAlert = (title, message, confirmAction, type = "error") => {
     setAlertTitle(title);
     setAlertMessage(message);
@@ -248,7 +249,10 @@ export default function SignUp({ navigation }) {
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => navigation.replace('Login')}>
-                  <Text style={styles.signUpText}>¿Ya tienes cuenta? Inicia sesión</Text>
+                  <View style={styles.loginTextContainer}>
+                    <Text style={styles.loginText}>¿Ya tiene cuenta?</Text>
+                    <Text style={styles.underlinedLogin}>Iniciar sesión</Text>
+                  </View>
                 </TouchableOpacity>
               </View>
 
@@ -424,14 +428,16 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     marginVertical:15,
-    width: '95%',
+    width: '70%',
     alignItems: 'center',
     alignSelf: 'center',
+    boxShadow: '1px 3px 6px 1px #999999c5',
   },
   buttonText: {
     color: '#ffffffff',
     fontSize: 16,
     fontWeight: 'bold',
+    textDecorationLine: 'underline',
   },
   backButton: {
     alignSelf: 'flex-start',
@@ -447,13 +453,28 @@ const styles = StyleSheet.create({
     color: '#031666ff',
     marginLeft: 8,
   },
-  signUpText: {
+  loginTextContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  underlinedLogin: {
     fontSize: 14,
     fontWeight: "600",
     marginTop: 20,
     marginBottom: 15,
     color: '#136dffff',
     textAlign: 'center',
+    textDecorationLine: 'underline',
+  },
+  loginText: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginTop: 20,
+    marginBottom: 15,
+    color: '#136dffff',
+    textAlign: 'center',
+    paddingRight: 5,
   },
   flexSpacer: {
     flex: 1,

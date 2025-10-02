@@ -72,7 +72,7 @@ export default function Login({ navigation }) {
     if (!email || !password) {
       showCustomAlert(
         "Error",
-        "Por favor ingrese ambos campos.",
+        "Por favor complete ambos campos.",
         () => setShowModal(false),
         "error" // tipo rojo
       );
@@ -224,14 +224,14 @@ export default function Login({ navigation }) {
                     trackColor={{ false: "#ccc", true: "#0317668f" }}
                     thumbColor={rememberMe ? "#031666ff" : "#f4f3f4"}
                   />
-                  <Text style={styles.rememberText}>Recordarme</Text>
+                  <Text style={styles.rememberText}>Recordar</Text>
                 </View>
 
                 {/* Olvidé contraseña a la derecha */}
                 <TouchableOpacity
                   onPress={() => navigation.navigate('ForgotPassword')}
                 >
-                  <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
+                  <Text style={styles.forgotPasswordText}>¿Olvidó su contraseña?</Text>
                 </TouchableOpacity>
               </View>
 
@@ -242,7 +242,10 @@ export default function Login({ navigation }) {
 
               {/* Go to SignUp */}
               <TouchableOpacity onPress={() => navigation.replace('SignUp')}>
-                <Text style={styles.signUpText}>¿No tienes cuenta aún? Regístrate</Text>
+                <View style={styles.signUpTextContainer}>
+                  <Text style={styles.signUpText}>¿No tiene cuenta aún?</Text>
+                  <Text style={styles.underlinedSignUp}>Registrarse</Text>
+                </View>
               </TouchableOpacity>
             </View>
           </ScrollView>
@@ -432,7 +435,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     marginVertical: 15,
-    width: '95%',
+    width: '70%',
     alignItems: 'center',
     alignSelf: 'center',
     marginBottom: 18,
@@ -441,6 +444,12 @@ const styles = StyleSheet.create({
     color: '#ffffffff',
     fontSize: 16,
     fontWeight: 'bold',
+    textDecorationLine: 'underline',
+  },
+  signUpTextContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   signUpText: {
     fontSize: 14,
@@ -448,6 +457,15 @@ const styles = StyleSheet.create({
     marginTop: 20,
     color: '#136dffff',
     textAlign: 'center',
+    paddingRight: 5,
+  },
+  underlinedSignUp: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginTop: 20,
+    color: '#136dffff',
+    textAlign: 'center',
+    textDecorationLine: 'underline',
   },
   footer: {
     width: width,

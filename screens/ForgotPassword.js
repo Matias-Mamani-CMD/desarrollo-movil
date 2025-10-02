@@ -147,7 +147,7 @@ return (
 
           <Text style={styles.title}>Restablecer contraseña</Text>
           <Text style={styles.subtitle}>
-            Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
+            Ingrese su correo electrónico y le enviaremos un enlace para restablecer tu contraseña.
           </Text>
 
           <Text style={styles.label}>Correo electrónico</Text>
