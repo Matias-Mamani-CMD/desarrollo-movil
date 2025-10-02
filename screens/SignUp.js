@@ -29,7 +29,7 @@ export default function SignUp({ navigation }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   //Validadores
   const validadorcaracteres = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+$/;
-  const validadorEmail = /^[a-zA-Z0-9,._-]+@(gmail|hotmail|outlook|yahoo)\.com$/;
+  const validadorEmail = /^[a-zA-Z0-9._-]+@(gmail|hotmail|outlook|yahoo|live|msn|icloud|me|aol|protonmail|proton|mail|zoho|yandex|gmx|terra|arnet|speedy|fibertel|ciudad)\.com$/;
   // Estados para el enfoque de los campos
   const [firstNameFocused, setFirstNameFocused] = useState(false);
   const [lastNameFocused, setLastNameFocused] = useState(false);
@@ -50,6 +50,7 @@ export default function SignUp({ navigation }) {
     setShowAlert(true);
   };
 
+
   // Manejar botón físico de atrás - Siempre va a Welcome
   useEffect(() => {
     const backAction = () => {
@@ -64,17 +65,6 @@ export default function SignUp({ navigation }) {
 
     return () => backHandler.remove();
   }, [navigation]);
-  
-  const validations = {
-    length: password.length >= 6,
-    upper: /[A-Z]/.test(password),
-    lower: /[a-z]/.test(password),
-    number: /[0-9]/.test(password),
-    hasSpecialChar: /[!@#$%^&*]/.test(password),
-  };
-
-  const passwordsMatch =
-    password && confirmPassword && password === confirmPassword;
 
   const handleSignUp = async () => {
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
@@ -85,7 +75,7 @@ export default function SignUp({ navigation }) {
     let validsurname = validadorcaracteres.test(lastName)
 
     if (!validname || !validsurname) {
-      showCustomAlert("Error", "Los nombres solo deben contener carácteres", null, "error")
+      showCustomAlert("Error", "Los nombres solo deben contener caracteres", null, "error")
       return;
     }
     if (!validadorEmail.test(email)) {
@@ -107,6 +97,7 @@ export default function SignUp({ navigation }) {
           setShowAlert(false);
           navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
         },
+        "success" // este define que se muestre azul
       );
     } catch (error) {
       let errorMessage = "Hubo un problema al registrar el usuario.";
@@ -163,7 +154,7 @@ export default function SignUp({ navigation }) {
               {/* Card translúcida */}
               <View style={styles.card}>
                 <View style={styles.topSection}>
-                  <Text style={styles.title}>Registro</Text>
+                  <Text style={styles.title}>Regístrate</Text>
                 </View>
                 
                 {/* Nombre */}
@@ -216,13 +207,8 @@ export default function SignUp({ navigation }) {
 
                 {/* Contraseña */}
                 <Text style={styles.label}>Contraseña</Text>
-                <View
-                  style={[
-                    styles.inputContainer,
-                    passwordFocused && styles.inputContainerFocused,
-                  ]}
-                >
-                  <FontAwesome name="lock" size={20} style={styles.icon} />
+                <View style={[styles.inputContainer, passwordFocused && styles.inputContainerFocused]}>
+                  <FontAwesome name="lock" size={20} style={styles.icon}/>  
                   <TextInput
                     style={styles.input}
                     placeholder={'Ingrese su contraseña'}
@@ -234,102 +220,53 @@ export default function SignUp({ navigation }) {
                     onBlur={() => setPasswordFocused(false)}
                   />
                   <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                    <FontAwesome
-                      name={showPassword ? 'eye-slash' : 'eye'}
-                      size={20}
-                      style={styles.icon}
+                    <FontAwesome 
+                      name={showPassword ? "eye-slash" : "eye"} 
+                      size={20} 
+                      style={styles.icon} 
                     />
                   </TouchableOpacity>
                 </View>
 
-                {/* Validación de contraseña */}
-                {(passwordFocused || password.length > 0) && (
-                  <View style={styles.validationBox}>
-                    <Text style={styles.validationText}>La contraseña debe tener al menos: </Text>
-                    <Text
-                      style={[styles.validationText, validations.length && styles.valid]}
-                    >
-                    • 6 carácteres
-                    </Text>
-                    <Text
-                      style={[styles.validationText, validations.upper && styles.valid]}
-                    >
-                    • Una mayúscula
-                    </Text>
-                    <Text
-                      style={[styles.validationText, validations.lower && styles.valid]}
-                    >
-                    • Una minúscula
-                    </Text>
-                    <Text
-                      style={[styles.validationText, validations.number && styles.valid]}
-                    >
-                    • Un número
-                    </Text>
-                    <Text
-                      style={[styles.validationText, validations.hasSpecialChar && styles.valid]}
-                    >
-                    • Un carácter especial (´!@#$%^&*)
-                    </Text>
-                  </View>
-                )}
+                <View style={styles.passwordHintContainer}>
+                  <Text style={styles.passwordHint}>
+                    Al menos 6 caracteres, incluyendo una mayúscula, una minúscula y un número.
+                  </Text>
+                </View>
 
-                  {/* Confirmar Contraseña */}
-                  <Text style={styles.label}>Confirmar Contraseña</Text>
-                  <View
-                    style={[
-                      styles.inputContainer,
-                      confirmPasswordFocused && styles.inputContainerFocused,
-                    ]}
-                  >
-                    <FontAwesome name="lock" size={20} style={styles.icon} />
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Confirme su contraseña"
-                      placeholderTextColor="#787878ff"
-                      value={confirmPassword}
-                      onChangeText={setConfirmPassword}
-                      secureTextEntry={!showConfirmPassword}
-                      onFocus={() => setConfirmPasswordFocused(true)}
-                      onBlur={() => setConfirmPasswordFocused(false)}
+                {/* Confirmar Contraseña */}
+                <Text style={styles.label}>Confirmar Contraseña</Text>
+                <View style={[styles.inputContainer, confirmPasswordFocused && styles.inputContainerFocused]}>
+                  <FontAwesome name="lock" size={20} style={styles.icon} />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Confirme su contraseña"
+                    placeholderTextColor="#787878ff"
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    secureTextEntry={!showConfirmPassword}
+                    onFocus={() => setConfirmPasswordFocused(true)}
+                    onBlur={() => setConfirmPasswordFocused(false)}
+                  />
+                  <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+                    <FontAwesome 
+                      name={showConfirmPassword ? "eye-slash" : "eye"} 
+                      size={20} 
+                      style={styles.icon} 
                     />
-                    <TouchableOpacity
-                      onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                    >
-                      <FontAwesome
-                        name={showConfirmPassword ? 'eye-slash' : 'eye'}
-                        size={20}
-                        style={styles.icon}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                
-                {/* Contraseñas iguales */}
-                <View style={styles.validationBox}>
-                  {confirmPassword.length > 0 && (
-                    <Text
-                      style={[
-                        styles.validationText,
-                        passwordsMatch ? styles.valid : styles.invalid,
-                      ]}
-                    >
-                      {passwordsMatch
-                        ? 'Las contraseñas coinciden'
-                        : 'Las contraseñas no coinciden'}
-                    </Text>
-                )}
+                  </TouchableOpacity>
                 </View>
 
                 <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-                  <Text style={styles.buttonText2}>Registrarse</Text>
+                  <Text style={styles.buttonText}>Registrarse</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => navigation.replace('Login')}>
-                  <Text style={styles.signUpText}>¿Ya tienes cuenta? <Text style={styles.underlinedSignUp}>Inicia sesión</Text></Text>
+                  <Text style={styles.signUpText}>¿Ya tienes cuenta? Inicia sesión</Text>
                 </TouchableOpacity>
               </View>
 
-              {/* Espacio que empuja el footer hacia abajo */}
+              {/* Espacio flexible que empuja el footer hacia abajo */}
               <View style={styles.flexSpacer} />
               
               {/* Footer que solo se ve al hacer scroll hasta el final */}
@@ -501,8 +438,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     marginVertical:15,
-    width: '43%',
-    height: '7%',
+    width: '95%',
     alignItems: 'center',
     alignSelf: 'center',
   },
@@ -525,12 +461,6 @@ const styles = StyleSheet.create({
     color: '#031666ff',
     marginLeft: 8,
   },
-  buttonText2: {
-    paddingTop: 4,
-    color: '#ffffffff',
-    fontSize: 17,
-    fontWeight: 'bold',
-  },
   signUpText: {
     fontSize: 14,
     fontWeight: "600",
@@ -542,14 +472,6 @@ const styles = StyleSheet.create({
   flexSpacer: {
     flex: 1,
     minHeight: 30, // Espacio mínimo para asegurar que el footer quede fuera de la vista inicial
-  },
-    underlinedSignUp: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginTop: 20,
-    color: '#136dffff',
-    textAlign: 'center',
-    textDecorationLine: 'underline',
   },
   footer: {
     width: width,
@@ -576,6 +498,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     elevation: 5,
     alignItems: 'center',
+    borderWidth: 2,
     borderWidth: 1.5,
     borderColor: "#000000ff",
     boxShadow: '1px 1px 7px 3px #2727277e',
@@ -621,20 +544,5 @@ const styles = StyleSheet.create({
   },
   modalDetailError: {
     backgroundColor: '#C81B1E', // rojo
-  },
-
-  validationBox: {
-    marginLeft: 24,
-    marginBottom: 10,
-  },
-  validationText: {
-    fontSize: 13,
-    color: 'gray', // gris por defecto
-  },
-  valid: {
-    color: 'green', // condición cumplida
-  },
-  invalid: {
-    color: 'red', // para "no coinciden"
   },
 });

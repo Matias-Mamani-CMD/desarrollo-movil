@@ -29,6 +29,9 @@ export default function ForgotPassword({ navigation }) {
   const [alertTitle, setAlertTitle] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
 
+  //Validador del formato de correos permitidos
+  const validadorEmail = /^[a-zA-Z0-9._-]+@(gmail|hotmail|outlook|yahoo|live|msn|icloud|me|aol|protonmail|proton|mail|zoho|yandex|gmx|terra|arnet|speedy|fibertel|ciudad)\.com$/;
+
   const showCustomAlert = (type, title, message, onClose = null) => {
     setAlertType(type);
     setAlertTitle(title);
@@ -77,12 +80,11 @@ export default function ForgotPassword({ navigation }) {
     }
 
     // Validación de formato de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!validadorEmail.test(email)) {
       showCustomAlert(
         "error",
         "Error",
-        "Por favor ingrese un correo electrónico válido."
+        "El correo electrónico no tiene un formato válido. Por favor, verifica e inténtalo nuevamente."
       );
       return;
     }
@@ -96,7 +98,7 @@ export default function ForgotPassword({ navigation }) {
         showCustomAlert(
           "error",
           "Usuario no encontrado",
-          "El correoo no está registrado."
+          "El correo ingresado no está registrado en el sistema."
         );
         setIsLoading(false);
         return;
@@ -107,7 +109,7 @@ export default function ForgotPassword({ navigation }) {
       showCustomAlert(
         "success",
         "Correo enviado",
-        "Se ha enviado un enlace para restablecer tu contraseña a tu correo electrónico. Por favor revisa tu bandeja de entrada y spam.",
+        "Hemos enviado un enlace para restablecer tu contraseña a tu correo electrónico. Revisa la bandeja de entrada y la carpeta de spam.",
         () => navigation.replace('Login')
       );
     } catch (error) {
