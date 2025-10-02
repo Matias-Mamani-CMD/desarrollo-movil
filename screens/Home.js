@@ -3,8 +3,7 @@ import {
   View, 
   Text, 
   TouchableOpacity, 
-  StyleSheet, 
-  Alert, 
+  StyleSheet,
   Image,
   ImageBackground, //imágen de fondo
   ScrollView, // pantalla desplazable

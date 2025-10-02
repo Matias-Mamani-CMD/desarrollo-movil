@@ -41,7 +41,6 @@ export default function SignUp({ navigation }) {
   const [onConfirm, setOnConfirm] = useState(() => () => {});
   const [alertType, setAlertType] = useState("error"); // "error" o "success"
   
-  
   const showCustomAlert = (title, message, confirmAction, type = "error") => {
     setAlertTitle(title);
     setAlertMessage(message);
@@ -49,7 +48,6 @@ export default function SignUp({ navigation }) {
     setAlertType(type);
     setShowAlert(true);
   };
-
 
   // Manejar botón físico de atrás - Siempre va a Welcome
   useEffect(() => {
@@ -65,6 +63,17 @@ export default function SignUp({ navigation }) {
 
     return () => backHandler.remove();
   }, [navigation]);
+  
+  const validations = {
+    length: password.length >= 6,
+    upper: /[A-Z]/.test(password),
+    lower: /[a-z]/.test(password),
+    number: /[0-9]/.test(password),
+    hasSpecialChar: /[!@#$%^&*]/.test(password),
+  };
+
+  const passwordsMatch =
+    password && confirmPassword && password === confirmPassword;
 
   const handleSignUp = async () => {
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
@@ -93,7 +102,7 @@ export default function SignUp({ navigation }) {
           setShowAlert(false);
           navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
         },
-        "success" // 👈 este define que se muestre azul
+        "success" //
       );
     } catch (error) {
       let errorMessage = "Hubo un problema al registrar el usuario.";
@@ -203,8 +212,13 @@ export default function SignUp({ navigation }) {
 
                 {/* Contraseña */}
                 <Text style={styles.label}>Contraseña</Text>
-                <View style={[styles.inputContainer, passwordFocused && styles.inputContainerFocused]}>
-                  <FontAwesome name="lock" size={20} style={styles.icon}/>  
+                <View
+                  style={[
+                    styles.inputContainer,
+                    passwordFocused && styles.inputContainerFocused,
+                  ]}
+                >
+                  <FontAwesome name="lock" size={20} style={styles.icon} />
                   <TextInput
                     style={styles.input}
                     placeholder={'Ingrese su contraseña'}
@@ -216,41 +230,91 @@ export default function SignUp({ navigation }) {
                     onBlur={() => setPasswordFocused(false)}
                   />
                   <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                    <FontAwesome 
-                      name={showPassword ? "eye-slash" : "eye"} 
-                      size={20} 
-                      style={styles.icon} 
+                    <FontAwesome
+                      name={showPassword ? 'eye-slash' : 'eye'}
+                      size={20}
+                      style={styles.icon}
                     />
                   </TouchableOpacity>
                 </View>
 
-                <View style={styles.passwordHintContainer}>
-                  <Text style={styles.passwordHint}>
-                    Al menos 6 caracteres, incluyendo una mayúscula, una minúscula y un número.
+                {/* Validación de contraseña */}
+                <View style={styles.validationBox}>
+                  <Text style={styles.validationText}>La contraseña debe tener al menos: </Text>
+                  <Text
+                    style={[
+                      styles.validationText,
+                      validations.length && styles.valid,
+                    ]}
+                  >
+                  • 6 caracteres
+                  </Text>
+                  <Text
+                    style={[styles.validationText, validations.upper && styles.valid]}
+                  >
+                  • Una mayúscula
+                  </Text>
+                  <Text
+                    style={[styles.validationText, validations.lower && styles.valid]}
+                  >
+                  • Una minúscula
+                  </Text>
+                  <Text
+                    style={[styles.validationText, validations.number && styles.valid]}
+                  >
+                  • Un número
+                  </Text>
+                  <Text
+                    style={[styles.validationText, validations.hasSpecialChar && styles.valid]}
+                  >
+                  • Un carácter especial (´!@#$%^&*)
                   </Text>
                 </View>
 
-                {/* Confirmar Contraseña */}
-                <Text style={styles.label}>Confirmar Contraseña</Text>
-                <View style={[styles.inputContainer, confirmPasswordFocused && styles.inputContainerFocused]}>
-                  <FontAwesome name="lock" size={20} style={styles.icon} />
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Confirme su contraseña"
-                    placeholderTextColor="#787878ff"
-                    value={confirmPassword}
-                    onChangeText={setConfirmPassword}
-                    secureTextEntry={!showConfirmPassword}
-                    onFocus={() => setConfirmPasswordFocused(true)}
-                    onBlur={() => setConfirmPasswordFocused(false)}
-                  />
-                  <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-                    <FontAwesome 
-                      name={showConfirmPassword ? "eye-slash" : "eye"} 
-                      size={20} 
-                      style={styles.icon} 
+                  {/* Confirmar Contraseña */}
+                  <Text style={styles.label}>Confirmar Contraseña</Text>
+                  <View
+                    style={[
+                      styles.inputContainer,
+                      confirmPasswordFocused && styles.inputContainerFocused,
+                    ]}
+                  >
+                    <FontAwesome name="lock" size={20} style={styles.icon} />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Confirme su contraseña"
+                      placeholderTextColor="#787878ff"
+                      value={confirmPassword}
+                      onChangeText={setConfirmPassword}
+                      secureTextEntry={!showConfirmPassword}
+                      onFocus={() => setConfirmPasswordFocused(true)}
+                      onBlur={() => setConfirmPasswordFocused(false)}
                     />
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      <FontAwesome
+                        name={showConfirmPassword ? 'eye-slash' : 'eye'}
+                        size={20}
+                        style={styles.icon}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                
+                {/* Contraseñas iguales */}
+                <View style={styles.validationBox}>
+                  {confirmPassword.length > 0 && (
+                    <Text
+                      style={[
+                        styles.validationText,
+                        passwordsMatch ? styles.valid : styles.invalid,
+                      ]}
+                    >
+                      {passwordsMatch
+                        ? 'Las contraseñas coinciden'
+                        : 'Las contraseñas no coinciden'}
+                    </Text>
+                )}
                 </View>
 
                 <TouchableOpacity style={styles.button} onPress={handleSignUp}>
@@ -265,7 +329,7 @@ export default function SignUp({ navigation }) {
                 </TouchableOpacity>
               </View>
 
-              {/* Espacio flexible que empuja el footer hacia abajo */}
+              {/* Espacio que empuja el footer hacia abajo */}
               <View style={styles.flexSpacer} />
               
               {/* Footer que solo se ve al hacer scroll hasta el final */}
@@ -514,7 +578,6 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     elevation: 5,
     alignItems: 'center',
-    borderWidth: 2,
     borderWidth: 1.5,
     borderColor: "#000000ff",
     boxShadow: '1px 1px 7px 3px #2727277e',
@@ -560,5 +623,19 @@ const styles = StyleSheet.create({
   },
   modalDetailError: {
     backgroundColor: '#C81B1E', // rojo
+  },
+  validationBox: {
+    marginLeft: 24,
+    marginBottom: 10,
+  },
+  validationText: {
+    fontSize: 13,
+    color: 'gray', // gris por defecto
+  },
+  valid: {
+    color: 'green', // condición cumplida
+  },
+  invalid: {
+    color: 'red', // para "no coinciden"
   },
 });
