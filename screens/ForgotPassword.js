@@ -39,7 +39,7 @@ export default function ForgotPassword({ navigation }) {
     setCustomAlertVisible(true);
 
     if (onClose) {
-      setTimeout(() => onClose(), 5000);
+      setTimeout(() => onClose(), 10000);
     }
   };
 
@@ -109,7 +109,7 @@ export default function ForgotPassword({ navigation }) {
       showCustomAlert(
         "success",
         "Correo enviado",
-        "Hemos enviado un enlace para restablecer tu contraseña a tu correo electrónico. Revisa la bandeja de entrada y la carpeta de spam.",
+        "Hemos enviado un enlace para restablecer su contraseña a su correo electrónico. Revise la bandeja de entrada y la carpeta de spam.",
         () => navigation.replace('Login')
       );
     } catch (error) {
@@ -183,7 +183,7 @@ export default function ForgotPassword({ navigation }) {
 
             <Text style={styles.title}>Restablecer contraseña</Text>
             <Text style={styles.subtitle}>
-              Ingrese su correo electrónico y le enviaremos un enlace para restablecer tu contraseña.
+              Ingrese su correo electrónico y le enviaremos un enlace para restablecer su contraseña.
             </Text>
 
             <Text style={styles.label}>Correo electrónico</Text>

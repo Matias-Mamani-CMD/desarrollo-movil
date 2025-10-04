@@ -63,7 +63,7 @@ export default function AboutUs({ navigation }) {
               <Text style={styles.title}>Sobre Nosotros</Text>
               <Text style={styles.description}>
                 El Instituto Jean Piaget es una institución educativa comprometida con la excelencia 
-                académica y la formación integral de nuestros estudiantes. Fundado en [año de fundación], 
+                académica y la formación integral de nuestros estudiantes. Fundado en 1989, 
                 nos enorgullece ofrecer una educación de calidad que combina tradición e innovación.
               </Text>
 
@@ -135,6 +135,13 @@ export default function AboutUs({ navigation }) {
                 >
                   <FontAwesome name="map-marker" size={20} color="#1E2A78" />
                   <Text style={styles.contactText}>Calle 123, Salta</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.contactItem}
+                  onPress={() => handleOpenLink('https://www.facebook.com/institutojeanpiaget.salta/?locale=es_LA')}
+                >
+                  <FontAwesome name="facebook-square" size={20} color="#1E2A78" />
+                  <Text style={styles.contactText}>Instituto Jean Piaget</Text>
                 </TouchableOpacity>
               </View>
             </View>
