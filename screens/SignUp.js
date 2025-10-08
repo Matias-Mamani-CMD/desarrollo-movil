@@ -29,7 +29,8 @@ export default function SignUp({ navigation }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   //Validadores
   const validadorcaracteres = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+$/;
-  const validadorEmail = /^[a-zA-Z0-9._-]+@(gmail|hotmail|outlook|yahoo|live|msn|icloud|me|aol|protonmail|proton|mail|zoho|yandex|gmx|terra|arnet|speedy|fibertel|ciudad)\.com$/;
+  const validadorEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const validadorPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
   // Estados para el enfoque de los campos
   const [firstNameFocused, setFirstNameFocused] = useState(false);
   const [lastNameFocused, setLastNameFocused] = useState(false);
@@ -50,6 +51,15 @@ export default function SignUp({ navigation }) {
     setShowAlert(true);
   };
 
+  const validations = {
+    length: password.length >= 6,
+    upper: /[A-Z]/.test(password),
+    lower: /[a-z]/.test(password),
+    number: /[0-9]/.test(password),
+  };
+
+  const passwordsMatch =
+    password && confirmPassword && password === confirmPassword;
 
   // Manejar botón físico de atrás - Siempre va a Welcome
   useEffect(() => {
@@ -84,6 +94,15 @@ export default function SignUp({ navigation }) {
     }
     if (password !== confirmPassword) {
       showCustomAlert("Error", "Las contraseñas no coinciden.", null, "error");
+      return;
+    }
+    if (!validadorPassword.test(password)) {
+      showCustomAlert(
+        "Error",
+        "La contraseña debe tener al menos 6 caracteres, una mayúscula, una minúscula y un número.",
+        null,
+        "error"
+      ); 
       return;
     }
 
@@ -205,6 +224,21 @@ export default function SignUp({ navigation }) {
                   />
                 </View>
 
+                {/* Validación de correo */}
+                {(emailFocused || email.length > 0) && (
+                  <Text
+                    style={[
+                      styles.validationText,
+                      validadorEmail.test(email) ? styles.valid : styles.invalid,
+                      { marginLeft: 18, marginBottom: 3 }
+                    ]}
+                  >
+                    {validadorEmail.test(email) 
+                      ? "Correo válido" 
+                      : "Formato de correo incorrecto"}
+                  </Text>
+                )}
+
                 {/* Contraseña */}
                 <Text style={styles.label}>Contraseña</Text>
                 <View style={[styles.inputContainer, passwordFocused && styles.inputContainerFocused]}>
@@ -228,11 +262,32 @@ export default function SignUp({ navigation }) {
                   </TouchableOpacity>
                 </View>
 
-                <View style={styles.passwordHintContainer}>
-                  <Text style={styles.passwordHint}>
-                    Al menos 6 caracteres, incluyendo una mayúscula, una minúscula y un número.
-                  </Text>
-                </View>
+                {/* Requisitos de contraseña */}
+                {(passwordFocused || password.length > 0) && (
+                  <View style={styles.validationBox}>
+                    <Text style={styles.validationText}>La contraseña debe tener al menos: </Text>
+                    <Text
+                      style={[styles.validationText, validations.length && styles.valid,]}
+                    >
+                    • 6 caracteres
+                    </Text>
+                    <Text
+                      style={[styles.validationText, validations.upper && styles.valid]}
+                    >
+                    • Una mayúscula
+                    </Text>
+                    <Text
+                      style={[styles.validationText, validations.lower && styles.valid]}
+                    >
+                    • Una minúscula
+                    </Text>
+                    <Text
+                      style={[styles.validationText, validations.number && styles.valid]}
+                    >
+                    • Un número
+                    </Text>
+                  </View>
+                )}
 
                 {/* Confirmar Contraseña */}
                 <Text style={styles.label}>Confirmar Contraseña</Text>
@@ -257,12 +312,31 @@ export default function SignUp({ navigation }) {
                   </TouchableOpacity>
                 </View>
 
+                {/* Mensaje de contraseñas coinciden */}
+                <View style={styles.validationBox}>
+                  {confirmPassword.length > 0 && (
+                    <Text
+                      style={[
+                        styles.validationText,
+                        passwordsMatch ? styles.valid : styles.invalid,
+                      ]}
+                    >
+                      {passwordsMatch
+                        ? 'Las contraseñas coinciden'
+                        : 'Las contraseñas no coinciden'}
+                    </Text>
+                  )}
+                </View>
+
                 <TouchableOpacity style={styles.button} onPress={handleSignUp}>
                   <Text style={styles.buttonText}>Registrarse</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => navigation.replace('Login')}>
-                  <Text style={styles.signUpText}>¿Ya tienes cuenta? Inicia sesión</Text>
+                  <View style={styles.signUpOption}>
+                    <Text style={styles.signUpText}>¿Ya tenés cuenta?</Text>
+                    <Text style={styles.signUpBoldText}>Iniciá sesión</Text>
+                  </View>
                 </TouchableOpacity>
               </View>
 
@@ -463,11 +537,25 @@ const styles = StyleSheet.create({
   },
   signUpText: {
     fontSize: 14,
+    fontWeight: "400",
+    marginTop: 20,
+    marginBottom: 15,
+    color: '#136dffff',
+    textAlign: 'center',
+    paddingRight: 5,
+  },
+  signUpBoldText: {
+    fontSize: 14,
     fontWeight: "600",
     marginTop: 20,
     marginBottom: 15,
     color: '#136dffff',
     textAlign: 'center',
+  },
+  signUpOption: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   flexSpacer: {
     flex: 1,
@@ -544,5 +632,20 @@ const styles = StyleSheet.create({
   },
   modalDetailError: {
     backgroundColor: '#C81B1E', // rojo
+  },
+  validationBox: {
+    marginLeft: 16,
+    marginBottom: 10,
+  },
+  validationText: {
+    fontSize: 13,
+    color: 'gray', // gris por defecto
+    paddingLeft: 10,
+  },
+  valid: {
+    color: 'green', // condición cumplida
+  },
+  invalid: {
+    color: 'red', // para "no coinciden"
   },
 });
