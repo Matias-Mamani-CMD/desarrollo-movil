@@ -399,8 +399,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 15,
     backgroundColor: "#1E2A78",
-    borderTopColor: "#FFD900",
-    borderTopWidth: 1.5,
   },
   footerText: {
     fontSize: 13,

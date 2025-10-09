@@ -117,13 +117,19 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff9b",
   },
   topSection: {
-    borderWidth: 1,
-    borderRadius: 30,
-    marginTop: 40,
+    marginTop: 30,
     marginHorizontal:10,
     backgroundColor: "#1E2A78",
     padding: 30,
     alignItems: "center",
+    shadowColor: '#000000',
+    shadowOffset: {
+        width: 0,
+        height: 1,
+    },
+    shadowOpacity: 100,
+    shadowRadius: 0,
+    elevation: 3,
   },
   welcomeText: {
     fontSize: 40,
@@ -211,8 +217,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 15,
     backgroundColor: "#1E2A78",
-    borderTopColor: "#FFD900",
-    borderTopWidth: 1.5,
   },
   footerText: {
     fontSize: 13,
