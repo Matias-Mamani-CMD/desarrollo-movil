@@ -150,9 +150,9 @@ export default function HomeSecretaria() {
           >
               {/* Bienvenida Tutor */}
               <View style={styles.box}>
-                <Text style={styles.title}>Bienvenido, Nombre Secretario</Text>
+                <Text style={styles.title}>Bienvenido, Nombre Empleado!</Text>
                 <Text style={styles.baseText}>
-                  En este apartado podrá gestionar los alumnos y tutores de manera rapida y sencilla.
+                  Este espacio le permitirá gestionar la información administrativa de los alumnos y tutores del instituto.
                 </Text>
               </View>
   
@@ -160,19 +160,23 @@ export default function HomeSecretaria() {
               
               
                 <View style={styles.grayBackground}>
-                  <Image 
-                  source={require('../assets/gestionalumnos.png')}
-                  style={styles.alumnImage}
-                  />
+                  <View style={styles.whiteBox}>
+                    <Image 
+                    source={require('../assets/gestionalumnos.png')}
+                    style={styles.alumnImage}
+                    />
+                  </View>
                   <TouchableOpacity style={styles.boxAlumnos} onPress={() => navigation.navigate('GestionarAlumnos')}>
                     <Text style={styles.textAlumnName}>Gestionar Alumnos</Text>
                   </TouchableOpacity>               
                 </View>
                 <View style={styles.grayBackground}>
-                  <Image 
-                  source={require('../assets/Tutores.png')}
-                  style={styles.tutorImage}
-                  />
+                  <View style={styles.whiteBox}>
+                    <Image 
+                    source={require('../assets/Tutores.png')}
+                    style={styles.tutorImage}
+                    />
+                  </View>
                   <TouchableOpacity style={styles.boxTutores} onPress={() => navigation.navigate('GestionarTutores')}>
                     <Text style={styles.textAlumnName}>Gestionar Tutores</Text>
                   </TouchableOpacity>                 
@@ -245,7 +249,8 @@ export default function HomeSecretaria() {
       alignItems: 'center',
       marginTop: 40,
       padding: 15, //espacio entre el cuadro de Bienvenida y el fondo
-      paddingBottom: 0,
+      paddingBottom: 96,
+      minHeight: '100%',
     },
     box: {
       backgroundColor: '#DB2024', //color caja de texto de Bienvenida 
@@ -296,27 +301,31 @@ export default function HomeSecretaria() {
       margin: 1,
       marginBottom: 1,
       backgroundColor: '#252861', //color de caja para seleccionar Alumno
-      borderRadius: 3, //bordes redondeados
-      padding: "1%", //espaciado entre el texto y la caja
+      padding: "1.2%", //espaciado entre el texto y la caja
       width: "70%",
       alignItems: 'center', //centra horizontalmente
       justifyContent: 'center', //centra verticalmente
+      boxShadow: '0px 0px 6px 0px #0000007e',
+      borderBottomLeftRadius: 8,
+      borderBottomRightRadius: 8,
     },
     boxTutores: {
       margin: 1,
       marginBottom: 1,
       backgroundColor: '#252861', //color de caja para seleccionar Alumno
-      borderRadius: 3, //bordes redondeados
-      padding: "1%", //espaciado entre el texto y la caja
+      padding: "1.2%", //espaciado entre el texto y la caja
       width: "70%",
       alignItems: 'center', //centra horizontalmente
       justifyContent: 'center', //centra verticalmente
+      borderBottomLeftRadius: 10,
+      borderBottomRightRadius: 10,
+      boxShadow: '0px 0px 6px 0px #0000007e',
     },
     textAlumnName: {
-      color: '#fff',
-      fontSize: 30,
-      fontWeight: 'medium',
-      paddingTop: 4,
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '700',
+    paddingTop: 4,
     }, // nombre del alumno
     textYear: {
       color: '#fff',
@@ -324,40 +333,39 @@ export default function HomeSecretaria() {
       fontWeight: 'regular',
       textAlign: 'center',
     }, //año que cursa el alumno
-    circleBackground: {
-      backgroundColor: '#fff',
-      width: 102,
-      height: 102,
-      borderRadius: 70,
-      justifyContent: 'center',
-      alignItems: 'center',
-    }, //fondo circular del ícono del alumno
+    whiteBox: {
+      backgroundColor: '#ffffffdc',
+      width: '70%',
+      height: '70%',
+      boxShadow: '0px 0px 6px 0px #0000007e',
+      borderTopLeftRadius: 10,
+      borderTopRightRadius: 10,
+    },
     alumnImage: {
-      marginHorizontal: 5,
+      marginHorizontal: -10,
+      marginVertical: -8,
       display: 'flex',
-      backgroundColor: '#fff',
-      borderRadius: 3,
-      width: "70%",
-      height: "70%",
+      width: "110%",
+      height: "110%",
     }, //íconos de alumnos
     tutorImage: {
-      marginHorizontal: 5,
+      marginHorizontal: -40,
+      marginVertical: -35.5,
       display: 'flex',
-      backgroundColor: '#fff',
-      borderRadius: 3,
-      width: "70%",
-      height: "70%",
+      width: "129%",
+      height: "129%",
     }, //íconos de alumnos
     grayBackground: {
-      backgroundColor: '#bdbdbdab',
+      backgroundColor: '#9b9b9ba1',
       flexDirection: 'column', // columna
       justifyContent: 'center',
       paddingVertical: 10,
       height: '30%',
       width: '110%',          // ocupa todo el ancho
-      borderRadius: 8,
+      borderRadius: 10,
       alignItems: 'center',
-      marginBottom: 30,
+      marginBottom: 50,
+      boxShadow: '0px 1px 6px 0px #00000063',
     }, // parte del fondo gris
     header: {
       flexDirection: "row",        // fila
@@ -433,14 +441,12 @@ export default function HomeSecretaria() {
       height: 20, // Espacio entre el último elemento y el footer
     },
     footer: {
-      alignItems: "center",
-      paddingTop: 15,
-      paddingBottom: 55,
-      width: '111%',
-      backgroundColor: "#1E2A78",
-      borderTopColor: "#FFD900",
-      borderTopWidth: 2,
-      marginTop: 'auto',
+    width: '110%',
+    alignItems: "center",
+    padding: 15,
+    backgroundColor: "#1E2A78",
+    borderTopColor: "#FFD900",
+    borderTopWidth: 1.5,
     },
     footerText: {
       fontSize: 13,
@@ -459,9 +465,6 @@ export default function HomeSecretaria() {
       paddingBottom: 20,
       elevation: 5,
       alignItems: 'center',
-      borderWidth: 2,
-      borderWidth: 1.5,
-      borderColor: "#000000ff",
       boxShadow: '1px 1px 7px 3px #2727277e',
     },
     modalDetail: {
@@ -475,7 +478,7 @@ export default function HomeSecretaria() {
     modalTitle: {
       textAlign: 'center',
       fontSize: 18,
-      fontWeight: "bold",
+      fontWeight: '500',
       margin: 8,
       color: "#ffffffff",
     },
@@ -502,6 +505,6 @@ export default function HomeSecretaria() {
     },
     modalButtonText: {
       fontSize: 16,
-      fontWeight: "bold",
+      fontWeight: "500",
     },
   });
