@@ -99,7 +99,7 @@ export default function Login({ navigation }) {
         "Has iniciado sesión correctamente.",
         () => {
           setShowModal(false);
-          navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
+          navigation.reset({ index: 0, routes: [{ name: 'HomeSecretaria' }] });
         },
         "success" // tipo azul
       );
