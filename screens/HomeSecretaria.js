@@ -5,503 +5,574 @@ import {
   TouchableOpacity, 
   StyleSheet,
   Image,
-  ImageBackground, //imágen de fondo
-  ScrollView, // pantalla desplazable
-  Modal, // menú cerrar sesión
-  Animated, // animación botón de menú
+  ImageBackground,
+  ScrollView,
+  Modal,
+  Animated,
 } from 'react-native';
 import { signOut } from 'firebase/auth';
 import { auth } from '../src/config/firebaseConfig';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FontAwesome, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native'
-
+import { useNavigation } from '@react-navigation/native';
 
 export default function HomeSecretaria() {
-  const navigation= useNavigation()
+  const navigation = useNavigation();
 
   const [menuVisible, setMenuVisible] = useState(false);
-    const [fadeAnim] = useState(new Animated.Value(0));
-    const [showAlert, setShowAlert] = useState(false);
-    const [alertTitle, setAlertTitle] = useState("");
-    const [alertMessage, setAlertMessage] = useState("");
-    const [onConfirm, setOnConfirm] = useState(() => () => {});
-  
-    const showCustomAlert = (title, message, confirmAction) => {
-      setAlertTitle(title);
-      setAlertMessage(message);
-      setOnConfirm(() => confirmAction);
-      setShowAlert(true);
-    };
-  
-    const handleLogOut = async () => {
-      try {
-        await signOut(auth);  
-        showCustomAlert(
-          "¿Confirma que quiere cerrar sesión?",
-          "Se cerrará su sesión actual.",
-          () => {
-            setShowAlert(false);
-            navigation.replace('Login');
-          }
-        );
-      } catch (error) {
-        showCustomAlert(
-          "Error",
-          "Ha ocurrido un problema.",
-          () => setShowAlert(false)
-        );
-      }
-    };
-  
-  
-    const toggleMenu = () => {
-      if (menuVisible) {
-        // Ocultar menú
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true,
-        }).start(() => setMenuVisible(false));
-      } else {
-        // Mostrar menú
-        setMenuVisible(true);
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        }).start();
-      }
-    };
-  
-    return (
-      <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-        <ImageBackground
-          source={require('../assets/background.jpg')}
-          style={styles.background}
-          resizeMode="cover"
-        >
-  
-          {/* Header con cuenta del tutor */}
-            <View style={styles.header}>
-              {/* Contenedor de Logo y nombre */}
-              <View style={styles.headerLeft}>
-                <Image source={require('../assets/piaget-icon.png')} style={styles.logo} />
-                <View>
-                  <Text style={styles.headerTitle}>Instituto{"\n"}Jean Piaget <Text style={styles.headerNumber}>N°8048</Text></Text>
+  const [fadeAnim] = useState(new Animated.Value(0));
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertTitle, setAlertTitle] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
+  const [onConfirm, setOnConfirm] = useState(() => () => {});
+
+  const showCustomAlert = (title, message, confirmAction) => {
+    setAlertTitle(title);
+    setAlertMessage(message);
+    setOnConfirm(() => confirmAction);
+    setShowAlert(true);
+  };
+
+  const handleLogOut = async () => {
+    try {
+      await signOut(auth);  
+      showCustomAlert(
+        "¿Confirma que quiere cerrar sesión?",
+        "Se cerrará su sesión actual.",
+        () => {
+          setShowAlert(false);
+          navigation.replace('Login');
+        }
+      );
+    } catch (error) {
+      showCustomAlert(
+        "Error",
+        "Ha ocurrido un problema.",
+        () => setShowAlert(false)
+      );
+    }
+  };
+
+  const toggleMenu = () => {
+    if (menuVisible) {
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start(() => setMenuVisible(false));
+    } else {
+      setMenuVisible(true);
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+      <ImageBackground
+        source={require('../assets/background.jpg')}
+        style={styles.background}
+        resizeMode="cover"
+      >
+
+        {/* Header con cuenta del tutor - MANTENIENDO EXACTAMENTE EL ORIGINAL */}
+        <View style={styles.header}>
+          {/* Contenedor de Logo y nombre */}
+          <View style={styles.headerLeft}>
+            <Image source={require('../assets/piaget-icon.png')} style={styles.logo} />
+            <View>
+              <Text style={styles.headerTitle}>Instituto{"\n"}Jean Piaget <Text style={styles.headerNumber}>N°8048</Text></Text>
+            </View>
+          </View>
+
+          {/* Íconos de Tutor en el header */}
+          <View style={styles.headerRight}>
+            <View style={styles.headerBlue}>
+              <View style={styles.iconPlacing}>
+                {/* Ícono de tutor */}
+                <View style={styles.tutorIconBackground}>
+                  <FontAwesome name="user-circle-o" size={45} color="black" style={styles.tutorIcon} />
                 </View>
+                {/* Ícono de menú */}
+                <TouchableOpacity onPress={toggleMenu} style={styles.menuIcon}>
+                  <MaterialCommunityIcons name="menu-down" size={32} color="white" />
+                </TouchableOpacity>
               </View>
-  
-              {/* Íconos de Tutor en el header */}
-              
-              <View style={styles.headerRight}>
-                <View style={styles.headerBlue}>
-                  <View style={styles.iconPlacing}>
-                    {/* Ícono de tutor */}
-                    <MaterialCommunityIcons name="bell" size={17} color="white" paddingTop={18} paddingRight={8}/>
-                    <View style={styles.tutorIconBackground}>
-                      <FontAwesome name="user-circle-o" size={45} color="black" style={styles.tutorIcon} />
-                    </View>
-                    {/* Ícono de menú */}
-                    <TouchableOpacity onPress={toggleMenu} style={styles.menuIcon}>
-                      <MaterialCommunityIcons name="menu-down" size={32} color="white" />
+            </View>
+          </View>
+        </View>
+
+        {/* Menú para opción cerrar sesión */}
+        <Modal
+          transparent={true}
+          visible={menuVisible}
+          animationType="none"
+          onRequestClose={toggleMenu}
+        >
+          <TouchableOpacity
+            style={styles.menuOverlay}
+            activeOpacity={1}
+            onPress={toggleMenu}
+          >
+            <Animated.View 
+              style={[
+                styles.button,
+                { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }
+              ]}
+            >
+              <View>
+                <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                toggleMenu();
+                navigation.navigate('PerfilUsuario');
+              }}>
+                <Text style={styles.buttonText}>Ver Pefil</Text>
+                <Ionicons name="person-outline" size={22} color="white" paddingLeft="5" />
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.menuItem}
+                onPress={() => {
+                  toggleMenu();
+                  handleLogOut();
+                }}>
+                <Text style={styles.buttonText}>Cerrar sesión</Text>
+                <Ionicons name="exit-outline" size={22} color="white" paddingLeft="5" />
+              </TouchableOpacity>
+              </View>
+            </Animated.View>
+          </TouchableOpacity>
+        </Modal>
+        
+        <ScrollView
+          contentContainerStyle={styles.container}
+          keyboardShouldPersistTaps="handled"
+        >
+            {/* Bienvenida - JUSTO DEBAJO DEL NAVBAR Y 100% ANCHO */}
+            <View style={styles.welcomeSection}>
+              <View style={styles.welcomeBox}>
+                <Text style={styles.welcomeTitle}>Bienvenido, Nombre Empleado!</Text>
+                <Text style={styles.welcomeText}>
+                  Este espacio le permitirá gestionar la información administrativa de los alumnos y tutores del instituto.
+                </Text>
+              </View>
+            </View>
+
+            {/* Contenido Principal - CON NUEVAS TARJETAS ESTILO HTML */}
+            <View style={styles.content}>
+              {/* Tarjeta Gestionar Alumnos */}
+              <View style={styles.moduleCard}>
+                <View style={styles.cardRedLine} />
+                <View style={styles.cardHeader}>
+                  {/* ESTILO ESPECÍFICO PARA ALUMNOS */}
+                  <Image 
+                    source={require('../assets/gestionalumnos.png')}
+                    style={styles.cardIconAlumnos}
+                  />
+                  <View style={styles.cardTitleSection}>
+                    <Text style={styles.cardTitle}>Gestionar</Text>
+                    <Text style={styles.cardSubtitle}>Alumnos</Text>
+                  </View>
+                </View>
+                <TouchableOpacity 
+                  style={styles.cardFooter}
+                  onPress={() => navigation.navigate('GestionarAlumnos')}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.cardDescription}>
+                    Administre el registro de estudiantes, datos personales, observaciones y tutores a cargo.
+                  </Text>
+                  <Text style={styles.cardArrow}>›</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Tarjeta Gestionar Tutores */}
+              <View style={styles.moduleCard}>
+                <View style={styles.cardRedLine} />
+                <View style={styles.cardHeader}>
+                  {/* ESTILO ESPECÍFICO PARA TUTORES */}
+                  <Image 
+                    source={require('../assets/Tutores.png')}
+                    style={styles.cardIconTutores}
+                  />
+                  <View style={styles.cardTitleSection}>
+                    <Text style={styles.cardTitle}>Gestionar</Text>
+                    <Text style={styles.cardSubtitle}>Tutores</Text>
+                  </View>
+                </View>
+                <TouchableOpacity 
+                  style={styles.cardFooter}
+                  onPress={() => navigation.navigate('GestionarTutores')}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.cardDescription}>
+                    Gestione la información de tutores y representantes legales, datos de contacto y vinculación familiar.
+                  </Text>
+                  <Text style={styles.cardArrow}>›</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Espacio adicional para asegurar que el footer se vea */}
+            <View style={styles.spacer} />
+
+            {/* Footer */}
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
+            </View>
+
+            {/* Modal de Alertas */}
+            <Modal
+              visible={showAlert}
+              transparent
+              animationType="fade"
+              onRequestClose={() => setShowAlert(false)}
+            >
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalContainer}>
+                  <View style={styles.modalDetail}>
+                    <Text style={styles.modalTitle}>{alertTitle}</Text>
+                  </View>
+                  <Text style={styles.modalMessage}>{alertMessage}</Text>
+                  
+                  <View style={styles.modalButtons}>
+                    <TouchableOpacity
+                      style={[styles.modalButton, {borderColor: "#252861"}]}
+                      onPress={() => setShowAlert(false)}
+                    >
+                      <Text style={[styles.modalButtonText, {color: "#252861"}]}>Cancelar</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={[styles.modalButton, { backgroundColor: "#DB2024", borderWidth: 0 }]}
+                      onPress={() => {
+                        onConfirm();
+                      }}
+                    >
+                      <Text style={[styles.modalButtonText, { color: "#fff"}]}>Aceptar</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
               </View>
-            </View>
-  
-            {/* Menú para opción cerrar sesión */}
-            <Modal
-              transparent={true}
-              visible={menuVisible}
-              animationType="none"
-              onRequestClose={toggleMenu}
-            >
-              <TouchableOpacity
-                style={styles.menuOverlay}
-                activeOpacity={1}
-                onPress={toggleMenu}
-              >
-                <Animated.View 
-                  style={[
-                    styles.button,
-                    { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }
-                  ]}
-                >
-                  <TouchableOpacity 
-                    style={styles.menuItem}
-                    onPress={() => {
-                      toggleMenu();
-                      handleLogOut();
-                    }}
-                  >
-                    <Text style={styles.buttonText}>Cerrar sesión</Text>
-                    <Ionicons name="exit-outline" size={22} color="white" paddingLeft="5" />
-                  </TouchableOpacity>
-  
-                </Animated.View>
-              </TouchableOpacity>
             </Modal>
-            
-          <ScrollView
-            contentContainerStyle={styles.container}
-            keyboardShouldPersistTaps="handled"
-          >
-              {/* Bienvenida Tutor */}
-              <View style={styles.box}>
-                <Text style={styles.title}>Bienvenido, Nombre Secretario</Text>
-                <Text style={styles.baseText}>
-                  En este apartado podrá gestionar los alumnos y tutores de manera rapida y sencilla.
-                </Text>
-              </View>
-  
-              {/* Parte del fondo gris */}
-              
-              
-                <View style={styles.grayBackground}>
-                  <Image 
-                  source={require('../assets/gestionalumnos.png')}
-                  style={styles.alumnImage}
-                  />
-                  <TouchableOpacity style={styles.boxAlumnos} onPress={() => navigation.navigate('GestionarAlumnos')}>
-                    <Text style={styles.textAlumnName}>Gestionar Alumnos</Text>
-                  </TouchableOpacity>               
-                </View>
-                <View style={styles.grayBackground}>
-                  <Image 
-                  source={require('../assets/Tutores.png')}
-                  style={styles.tutorImage}
-                  />
-                  <TouchableOpacity style={styles.boxTutores} onPress={() => navigation.navigate('GestionarTutores')}>
-                    <Text style={styles.textAlumnName}>Gestionar Tutores</Text>
-                  </TouchableOpacity>                 
-                </View>
-              
-              
-              
-  
-              {/* Espacio adicional para asegurar que el footer se vea */}
-              <View style={styles.spacer} />
-  
-              {/* Footer */}
-              <View style={styles.footer}>
-                <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
-              </View>
-              {/* Modal de Alertas */}
-              <Modal
-                visible={showAlert}
-                transparent
-                animationType="fade"
-                onRequestClose={() => setShowAlert(false)}
-              >
-                <View style={styles.modalOverlay}>
-                  <View style={styles.modalContainer}>
-                    <View style={styles.modalDetail}>
-                      <Text style={styles.modalTitle}>{alertTitle}</Text>
-                    </View>
-                    <Text style={styles.modalMessage}>{alertMessage}</Text>
-                    
-                    <View style={styles.modalButtons}>
-                      <TouchableOpacity
-                        style={[styles.modalButton, {borderColor: "#252861"}]}
-                        onPress={() => setShowAlert(false)}
-                      >
-                        <Text style={[styles.modalButtonText, {color: "#252861"}]}>Cancelar</Text>
-                      </TouchableOpacity>
-  
-                      <TouchableOpacity
-                        style={[styles.modalButton, { backgroundColor: "#DB2024", borderWidth: 0 }]}
-                        onPress={() => {
-                          onConfirm();
-                        }}
-                      >
-                        <Text style={[styles.modalButtonText, { color: "#fff",}]}>Aceptar</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </View>
-              </Modal>
-  
-          </ScrollView>
-        </ImageBackground>
-      </SafeAreaView>
-    );
-  }
-  
-  const styles = StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      padding: 0,
-      backgroundColor: '#000000c6',
-    },
-    background: {
-      flex: 1,
-      width: '100%',
-      height: '100%',
-    }, //mostrar fondo
-    container: {
-      flexGrow: 1,
-      alignItems: 'center',
-      marginTop: 40,
-      padding: 15, //espacio entre el cuadro de Bienvenida y el fondo
-      paddingBottom: 0,
-    },
-    box: {
-      backgroundColor: '#DB2024', //color caja de texto de Bienvenida 
-      borderRadius: 10, //bordes redondeados
-      padding: 14, //espacio entre el texto y la caja
-      paddingBottom: 27, //espacio inferior
-      borderColor: '#000000ff', //color de borde de la caja de Bienvenida
-      borderWidth: 0.5, //ancho del borde de la caja
-      marginBottom: 50, //separación inferior con la sección de Alumnos
-      boxShadow: '1px 2px 6px 1px #0000007e',
-    },
-    title: {
-      color: '#fff', //color de fuente en el título de Bienvenida
-      fontSize: 21,
-      fontWeight: 'bold',
-      marginBottom: 21,
-      textAlign: 'left', //texto principal de Bienvenida a Tutor
-    },
-    baseText:{
-      color: '#fff',
-      fontSize: 15,
-      fontWeight: 'regular',
-      marginBottom: 15,
-    },
-    button: {
-      position: 'absolute',
-      top: 60,
-      right: 10,
-      flexDirection: 'row',
-      backgroundColor: '#252861', // color del botón de cerrar sesión
-      paddingVertical: 7,
-      borderColor: '#000',
-      borderWidth: 0.9,
-      borderRadius: 5, //bordes redondeados
-      marginTop: 18,
-      alignSelf: 'flex-end',
-      marginRight: -13,
-    },
-    buttonText: {
-      color: '#fff',
-      fontSize: 15,
-      fontWeight: '450',
-      borderBottomWidth: 1,
-      borderBottomColor: '#fff',
-      paddingBottom: 3,
-    },
-    boxAlumnos: {
-      margin: 1,
-      marginBottom: 1,
-      backgroundColor: '#252861', //color de caja para seleccionar Alumno
-      borderRadius: 3, //bordes redondeados
-      padding: "1%", //espaciado entre el texto y la caja
-      width: "70%",
-      alignItems: 'center', //centra horizontalmente
-      justifyContent: 'center', //centra verticalmente
-    },
-    boxTutores: {
-      margin: 1,
-      marginBottom: 1,
-      backgroundColor: '#252861', //color de caja para seleccionar Alumno
-      borderRadius: 3, //bordes redondeados
-      padding: "1%", //espaciado entre el texto y la caja
-      width: "70%",
-      alignItems: 'center', //centra horizontalmente
-      justifyContent: 'center', //centra verticalmente
-    },
-    textAlumnName: {
-      color: '#fff',
-      fontSize: 30,
-      fontWeight: 'medium',
-      paddingTop: 4,
-    }, // nombre del alumno
-    textYear: {
-      color: '#fff',
-      fontSize: 15,
-      fontWeight: 'regular',
-      textAlign: 'center',
-    }, //año que cursa el alumno
-    circleBackground: {
-      backgroundColor: '#fff',
-      width: 102,
-      height: 102,
-      borderRadius: 70,
-      justifyContent: 'center',
-      alignItems: 'center',
-    }, //fondo circular del ícono del alumno
-    alumnImage: {
-      marginHorizontal: 5,
-      display: 'flex',
-      backgroundColor: '#fff',
-      borderRadius: 3,
-      width: "70%",
-      height: "70%",
-    }, //íconos de alumnos
-    tutorImage: {
-      marginHorizontal: 5,
-      display: 'flex',
-      backgroundColor: '#fff',
-      borderRadius: 3,
-      width: "70%",
-      height: "70%",
-    }, //íconos de alumnos
-    grayBackground: {
-      backgroundColor: '#bdbdbdab',
-      flexDirection: 'column', // columna
-      justifyContent: 'center',
-      paddingVertical: 10,
-      height: '30%',
-      width: '110%',          // ocupa todo el ancho
-      borderRadius: 8,
-      alignItems: 'center',
-      marginBottom: 30,
-    }, // parte del fondo gris
-    header: {
-      flexDirection: "row",        // fila
-      alignItems: "center",        // centrado vertical
-      justifyContent: "space-between", // separa elementos
-      backgroundColor: "#C81B1E",
-      boxShadow: '6px 2px 6px 1px #0000007e',
-    },
-    headerLeft: {
-      flexDirection: "row",
-      alignItems: "center",
-    },
-    headerRight: {
-      flexDirection: "row",
-      alignItems: "center",
+        </ScrollView>
+      </ImageBackground>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    padding: 0,
+    backgroundColor: '#000000c6',
   },
-    headerBlue: {
-      backgroundColor: "#252861",
-      alignItems: 'flex-end',
-      paddingTop: 4,
-      width: '130',
-      height:'80',
+  background: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
   },
-    logo: {
-      width: 105,
-      height: 105,
-      resizeMode: "cover",
-      marginTop: -15,
-      marginBottom: -10,
-      marginLeft: -15,
+  container: {
+    flexGrow: 1,
+    alignItems: 'center',
+    paddingBottom: 0,
+  },
+  // Header Styles - ORIGINALES
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#C81B1E",
+    boxShadow: '6px 2px 6px 1px #0000007e',
+  },
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  headerBlue: {
+    backgroundColor: "#252861",
+    alignItems: 'flex-end',
+    paddingTop: 4,
+    width: '130',
+    height: '80',
+  },
+  logo: {
+    width: 105,
+    height: 105,
+    resizeMode: "cover",
+    marginTop: -15,
+    marginBottom: -10,
+    marginLeft: -15,
+  },
+  headerTitle: {
+    color: "#fff",
+    fontSize: 24,
+    fontWeight: "800",
+    lineHeight: 28,
+    marginLeft: -10,
+  },
+  headerNumber: {
+    color: "#fff",
+    fontSize: 13,      
+  },
+  menuIcon: {
+    paddingTop: 28,
+  },
+  iconPlacing: {
+    padding: 7.6,
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  tutorIconBackground: {
+    backgroundColor: '#fff',
+    width: 45.3,
+    height: 45.3,
+    borderRadius: 70,
+  },
+  // Menu Styles - ORIGINALES
+  menuOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-end',
+    paddingTop: 60,
+    paddingRight: 10,
+  },
+  button: {
+    position: 'absolute',
+    top: 60,
+    right: 10,
+    flexDirection: 'row',
+    backgroundColor: '#252861',
+    paddingVertical: 7,
+    borderColor: '#000',
+    borderWidth: 0.9,
+    borderRadius: 5,
+    marginTop: 18,
+    alignSelf: 'flex-end',
+    marginRight: -13,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderBottomWidth: 0,
+    borderBottomColor: '#f0f0f0',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '450',
+    borderBottomWidth: 1,
+    borderBottomColor: '#fff',
+    paddingBottom: 3,
+  },
+  // Welcome Section - JUSTO DEBAJO DEL NAVBAR Y 100% ANCHO
+  welcomeSection: {
+    backgroundColor: '#252861',
+    padding: 30,
+    marginBottom: 30,
+    width: '100%',
+    alignSelf: 'stretch',
+  },
+  welcomeBox: {
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderRadius: 12,
+    padding: 20,
+    width: '100%',
+  },
+  welcomeTitle: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 12,
+  },
+  welcomeText: {
+    color: '#fff',
+    fontSize: 14,
+    lineHeight: 20,
+    opacity: 0.95,
+  },
+  // Content Area
+  content: {
+    width: '100%',
+    paddingHorizontal: 20,
+    alignSelf: 'stretch',
+  },
+  // Module Card
+  moduleCard: {
+    marginTop:25,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    marginBottom: 20,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
     },
-    headerTitle: {
-      color: "#fff",
-      fontSize: 24,
-      fontWeight: "800",
-      lineHeight: 28,
-      marginLeft: -10,
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
+    width: '100%',
+  },
+  cardRedLine: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 6,
+    backgroundColor: '#C81B1E',
+    zIndex: 1,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+    paddingLeft: 26,
+    backgroundColor: 'white',
+  },
+
+  cardIconAlumnos: {
+    width: 200,  
+    height: 100,
+    marginRight: 15,
+    resizeMode: 'contain',
+
+  },
+  cardIconTutores: {
+    width: 200, 
+    height: 100, 
+    marginRight: 15,
+    resizeMode: 'contain',
+
+  },
+  cardTitleSection: {
+    flex: 1,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#000',
+    marginBottom: 2,
+  },
+  cardSubtitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000',
+  },
+  cardFooter: {
+    backgroundColor: '#252861',
+    padding: 15,
+    paddingLeft: 26,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: -15,
+  },
+  cardDescription: {
+    color: '#fff',
+    fontSize: 13,
+    lineHeight: 18,
+    flex: 1,
+    paddingRight: 15,
+  },
+  cardArrow: {
+    color: 'white',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  // Footer y Espacio - ORIGINALES
+  spacer: {
+    height: 20,
+  },
+  footer: {
+    alignItems: "center",
+    paddingTop: 10,
+    paddingBottom: 20,
+    width: '111%',
+    backgroundColor: "#1E2A78",
+    marginTop: 'auto',
+  },
+  footerText: {
+    fontSize: 13,
+    color: "#fff",
+    alignItems: 'center',
+  },
+  // Modal Styles - ORIGINALES
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    width: '85%',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    paddingBottom: 20,
+    elevation: 5,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderWidth: 1.5,
+    borderColor: "#000000ff",
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 1,
+      height: 1,
     },
-    headerNumber: {
-      color: "#fff",
-      fontSize: 13,      
-    },
-    menuIcon: {
-      paddingTop: 28,
-    },
-    iconPlacing: {
-      padding: 7.6,
-      flexDirection: 'row',   // ícono y flecha en línea
-    },
-    tutorIconBackground: {
-      backgroundColor: '#fff',
-      width: 45.3,
-      height: 45.3,
-      borderRadius: 70,
-    }, //fondo circular del ícono de Tutor
-    menuOverlay: {
-      flex: 1,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      justifyContent: 'flex-start',
-      alignItems: 'flex-end',
-      paddingTop: 60,
-      paddingRight: 10,
-    },
-    menuItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: 12,
-      paddingHorizontal: 8,
-      borderBottomWidth: 0,
-      borderBottomColor: '#f0f0f0',
-    },
-    spacer: {
-      height: 20, // Espacio entre el último elemento y el footer
-    },
-    footer: {
-      alignItems: "center",
-      paddingTop: 15,
-      paddingBottom: 55,
-      width: '111%',
-      backgroundColor: "#1E2A78",
-      borderTopColor: "#FFD900",
-      borderTopWidth: 2,
-      marginTop: 'auto',
-    },
-    footerText: {
-      fontSize: 13,
-      color: "#fff",
-    },
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0,0,0,0.5)",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    modalContainer: {
-      width: '85%',
-      backgroundColor: '#fff',
-      borderRadius: 12,
-      paddingBottom: 20,
-      elevation: 5,
-      alignItems: 'center',
-      borderWidth: 2,
-      borderWidth: 1.5,
-      borderColor: "#000000ff",
-      boxShadow: '1px 1px 7px 3px #2727277e',
-    },
-    modalDetail: {
-      backgroundColor: '#C81B1E',
-      paddingHorizontal: 10,
-      paddingVertical: 10,
-      width: '100%',
-      borderTopLeftRadius: 10,
-      borderTopRightRadius: 10,
-    },
-    modalTitle: {
-      textAlign: 'center',
-      fontSize: 18,
-      fontWeight: "bold",
-      margin: 8,
-      color: "#ffffffff",
-    },
-    modalMessage: {
-      fontSize: 16,
-      marginTop: 20,
-      marginBottom: 20,
-      textAlign: "center",
-      color: "#333",
-    },
-    modalButtons: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      width: "100%",
-    },
-    modalButton: {
-      flex: 1,
-      backgroundColor: "#ffffffff",
-      borderWidth: 2.5,
-      marginHorizontal: 12,
-      padding: 12,
-      borderRadius: 6,
-      alignItems: "center",
-    },
-    modalButtonText: {
-      fontSize: 16,
-      fontWeight: "bold",
-    },
-  });
+    shadowOpacity: 0.47,
+    shadowRadius: 3,
+    elevation: 5,
+  },
+  modalDetail: {
+    backgroundColor: '#C81B1E',
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    width: '100%',
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+  },
+  modalTitle: {
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: "bold",
+    margin: 8,
+    color: "#ffffffff",
+  },
+  modalMessage: {
+    fontSize: 16,
+    marginTop: 20,
+    marginBottom: 20,
+    textAlign: "center",
+    color: "#333",
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  modalButton: {
+    flex: 1,
+    backgroundColor: "#ffffffff",
+    borderWidth: 2.5,
+    marginHorizontal: 12,
+    padding: 12,
+    borderRadius: 6,
+    alignItems: "center",
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+});
