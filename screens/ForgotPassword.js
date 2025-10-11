@@ -399,8 +399,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 15,
     backgroundColor: "#1E2A78",
-    borderTopColor: "#FFD900",
-    borderTopWidth: 1.5,
   },
   footerText: {
     fontSize: 13,
@@ -429,9 +427,6 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     elevation: 5,
     alignItems: 'center',
-    borderWidth: 2,
-    borderWidth: 1.5,
-    borderColor: "#000000ff",
     boxShadow: '1px 1px 7px 3px #2727277e',
     overflow: 'hidden', // mantiene el borde redondeado del alert
   },

@@ -436,24 +436,44 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   card: {
-    width: '100%',
-    maxWidth: 400,
-    backgroundColor: "#ffffffd1",
-    borderRadius: 10,
-    borderColor: '#000000ff',
-    borderWidth: 1,
+    width: '95%',
+    maxWidth: 900,
+    backgroundColor: "#ffffffc0",
+    borderRadius: 25, // Puedes usar solo esta propiedad
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    borderColor: '#00000030', // Más transparente
+    borderWidth: 0.5, // Un poco más grueso
     alignSelf: 'center',
-    marginTop:10,
+    marginTop: 25,
+    paddingBottom: 30,
+    // Sombra mejorada
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
   },
   topSection: {
-    borderWidth: 1,
-    borderTopLeftRadius:10,
-    borderTopRightRadius:10,
-    marginVertical:-1,
+    borderWidth: 0.3,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    marginVertical: -1,
     backgroundColor: "#1E2A78",
-    padding: 10,
+    padding: 13,
     alignItems: "center",
+    shadowColor: '#000000',
+    shadowOffset: {
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 1,
   },
+},
   title: {
     fontSize: 25,
     fontWeight: '600',
@@ -508,18 +528,21 @@ const styles = StyleSheet.create({
     color: 'red',
   },
   button: {
-    backgroundColor: '#031666ff',
-    paddingVertical: 10,
+    backgroundColor: '#031666',
+    paddingVertical: 10, // Mejor que altura fija
     borderRadius: 8,
-    marginVertical:15,
-    width: '95%',
+    marginVertical: 15,
+    width: '40%',
     alignItems: 'center',
     alignSelf: 'center',
+    marginBottom: 20,
+    justifyContent: 'center', // Para centrar verticalmente
   },
   buttonText: {
+    paddingTop: 2,
     color: '#ffffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '500',
   },
   backButton: {
     alignSelf: 'flex-start',
@@ -566,8 +589,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 15,
     backgroundColor: "#1E2A78",
-    borderTopColor: "#FFD900",
-    borderTopWidth: 1.5,
   },
   footerText: {
     fontSize: 13,
@@ -586,9 +607,6 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     elevation: 5,
     alignItems: 'center',
-    borderWidth: 2,
-    borderWidth: 1.5,
-    borderColor: "#000000ff",
     boxShadow: '1px 1px 7px 3px #2727277e',
   },
   modalDetail: {
@@ -600,7 +618,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 18, 
-    fontWeight: "bold",
+    fontWeight: "500",
     color: "#ffffffff",
     textAlign: 'center',
   },
@@ -624,7 +642,7 @@ const styles = StyleSheet.create({
   },
   modalButtonText: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "500",
     color: '#ffffffff',
   },
   modalDetailSuccess: {
