@@ -15,9 +15,10 @@ import {
    Modal,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { auth } from '../src/config/firebaseConfig';
+import { auth, db } from '../src/config/firebaseConfig';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { doc, setDoc } from 'firebase/firestore';
 
 export default function SignUp({ navigation }) {
   const [firstName, setFirstName] = useState('');
@@ -61,6 +62,28 @@ export default function SignUp({ navigation }) {
   const passwordsMatch =
     password && confirmPassword && password === confirmPassword;
 
+  const handlenombre = (firstname) => {
+    if (firstname === '' || validadorcaracteres.test(firstname)) {
+      setFirstName(firstname);
+    }
+  };
+
+  const handleapellido = (lastname) => {
+    if (lastname === '' || validadorcaracteres.test(lastname)) {
+      setLastName(lastname);
+    }
+  };
+
+  const validations = {
+    length: password.length >= 6,
+    upper: /[A-Z]/.test(password),
+    lower: /[a-z]/.test(password),
+    number: /[0-9]/.test(password),
+  };
+
+  const passwordsMatch =
+    password && confirmPassword && password === confirmPassword;
+
   // Manejar botón físico de atrás - Siempre va a Welcome
   useEffect(() => {
     const backAction = () => {
@@ -83,6 +106,7 @@ export default function SignUp({ navigation }) {
     }
     let validname = validadorcaracteres.test(firstName)
     let validsurname = validadorcaracteres.test(lastName)
+    
 
     if (!validname || !validsurname) {
       showCustomAlert("Error", "Los nombres solo deben contener caracteres", null, "error")
@@ -107,8 +131,19 @@ export default function SignUp({ navigation }) {
     }
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      // Crear el usuario en Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Crea un documento en la colección "users" con el ID igual al UID del usuario
+      await setDoc(doc(db, "users", user.uid), {
+        firstName: firstName,
+        lastName: lastName,
+        email: user.email, // Guardamos el email
+        createdAt: new Date(), // guardamos la fecha de creación
+      });
       
+      // Mostrar la alerta de éxito
       showCustomAlert(
         "Registro exitoso",
         "Usuario registrado con éxito.",
@@ -116,7 +151,7 @@ export default function SignUp({ navigation }) {
           setShowAlert(false);
           navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
         },
-        "success" // este define que se muestre azul
+        "success"
       );
     } catch (error) {
       let errorMessage = "Hubo un problema al registrar el usuario.";
@@ -185,7 +220,7 @@ export default function SignUp({ navigation }) {
                     placeholder="Ingrese su nombre"
                     placeholderTextColor="#787878ff"
                     value={firstName}
-                    onChangeText={setFirstName}
+                    onChangeText={handlenombre}
                     onFocus={() => setFirstNameFocused(true)}
                     onBlur={() => setFirstNameFocused(false)}
                   />
@@ -201,7 +236,7 @@ export default function SignUp({ navigation }) {
                     placeholder="Ingrese su apellido"
                     placeholderTextColor="#787878ff"
                     value={lastName}
-                    onChangeText={setLastName}
+                    onChangeText={handleapellido}
                     onFocus={() => setLastNameFocused(true)}
                     onBlur={() => setLastNameFocused(false)}
                   />

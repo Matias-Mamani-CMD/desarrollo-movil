@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -10,11 +10,13 @@ import {
   Modal,
   Animated,
 } from 'react-native';
-import { signOut } from 'firebase/auth';
-import { auth } from '../src/config/firebaseConfig';
+import { signOut, onAuthStateChanged } from 'firebase/auth';
+import { auth, db } from '../src/config/firebaseConfig';
+import { doc, getDoc} from 'firebase/firestore';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FontAwesome, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function HomeSecretaria() {
   const navigation = useNavigation();
@@ -25,6 +27,40 @@ export default function HomeSecretaria() {
   const [alertTitle, setAlertTitle] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
   const [onConfirm, setOnConfirm] = useState(() => () => {});
+  const isFocused = useIsFocused();
+  const [nombre, setNombre] = useState('');
+  const [apellido, setApellido] = useState('');
+  const [imageUri, setImageUri] = useState(null);
+
+  useEffect(() => {
+  // Función para cargar los datos
+  const fetchUserData = async () => {
+    const user = auth.currentUser; 
+    if (user) {
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const userData = docSnap.data();
+        setNombre(userData.firstName);
+        setApellido(userData.lastName);
+        setImageUri(userData.photoURL || null);
+      } else {
+        console.log("No se encontraron datos para este usuario.");
+      }
+    } else {
+      navigation.replace('Login');
+    }
+  };
+
+  // Solo ejecuta la función si la pantalla está en foco
+  if (isFocused) {
+    fetchUserData();
+  }
+
+}, [isFocused]);
+
+  
 
   const showCustomAlert = (title, message, confirmAction) => {
     setAlertTitle(title);
@@ -34,24 +70,24 @@ export default function HomeSecretaria() {
   };
 
   const handleLogOut = async () => {
-    try {
-      await signOut(auth);  
-      showCustomAlert(
-        "¿Confirma que quiere cerrar sesión?",
-        "Se cerrará su sesión actual.",
-        () => {
-          setShowAlert(false);
-          navigation.replace('Login');
-        }
-      );
-    } catch (error) {
-      showCustomAlert(
-        "Error",
-        "Ha ocurrido un problema.",
-        () => setShowAlert(false)
-      );
-    }
-  };
+      try {
+        showCustomAlert(
+          "¿Confirma que quiere cerrar sesión?",
+          "Se cerrará su sesión actual.",
+          async () => {
+            await signOut(auth);
+            setShowAlert(false);
+            navigation.replace('Login');
+          }
+        );
+      } catch (error) {
+        showCustomAlert(
+          "Error",
+          "Ha ocurrido un problema.",
+          () => setShowAlert(false)
+        );
+      }
+    };
 
   const toggleMenu = () => {
     if (menuVisible) {
@@ -94,7 +130,7 @@ export default function HomeSecretaria() {
               <View style={styles.iconPlacing}>
                 {/* Ícono de tutor */}
                 <View style={styles.tutorIconBackground}>
-                  <FontAwesome name="user-circle-o" size={45} color="black" style={styles.tutorIcon} />
+                  <Image source={{ uri: imageUri }} style={{ width: '100%', height: '100%', borderRadius: 50 }} resizeMode="cover"/>
                 </View>
                 {/* Ícono de menú */}
                 <TouchableOpacity onPress={toggleMenu} style={styles.menuIcon}>
@@ -154,7 +190,7 @@ export default function HomeSecretaria() {
             {/* Bienvenida - JUSTO DEBAJO DEL NAVBAR Y 100% ANCHO */}
             <View style={styles.welcomeSection}>
               <View style={styles.welcomeBox}>
-                <Text style={styles.welcomeTitle}>Bienvenido, Nombre Empleado!</Text>
+                <Text style={styles.welcomeTitle}>Bienvenido, {nombre} {apellido}!</Text>
                 <Text style={styles.welcomeText}>
                   Este espacio le permitirá gestionar la información administrativa de los alumnos y tutores del instituto.
                 </Text>
@@ -280,7 +316,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingBottom: 0,
   },
-  // Header Styles - ORIGINALES
+  // Header 
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -336,7 +372,7 @@ const styles = StyleSheet.create({
     height: 45.3,
     borderRadius: 70,
   },
-  // Menu Styles - ORIGINALES
+  // Menu Styles 
   menuOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -375,7 +411,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#fff',
     paddingBottom: 3,
   },
-  // Welcome Section - JUSTO DEBAJO DEL NAVBAR Y 100% ANCHO
+  // Welcome 
   welcomeSection: {
     backgroundColor: '#252861',
     padding: 30,
@@ -492,7 +528,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
   },
-  // Footer y Espacio - ORIGINALES
+  // Footer y Espacio 
   spacer: {
     height: 20,
   },

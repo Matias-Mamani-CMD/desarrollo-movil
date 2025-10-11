@@ -45,7 +45,7 @@ export default function ForgotPassword({ navigation }) {
 
   useEffect(() => {
     const backAction = () => {
-      navigation.replace('Login');
+      navigation.goBack();
       return true;
     };
 
@@ -171,8 +171,7 @@ export default function ForgotPassword({ navigation }) {
             showsVerticalScrollIndicator={true}
           >
             <TouchableOpacity 
-              style={styles.backButton}
-              onPress={() => navigation.replace('Login')}
+              style={styles.backButton} onPress={() => navigation.goBack()}
               disabled={isLoading}
             >
               <FontAwesome name="arrow-left" size={25} color="#252861" />
