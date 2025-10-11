@@ -93,7 +93,6 @@ export default function HomeSecretaria() {
             <View style={styles.headerBlue}>
               <View style={styles.iconPlacing}>
                 {/* Ícono de tutor */}
-                <MaterialCommunityIcons name="bell" size={17} color="white" paddingTop={18} paddingRight={8}/>
                 <View style={styles.tutorIconBackground}>
                   <FontAwesome name="user-circle-o" size={45} color="black" style={styles.tutorIcon} />
                 </View>
@@ -124,16 +123,26 @@ export default function HomeSecretaria() {
                 { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }
               ]}
             >
+              <View>
+                <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                toggleMenu();
+                navigation.navigate('PerfilUsuario');
+              }}>
+                <Text style={styles.buttonText}>Ver Pefil</Text>
+                <Ionicons name="person-outline" size={22} color="white" paddingLeft="5" />
+              </TouchableOpacity>
               <TouchableOpacity 
                 style={styles.menuItem}
                 onPress={() => {
                   toggleMenu();
                   handleLogOut();
-                }}
-              >
+                }}>
                 <Text style={styles.buttonText}>Cerrar sesión</Text>
                 <Ionicons name="exit-outline" size={22} color="white" paddingLeft="5" />
               </TouchableOpacity>
+              </View>
             </Animated.View>
           </TouchableOpacity>
         </Modal>
@@ -319,6 +328,7 @@ const styles = StyleSheet.create({
   iconPlacing: {
     padding: 7.6,
     flexDirection: 'row',
+    alignItems: 'center'
   },
   tutorIconBackground: {
     backgroundColor: '#fff',
@@ -365,7 +375,6 @@ const styles = StyleSheet.create({
     borderBottomColor: '#fff',
     paddingBottom: 3,
   },
-  // NUEVOS ESTILOS DEL HTML PARA CONTENIDO - CORREGIDOS
   // Welcome Section - JUSTO DEBAJO DEL NAVBAR Y 100% ANCHO
   welcomeSection: {
     backgroundColor: '#252861',
