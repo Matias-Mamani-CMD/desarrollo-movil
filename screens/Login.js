@@ -74,7 +74,7 @@ export default function Login({ navigation }) {
     if (!email || !password) {
       showCustomAlert(
         "Error",
-        "Por favor ingrese ambos campos.",
+        "Por favor complete ambos campos.",
         () => setShowModal(false),
         "error" // tipo rojo
       );
@@ -99,7 +99,7 @@ export default function Login({ navigation }) {
         "Has iniciado sesión correctamente.",
         () => {
           setShowModal(false);
-          navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
+          navigation.reset({ index: 0, routes: [{ name: 'HomeSecretaria' }] });
         },
         "success" // tipo azul
       );
@@ -228,25 +228,28 @@ export default function Login({ navigation }) {
                     trackColor={{ false: "#ccc", true: "#0317668f" }}
                     thumbColor={rememberMe ? "#031666ff" : "#f4f3f4"}
                   />
-                  <Text style={styles.rememberText}>Recordarme</Text>
+                  <Text style={styles.rememberText}>Recordar</Text>
                 </View>
 
                 {/* Olvidé contraseña a la derecha */}
                 <TouchableOpacity
                   onPress={() => navigation.navigate('ForgotPassword')}
                 >
-                  <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
+                  <Text style={styles.forgotPasswordText}>¿Olvidó su contraseña?</Text>
                 </TouchableOpacity>
               </View>
 
               {/* Login Button */}
               <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                <Text style={styles.buttonText}>Ingresar</Text>
+                <Text style={styles.buttonText2}>Ingresar</Text>
               </TouchableOpacity>
 
               {/* Go to SignUp */}
               <TouchableOpacity onPress={() => navigation.replace('SignUp')}>
-                <Text style={styles.signUpText}>¿No tienes cuenta aún? Regístrate</Text>
+                <View style={styles.signUpTextContainer}>
+                  <Text style={styles.signUpText}>¿No tenés cuenta aún?</Text>
+                  <Text style={styles.boldSignUp}>Registrate</Text>
+                </View>
               </TouchableOpacity>
             </View>
           </ScrollView>
@@ -342,31 +345,50 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   backButtonText: {
-    fontSize: 22,
-    fontWeight: '900',
+    fontSize: 20,
+    fontWeight: '500',
     color: '#031666ff',
     marginLeft: 8,
   },
   card: {
     width: '100%',
-    maxWidth: 400,
-    backgroundColor: "#ffffffd1",
-    borderRadius: 10,
-    borderColor: '#000000ff',
-    borderWidth: 1,
+    maxWidth: 900,
+    backgroundColor: "#ffffffc0",
+    borderRadius: 25, // Puedes usar solo esta propiedad
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    borderColor: '#00000030', // Más transparente
+    borderWidth: 0.5, // Un poco más grueso
     alignSelf: 'center',
-    paddingBottom: 20,
-    marginTop: 45,
+    marginTop: 25,
+    paddingBottom: 30,
+    // Sombra mejorada
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
   },
   topSection: {
-    borderWidth: 1,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    borderWidth: 0.3,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     marginVertical: -1,
     backgroundColor: "#1E2A78",
-    padding: 10,
+    padding: 13,
     alignItems: "center",
+    shadowColor: '#000000',
+    shadowOffset: {
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 1,
   },
+},
   title: {
     fontSize: 25,
     fontWeight: '600',
@@ -377,7 +399,7 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     alignSelf: 'flex-start',
     fontSize: 18,
-    marginTop: 18,
+    marginTop: 20,
     color: '#000000ff',
   },
   inputContainer: {
@@ -413,7 +435,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginHorizontal: 16,
-    marginBottom: 20,
+    marginBottom: 30,
+    marginTop: -20,
   },
   rememberContainer: {
     flexDirection: 'row',
@@ -427,26 +450,41 @@ const styles = StyleSheet.create({
   },
   forgotPasswordText: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "300",
     color: '#136dffff',
     marginTop: 5,
   },
   button: {
-    backgroundColor: '#031666ff',
-    paddingVertical: 10,
+    backgroundColor: '#031666',
+    paddingVertical: 10, // Mejor que altura fija
     borderRadius: 8,
     marginVertical: 15,
-    width: '95%',
+    width: '40%',
     alignItems: 'center',
     alignSelf: 'center',
-    marginBottom: 18,
+    marginBottom: 20,
+    justifyContent: 'center', // Para centrar verticalmente
   },
-  buttonText: {
+    buttonText2: {
+    paddingTop: 2,
     color: '#ffffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '500',
+  },
+  signUpTextContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   signUpText: {
+    fontSize: 14,
+    fontWeight: "400",
+    marginTop: 20,
+    color: '#136dffff',
+    textAlign: 'center',
+    paddingRight: 5,
+  },
+  boldSignUp: {
     fontSize: 14,
     fontWeight: "600",
     marginTop: 20,
@@ -458,8 +496,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 15,
     backgroundColor: "#1E2A78",
-    borderTopColor: "#FFD900",
-    borderTopWidth: 1.5,
   },
   footerText: {
     fontSize: 13,

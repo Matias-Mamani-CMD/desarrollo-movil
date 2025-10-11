@@ -15,9 +15,10 @@ import {
    Modal,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { auth } from '../src/config/firebaseConfig';
+import { auth, db } from '../src/config/firebaseConfig';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { doc, setDoc } from 'firebase/firestore';
 
 export default function SignUp({ navigation }) {
   const [firstName, setFirstName] = useState('');
@@ -29,7 +30,8 @@ export default function SignUp({ navigation }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   //Validadores
   const validadorcaracteres = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+$/;
-  const validadorEmail = /^[a-zA-Z0-9._-]+@(gmail|hotmail|outlook|yahoo|live|msn|icloud|me|aol|protonmail|proton|mail|zoho|yandex|gmx|terra|arnet|speedy|fibertel|ciudad)\.com$/;
+  const validadorEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const validadorPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
   // Estados para el enfoque de los campos
   const [firstNameFocused, setFirstNameFocused] = useState(false);
   const [lastNameFocused, setLastNameFocused] = useState(false);
@@ -50,6 +52,28 @@ export default function SignUp({ navigation }) {
     setShowAlert(true);
   };
 
+
+  const handlenombre = (firstname) => {
+    if (firstname === '' || validadorcaracteres.test(firstname)) {
+      setFirstName(firstname);
+    }
+  };
+
+  const handleapellido = (lastname) => {
+    if (lastname === '' || validadorcaracteres.test(lastname)) {
+      setLastName(lastname);
+    }
+  };
+
+  const validations = {
+    length: password.length >= 6,
+    upper: /[A-Z]/.test(password),
+    lower: /[a-z]/.test(password),
+    number: /[0-9]/.test(password),
+  };
+
+  const passwordsMatch =
+    password && confirmPassword && password === confirmPassword;
 
   // Manejar botón físico de atrás - Siempre va a Welcome
   useEffect(() => {
@@ -73,6 +97,7 @@ export default function SignUp({ navigation }) {
     }
     let validname = validadorcaracteres.test(firstName)
     let validsurname = validadorcaracteres.test(lastName)
+    
 
     if (!validname || !validsurname) {
       showCustomAlert("Error", "Los nombres solo deben contener caracteres", null, "error")
@@ -86,10 +111,30 @@ export default function SignUp({ navigation }) {
       showCustomAlert("Error", "Las contraseñas no coinciden.", null, "error");
       return;
     }
+    if (!validadorPassword.test(password)) {
+      showCustomAlert(
+        "Error",
+        "La contraseña debe tener al menos 6 caracteres, una mayúscula, una minúscula y un número.",
+        null,
+        "error"
+      ); 
+      return;
+    }
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      // Crear el usuario en Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Crea un documento en la colección "users" con el ID igual al UID del usuario
+      await setDoc(doc(db, "users", user.uid), {
+        firstName: firstName,
+        lastName: lastName,
+        email: user.email, // Guardamos el email
+        createdAt: new Date(), // guardamos la fecha de creación
+      });
       
+      // Mostrar la alerta de éxito
       showCustomAlert(
         "Registro exitoso",
         "Usuario registrado con éxito.",
@@ -97,7 +142,7 @@ export default function SignUp({ navigation }) {
           setShowAlert(false);
           navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
         },
-        "success" // este define que se muestre azul
+        "success"
       );
     } catch (error) {
       let errorMessage = "Hubo un problema al registrar el usuario.";
@@ -166,7 +211,7 @@ export default function SignUp({ navigation }) {
                     placeholder="Ingrese su nombre"
                     placeholderTextColor="#787878ff"
                     value={firstName}
-                    onChangeText={setFirstName}
+                    onChangeText={handlenombre}
                     onFocus={() => setFirstNameFocused(true)}
                     onBlur={() => setFirstNameFocused(false)}
                   />
@@ -182,7 +227,7 @@ export default function SignUp({ navigation }) {
                     placeholder="Ingrese su apellido"
                     placeholderTextColor="#787878ff"
                     value={lastName}
-                    onChangeText={setLastName}
+                    onChangeText={handleapellido}
                     onFocus={() => setLastNameFocused(true)}
                     onBlur={() => setLastNameFocused(false)}
                   />
@@ -204,6 +249,21 @@ export default function SignUp({ navigation }) {
                     onBlur={() => setEmailFocused(false)}
                   />
                 </View>
+
+                {/* Validación de correo */}
+                {(emailFocused || email.length > 0) && (
+                  <Text
+                    style={[
+                      styles.validationText,
+                      validadorEmail.test(email) ? styles.valid : styles.invalid,
+                      { marginLeft: 18, marginBottom: 3 }
+                    ]}
+                  >
+                    {validadorEmail.test(email) 
+                      ? "Correo válido" 
+                      : "Formato de correo incorrecto"}
+                  </Text>
+                )}
 
                 {/* Contraseña */}
                 <Text style={styles.label}>Contraseña</Text>
@@ -228,11 +288,32 @@ export default function SignUp({ navigation }) {
                   </TouchableOpacity>
                 </View>
 
-                <View style={styles.passwordHintContainer}>
-                  <Text style={styles.passwordHint}>
-                    Al menos 6 caracteres, incluyendo una mayúscula, una minúscula y un número.
-                  </Text>
-                </View>
+                {/* Requisitos de contraseña */}
+                {(passwordFocused || password.length > 0) && (
+                  <View style={styles.validationBox}>
+                    <Text style={styles.validationText}>La contraseña debe tener al menos: </Text>
+                    <Text
+                      style={[styles.validationText, validations.length && styles.valid,]}
+                    >
+                    • 6 caracteres
+                    </Text>
+                    <Text
+                      style={[styles.validationText, validations.upper && styles.valid]}
+                    >
+                    • Una mayúscula
+                    </Text>
+                    <Text
+                      style={[styles.validationText, validations.lower && styles.valid]}
+                    >
+                    • Una minúscula
+                    </Text>
+                    <Text
+                      style={[styles.validationText, validations.number && styles.valid]}
+                    >
+                    • Un número
+                    </Text>
+                  </View>
+                )}
 
                 {/* Confirmar Contraseña */}
                 <Text style={styles.label}>Confirmar Contraseña</Text>
@@ -257,12 +338,31 @@ export default function SignUp({ navigation }) {
                   </TouchableOpacity>
                 </View>
 
+                {/* Mensaje de contraseñas coinciden */}
+                <View style={styles.validationBox}>
+                  {confirmPassword.length > 0 && (
+                    <Text
+                      style={[
+                        styles.validationText,
+                        passwordsMatch ? styles.valid : styles.invalid,
+                      ]}
+                    >
+                      {passwordsMatch
+                        ? 'Las contraseñas coinciden'
+                        : 'Las contraseñas no coinciden'}
+                    </Text>
+                  )}
+                </View>
+
                 <TouchableOpacity style={styles.button} onPress={handleSignUp}>
                   <Text style={styles.buttonText}>Registrarse</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => navigation.replace('Login')}>
-                  <Text style={styles.signUpText}>¿Ya tienes cuenta? Inicia sesión</Text>
+                  <View style={styles.signUpOption}>
+                    <Text style={styles.signUpText}>¿Ya tenés cuenta?</Text>
+                    <Text style={styles.signUpBoldText}>Iniciá sesión</Text>
+                  </View>
                 </TouchableOpacity>
               </View>
 
@@ -362,24 +462,44 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   card: {
-    width: '100%',
-    maxWidth: 400,
-    backgroundColor: "#ffffffd1",
-    borderRadius: 10,
-    borderColor: '#000000ff',
-    borderWidth: 1,
+    width: '95%',
+    maxWidth: 900,
+    backgroundColor: "#ffffffc0",
+    borderRadius: 25, // Puedes usar solo esta propiedad
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    borderColor: '#00000030', // Más transparente
+    borderWidth: 0.5, // Un poco más grueso
     alignSelf: 'center',
-    marginTop:10,
+    marginTop: 25,
+    paddingBottom: 30,
+    // Sombra mejorada
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
   },
   topSection: {
-    borderWidth: 1,
-    borderTopLeftRadius:10,
-    borderTopRightRadius:10,
-    marginVertical:-1,
+    borderWidth: 0.3,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    marginVertical: -1,
     backgroundColor: "#1E2A78",
-    padding: 10,
+    padding: 13,
     alignItems: "center",
+    shadowColor: '#000000',
+    shadowOffset: {
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 1,
   },
+},
   title: {
     fontSize: 25,
     fontWeight: '600',
@@ -434,18 +554,21 @@ const styles = StyleSheet.create({
     color: 'red',
   },
   button: {
-    backgroundColor: '#031666ff',
-    paddingVertical: 10,
+    backgroundColor: '#031666',
+    paddingVertical: 10, // Mejor que altura fija
     borderRadius: 8,
-    marginVertical:15,
-    width: '95%',
+    marginVertical: 15,
+    width: '40%',
     alignItems: 'center',
     alignSelf: 'center',
+    marginBottom: 20,
+    justifyContent: 'center', // Para centrar verticalmente
   },
   buttonText: {
+    paddingTop: 2,
     color: '#ffffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '500',
   },
   backButton: {
     alignSelf: 'flex-start',
@@ -463,11 +586,25 @@ const styles = StyleSheet.create({
   },
   signUpText: {
     fontSize: 14,
+    fontWeight: "400",
+    marginTop: 20,
+    marginBottom: 15,
+    color: '#136dffff',
+    textAlign: 'center',
+    paddingRight: 5,
+  },
+  signUpBoldText: {
+    fontSize: 14,
     fontWeight: "600",
     marginTop: 20,
     marginBottom: 15,
     color: '#136dffff',
     textAlign: 'center',
+  },
+  signUpOption: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   flexSpacer: {
     flex: 1,
@@ -478,8 +615,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 15,
     backgroundColor: "#1E2A78",
-    borderTopColor: "#FFD900",
-    borderTopWidth: 1.5,
   },
   footerText: {
     fontSize: 13,
@@ -498,9 +633,6 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     elevation: 5,
     alignItems: 'center',
-    borderWidth: 2,
-    borderWidth: 1.5,
-    borderColor: "#000000ff",
     boxShadow: '1px 1px 7px 3px #2727277e',
   },
   modalDetail: {
@@ -512,7 +644,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 18, 
-    fontWeight: "bold",
+    fontWeight: "500",
     color: "#ffffffff",
     textAlign: 'center',
   },
@@ -536,7 +668,7 @@ const styles = StyleSheet.create({
   },
   modalButtonText: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "500",
     color: '#ffffffff',
   },
   modalDetailSuccess: {
@@ -544,5 +676,20 @@ const styles = StyleSheet.create({
   },
   modalDetailError: {
     backgroundColor: '#C81B1E', // rojo
+  },
+  validationBox: {
+    marginLeft: 16,
+    marginBottom: 10,
+  },
+  validationText: {
+    fontSize: 13,
+    color: 'gray', // gris por defecto
+    paddingLeft: 10,
+  },
+  valid: {
+    color: 'green', // condición cumplida
+  },
+  invalid: {
+    color: 'red', // para "no coinciden"
   },
 });

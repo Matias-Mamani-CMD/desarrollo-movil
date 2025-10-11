@@ -7,8 +7,11 @@ import Welcome from '../screens/Welcome';
 import Login from '../screens/Login';
 import ForgotPassword from '../screens/ForgotPassword';
 import SignUp from '../screens/SignUp';
-import Home from '../screens/Home';
+import HomeSecretaria from '../screens/HomeSecretaria';
 import AboutUs from '../screens/AboutUs';
+import GestionarTutores from '../screens/GestionarTutores';
+import AddTutor from '../screens/AddTutor';
+import PerfilUsuario from '../screens/PerfilUsuario';
 
 const Stack = createStackNavigator();
 
@@ -34,14 +37,17 @@ function Navigation() {
           headerShown: false,
           gestureEnabled: false
         }} 
-        initialRouteName={isAuthenticated ? "Home" : "Welcome"}
+        initialRouteName={isAuthenticated ? "HomeSecretaria" : "Welcome"}
       >
         <Stack.Screen name="Welcome" component={Welcome}/>
         <Stack.Screen name="Login" component={Login} options={{ gestureEnabled: false }} />
         <Stack.Screen name="SignUp" component={SignUp} options={{ gestureEnabled: false }} />
         <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ gestureEnabled: false }} />
-        <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="HomeSecretaria" component={HomeSecretaria} />
         <Stack.Screen name="AboutUs" component={AboutUs} options={{ gestureEnabled: false }} /> 
+        <Stack.Screen name="GestionarTutores" component={GestionarTutores} options={{ gestureEnabled: false }} />
+        <Stack.Screen name="AddTutor" component={AddTutor} options={{ gestureEnabled: false }} />
+        <Stack.Screen name="PerfilUsuario" component={PerfilUsuario} options={{ gestureEnabled: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
