@@ -15,8 +15,8 @@ import {
   Platform,
 } from 'react-native';
 import { signOut, onAuthStateChanged, updateEmail } from 'firebase/auth';
-import * as LocalAuthentication from 'expo-local-authentication';
 import { auth, db } from '../src/config/firebaseConfig';
+import * as LocalAuthentication from 'expo-local-authentication';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FontAwesome, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
@@ -154,7 +154,7 @@ export default function PerfilUsuario() {
   };
 
   // Manejo de la actualización completa del perfil
-  // Función para verificar biometría
+ // Función para verificar biometría
 const authenticateWithBiometrics = async () => {
   try {
     // Verificar si el dispositivo tiene hardware biométrico
@@ -489,10 +489,7 @@ const handleUpdateProfile = async () => {
                 </View>
               </View>
             </View>
-            <View style={styles.spacer} />
-            <View style={styles.footer}>
-              <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
-            </View>
+            
           </ScrollView>
           
           {/* Modal de Alertas */}
@@ -551,6 +548,10 @@ const handleUpdateProfile = async () => {
             </View>
           </Modal>
         </KeyboardAvoidingView>
+        <View style={styles.spacer} />
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
+        </View>
       </ImageBackground>
     </SafeAreaView>
   );
@@ -777,7 +778,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: 10,
     paddingBottom: 20,
-    width: '111%',
+    width: '100%',
     backgroundColor: "#1E2A78",
     marginTop: 'auto',
     position: 'absolute',

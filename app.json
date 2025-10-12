@@ -1,14 +1,14 @@
-  {
+{
   "expo": {
-    "name": "mobileStart",
-    "slug": "mobileStart",
+    "name": "Sistema de gestion",
+    "slug": "Jeanpiaget",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/apklogo.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/Bienvenido.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -20,14 +20,17 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/apklogo.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
       "permissions": [
         "USE_BIOMETRIC",
-        "USE_FINGERPRINT"
-      ]
+        "USE_FINGERPRINT",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ],
+      "package": "com.sarscod.Jeanpiaget"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -38,7 +41,13 @@
         {
           "faceIDPermission": "Usamos Face ID para verificar tu identidad al actualizar información sensible del perfil."
         }
-      ]
-    ]
+      ],
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "3d25908a-4b02-4384-aecc-3443a4f78730"
+      }
+    }
   }
 }
