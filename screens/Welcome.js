@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   card: {
-    marginTop: 10,
+    marginTop: 30,
     flex:1,
     marginHorizontal: 2,
     marginVertical: 2,
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
     marginHorizontal:10,
     backgroundColor: "#1E2A78",
-    padding: 30,
+    padding: 35,
     alignItems: "center",
     shadowColor: '#000000',
     shadowOffset: {
@@ -129,6 +129,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 100,
     shadowRadius: 0,
+    borderRadius: 20,
     elevation: 3,
   },
   welcomeText: {
@@ -140,13 +141,15 @@ const styles = StyleSheet.create({
     width: 140,
     height: 2,
     backgroundColor: "#fff",
-    marginVertical: 10,
+    marginVertical: 15,
   },
   description: {
     color: "#fff",
     fontSize: 17,
     textAlign: "center",
     lineHeight: 20,
+    paddingTop: 10,
+    paddingBottom: 10,
   },
   bottomSection: {
     alignItems: "center",
@@ -199,7 +202,7 @@ const styles = StyleSheet.create({
   aboutContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 170,
+    marginTop: 130,
     marginLeft: 240,
   },
   aboutText: {

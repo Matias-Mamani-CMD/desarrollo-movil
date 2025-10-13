@@ -166,7 +166,7 @@ export default function HomeSecretaria() {
                 toggleMenu();
                 navigation.navigate('PerfilUsuario');
               }}>
-                <Text style={styles.buttonText}>Ver Pefil</Text>
+                <Text style={styles.buttonText}>Ver Perfil</Text>
                 <Ionicons name="person-outline" size={22} color="white" paddingLeft="5" />
               </TouchableOpacity>
               <TouchableOpacity 
@@ -190,7 +190,7 @@ export default function HomeSecretaria() {
             {/* Bienvenida - JUSTO DEBAJO DEL NAVBAR Y 100% ANCHO */}
             <View style={styles.welcomeSection}>
               <View style={styles.welcomeBox}>
-                <Text style={styles.welcomeTitle}>Bienvenido, {nombre} {apellido}!</Text>
+                <Text style={styles.welcomeTitle}>¡Bienvenido/a, {nombre} {apellido}!</Text>
                 <Text style={styles.welcomeText}>
                   Este espacio le permitirá gestionar la información administrativa de los alumnos y tutores del instituto.
                 </Text>
@@ -534,8 +534,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     alignItems: "center",
-    paddingTop: 10,
-    paddingBottom: 20,
+    padding: 15,
     width: '111%',
     backgroundColor: "#1E2A78",
     marginTop: 'auto',

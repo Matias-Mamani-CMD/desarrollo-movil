@@ -52,16 +52,6 @@ export default function SignUp({ navigation }) {
     setShowAlert(true);
   };
 
-  const validations = {
-    length: password.length >= 6,
-    upper: /[A-Z]/.test(password),
-    lower: /[a-z]/.test(password),
-    number: /[0-9]/.test(password),
-  };
-
-  const passwordsMatch =
-    password && confirmPassword && password === confirmPassword;
-
   const handlenombre = (firstname) => {
     if (firstname === '' || validadorcaracteres.test(firstname)) {
       setFirstName(firstname);
@@ -208,7 +198,7 @@ export default function SignUp({ navigation }) {
               {/* Card translúcida */}
               <View style={styles.card}>
                 <View style={styles.topSection}>
-                  <Text style={styles.title}>Regístrate</Text>
+                  <Text style={styles.title}>Registrarse</Text>
                 </View>
                 
                 {/* Nombre */}

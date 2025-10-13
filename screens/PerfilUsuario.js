@@ -15,11 +15,11 @@ import {
   Platform,
 } from 'react-native';
 import { signOut, onAuthStateChanged, updateEmail } from 'firebase/auth';
-import { auth, db } from '../src/config/firebaseConfig';
 import * as LocalAuthentication from 'expo-local-authentication';
+import { auth, db } from '../src/config/firebaseConfig';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { FontAwesome, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import { FontAwesome, MaterialCommunityIcons, MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -154,7 +154,7 @@ export default function PerfilUsuario() {
   };
 
   // Manejo de la actualización completa del perfil
- // Función para verificar biometría
+  // Función para verificar biometría
 const authenticateWithBiometrics = async () => {
   try {
     // Verificar si el dispositivo tiene hardware biométrico
@@ -343,217 +343,223 @@ const handleUpdateProfile = async () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-      <ImageBackground
-        source={require('../assets/background.jpg')}
-        style={styles.background}
-        resizeMode="cover"
-      >
-        <View style={styles.header}>
-            <View style={styles.headerLeft}>
-              <Image source={require('../assets/piaget-icon.png')} style={styles.logo} />
-              <View>
-                <Text style={styles.headerTitle}>Instituto{"\n"}Jean Piaget <Text style={styles.headerNumber}>N°8048</Text></Text>
-              </View>
-            </View>
-            <View style={styles.headerRight}>
-              <View style={styles.headerBlue}>
-                <View style={styles.iconPlacing}>
-                  <View style={styles.tutorIconBackground}>
-                    <Image source={{ uri: imageUri }} style={{ width: '100%', height: '100%', borderRadius: 50 }} resizeMode="cover"/>
-                  </View>
-                  <TouchableOpacity onPress={toggleMenu} style={styles.menuIcon}>
-                    <MaterialCommunityIcons name="menu-down" size={32} color="white" />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-        </View>
-
-        <Modal
-            transparent={true}
-            visible={menuVisible}
-            animationType="none"
-            onRequestClose={toggleMenu}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+        <ImageBackground
+          source={require('../assets/background.jpg')}
+          style={styles.background}
+          resizeMode="cover"
         >
-            <TouchableOpacity style={styles.menuOverlay} activeOpacity={1} onPress={toggleMenu}>
-                <Animated.View style={[styles.button, { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }]}>
-                    <View>
-                        <TouchableOpacity style={styles.menuItem} onPress={() => { toggleMenu(); navigation.navigate('PerfilUsuario'); }}>
-                            <Text style={styles.buttonText}>Ver Perfil</Text>
-                            <Ionicons name="person-outline" size={22} color="white" style={{paddingLeft: 5}} />
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.menuItem} onPress={() => { toggleMenu(); handleLogOut(); }}>
-                            <Text style={styles.buttonText}>Cerrar sesión</Text>
-                            <Ionicons name="exit-outline" size={22} color="white" style={{paddingLeft: 5}} />
-                        </TouchableOpacity>
+          <View style={styles.header}>
+              <View style={styles.headerLeft}>
+                <Image source={require('../assets/piaget-icon.png')} style={styles.logo} />
+                <View>
+                  <Text style={styles.headerTitle}>Instituto{"\n"}Jean Piaget <Text style={styles.headerNumber}>N°8048</Text></Text>
+                </View>
+              </View>
+              <View style={styles.headerRight}>
+                <View style={styles.headerBlue}>
+                  <View style={styles.iconPlacing}>
+                    <View style={styles.tutorIconBackground}>
+                      <Image source={{ uri: imageUri }} style={{ width: '100%', height: '100%', borderRadius: 50 }} resizeMode="cover"/>
                     </View>
-                </Animated.View>
-            </TouchableOpacity>
-        </Modal>
-        <KeyboardAvoidingView
-                  behavior={Platform.OS === "ios" ? "padding" : "height"}
-                  style={styles.keyboardAvoidingView}
-                  keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
-                >
-          <ScrollView
-            contentContainerStyle={styles.container}
-            keyboardShouldPersistTaps="handled"
+                    <TouchableOpacity onPress={toggleMenu} style={styles.menuIcon}>
+                      <MaterialCommunityIcons name="menu-down" size={32} color="white" />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+          </View>
+
+          <Modal
+              transparent={true}
+              visible={menuVisible}
+              animationType="none"
+              onRequestClose={toggleMenu}
           >
-            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-              <Ionicons name="chevron-back" size={24} color="#252861" />
-              <Text style={styles.backButtonText}>Volver</Text>
-            </TouchableOpacity>
+              <TouchableOpacity style={styles.menuOverlay} activeOpacity={1} onPress={toggleMenu}>
+                  <Animated.View style={[styles.button, { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }]}>
+                      <View>
+                          <TouchableOpacity style={styles.menuItem} onPress={() => { toggleMenu(); navigation.navigate('PerfilUsuario'); }}>
+                              <Text style={styles.buttonText}>Ver Perfil</Text>
+                              <Ionicons name="person-outline" size={22} color="white" style={{paddingLeft: 5}} />
+                          </TouchableOpacity>
+                          <TouchableOpacity style={styles.menuItem} onPress={() => { toggleMenu(); handleLogOut(); }}>
+                              <Text style={styles.buttonText}>Cerrar sesión</Text>
+                              <Ionicons name="exit-outline" size={22} color="white" style={{paddingLeft: 5}} />
+                          </TouchableOpacity>
+                      </View>
+                  </Animated.View>
+              </TouchableOpacity>
+          </Modal>
 
-            <View style={styles.formContainer}>
-              <View style={styles.formHeader}>
-                <Text style={styles.formTitle}>Modificar Datos</Text>
-              </View>
+            <ScrollView
+              contentContainerStyle={styles.scrollContent}
+              keyboardShouldPersistTaps="handled"
+            >
+              <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                <FontAwesome name="arrow-left" size={25} color="#031666ff" />
+                <Text style={styles.backButtonText}>Volver</Text>
+              </TouchableOpacity>
 
-              <View style={styles.avatarContainer}>
-                <Image
-                  source={imageUri ? { uri: imageUri } : require('../assets/piaget-icon.png')}
-                  style={styles.avatar}
-                />
-                <TouchableOpacity onPress={pickImage} style={styles.changePicButton} disabled={isUploading}>
-                  <Text style={styles.changePicButtonText}>Cambiar foto</Text>
-                </TouchableOpacity>
-                {isUploading && <ActivityIndicator style={{ marginTop: 10 }} size="small" color="#252861" />}
-              </View>
-
-              <View style={styles.formBody}>
-                <Text style={styles.inputLabel}>Nombre ({nombre})</Text>
-                <View style={[styles.inputContainer, firstNameFocused && styles.inputContainerFocused]}>
-                  <FontAwesome name="user" size={20} style={styles.inputIcon} />
-                  <TextInput
-                    placeholder="Ingrese su nombre (Opcional)"
-                    style={styles.textInput}
-                    value={nombre}
-                    onChangeText={handlenombre}
-                    onFocus={() => setFirstNameFocused(true)}
-                    onBlur={() => setFirstNameFocused(false)}
-                  />
+              <View style={styles.formContainer}>
+                <View style={styles.formHeader}>
+                  <Text style={styles.formTitle}>Modificar Datos</Text>
                 </View>
 
-                <Text style={styles.inputLabel}>Apellido ({apellido})</Text>
-                <View style={[styles.inputContainer, lastNameFocused && styles.inputContainerFocused]}>
-                  <FontAwesome name="user" size={20} style={styles.inputIcon} />
-                  <TextInput
-                    placeholder="Ingrese su apellido (Opcional)"
-                    style={styles.textInput}
-                    value={apellido}
-                    onChangeText={handleapellido}
-                    onFocus={() => setLastNameFocused(true)}
-                    onBlur={() => setLastNameFocused(false)}
+                <View style={styles.avatarContainer}>
+                  <Image
+                    source={imageUri ? { uri: imageUri } : require('../assets/piaget-icon.png')}
+                    style={styles.avatar}
                   />
-                </View>
-                {/* Validación del correo */}
-                <Text style={styles.inputLabel}>Correo ({correo})</Text>
-                <View style={[styles.inputContainer, emailFocused && styles.inputContainerFocused]}>
-                  <Ionicons name="mail" size={20} style={styles.inputIcon} />
-                  <TextInput
-                    placeholder="Ingrese un nuevo correo (opcional)"
-                    style={styles.textInput}
-                    keyboardType="email-address"
-                    value={correo}
-                    onChangeText={setCorreo}
-                    autoCapitalize='none'
-                    onFocus={() => setEmailFocused(true)}
-                    onBlur={() => setEmailFocused(false)}
-                  />
-                </View>
-
-                {(emailFocused || correo.length > 0) && (
-                  <Text
-                    style={[
-                      styles.validationText,
-                      validadorEmail.test(correo) ? styles.valid : styles.invalid,
-                      { marginLeft: 18, marginBottom: 3 }
-                    ]}
-                  >
-                    {validadorEmail.test(correo) 
-                      ? "Correo válido" 
-                      : "Formato de correo incorrecto"}
-                  </Text>
-                )}
-                <View style={styles.centerbox}>
-                  <TouchableOpacity style={[styles.boxEliminar]} onPress={() => {
-                    navigation.navigate('ForgotPassword');
-                    }}>
-                    <Text style={[styles.textAlumnName, {paddingTop: 0}]}>¿Cambiar Contraseña?</Text>
+                  <TouchableOpacity onPress={pickImage} style={styles.changePicButton} disabled={isUploading}>
+                    <Text style={styles.changePicButtonText}>Cambiar foto</Text>
                   </TouchableOpacity>
-                  
-                  <TouchableOpacity style={[styles.boxAñadir]} onPress={handleUpdateProfile} disabled={isSaving || isUploading}>
-                    <Text style={[styles.textAlumnName, {paddingTop: 0}]}>{isSaving || isUploading ? 'Guardando...' : 'Aceptar'}</Text>
-                  </TouchableOpacity>
+                  {isUploading && <ActivityIndicator style={{ marginTop: 10 }} size="small" color="#252861" />}
+                </View>
+
+                <View>
+                  <Text style={styles.inputLabel}>Nombre ({nombre})</Text>
+                  <View style={[styles.inputContainer, firstNameFocused && styles.inputContainerFocused]}>
+                    <FontAwesome name="user" size={20} style={styles.inputIcon} />
+                    <TextInput
+                      placeholder="Ingrese su nombre (Opcional)"
+                      style={styles.textInput}
+                      value={nombre}
+                      onChangeText={handlenombre}
+                      onFocus={() => setFirstNameFocused(true)}
+                      onBlur={() => setFirstNameFocused(false)}
+                    />
+                  </View>
+
+                  <Text style={styles.inputLabel}>Apellido ({apellido})</Text>
+                  <View style={[styles.inputContainer, lastNameFocused && styles.inputContainerFocused]}>
+                    <FontAwesome name="user" size={20} style={styles.inputIcon} />
+                    <TextInput
+                      placeholder="Ingrese su apellido (Opcional)"
+                      style={styles.textInput}
+                      value={apellido}
+                      onChangeText={handleapellido}
+                      onFocus={() => setLastNameFocused(true)}
+                      onBlur={() => setLastNameFocused(false)}
+                    />
+                  </View>
+                  {/* Validación del correo */}
+                  <Text style={styles.inputLabel}>Correo ({correo})</Text>
+                  <View style={[styles.inputContainer, emailFocused && styles.inputContainerFocused]}>
+                    <Ionicons name="mail" size={20} style={styles.inputIcon} />
+                    <TextInput
+                      placeholder="Ingrese un nuevo correo (opcional)"
+                      style={styles.textInput}
+                      keyboardType="email-address"
+                      value={correo}
+                      onChangeText={setCorreo}
+                      autoCapitalize='none'
+                      onFocus={() => setEmailFocused(true)}
+                      onBlur={() => setEmailFocused(false)}
+                    />
+                  </View>
+
+                  {(emailFocused || correo.length > 0) && (
+                    <Text
+                      style={[
+                        styles.validationText,
+                        validadorEmail.test(correo) ? styles.valid : styles.invalid,
+                        { marginLeft: 18, marginBottom: 3 }
+                      ]}
+                    >
+                      {validadorEmail.test(correo) 
+                        ? "Correo válido" 
+                        : "Formato de correo incorrecto"}
+                    </Text>
+                  )}
+                  <View style={styles.centerbox}>
+                    <TouchableOpacity style={[styles.boxChangePassword]} onPress={() => {
+                      navigation.navigate('ForgotPassword');
+                      }}>
+                      <View style={styles.changePasswordIcons}>
+                        <FontAwesome name="lock" size={20} paddingRight={20} paddingLeft={10} style={styles.icon}/>
+                        <View style={styles.verticalLine} />
+                        <Text style={[styles.textChangePassword, {paddingTop: 0}]}>Cambiar Contraseña</Text>
+                        <View style={[styles.spaceChangePassword]}/>
+                        <View style={styles.verticalLineRight}/>
+                        <MaterialIcons name="navigate-next" size={24} paddingLeft={10} color="black" />
+                      </View>
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity style={[styles.boxAñadir]} onPress={handleUpdateProfile} disabled={isSaving || isUploading}>
+                      <Text style={[styles.textButton, {paddingTop: 0}]}>{isSaving || isUploading ? 'Guardando...' : 'Aceptar'}</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
-            </View>
+              <View style={styles.spacer} />
+              <View style={styles.footer}>
+                <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
+              </View>
+            </ScrollView>
             
-          </ScrollView>
-          
-          {/* Modal de Alertas */}
-          <Modal
-            visible={showAlert}
-            transparent
-            animationType="fade"
-            onRequestClose={() => setShowAlert(false)}
-          >
-            <View style={styles.modalOverlay}>
-              <View style={styles.modalContainer}>
-                <View style={styles.modalDetail}>
-                  <Text style={styles.modalTitle}>{alertTitle}</Text>
-                </View>
-                <Text style={styles.modalMessage}>{alertMessage}</Text>
-                <View style={styles.modalButtons}>
-                  <TouchableOpacity
-                    style={[styles.modalButton, {borderColor: "#252861"}]}
-                    onPress={() => setShowAlert(false)}
-                  >
-                    <Text style={[styles.modalButtonText, {color: "#252861"}]}>Cancelar</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.modalButton, { backgroundColor: "#DB2024", borderWidth: 0 }]}
-                    onPress={() => onConfirm()}
-                  >
-                    <Text style={[styles.modalButtonText, { color: "#fff"}]}>Aceptar</Text>
-                  </TouchableOpacity>
+            {/* Modal de Alertas */}
+            <Modal
+              visible={showAlert}
+              transparent
+              animationType="fade"
+              onRequestClose={() => setShowAlert(false)}
+            >
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalContainer}>
+                  <View style={styles.modalDetail}>
+                    <Text style={styles.modalTitle}>{alertTitle}</Text>
+                  </View>
+                  <Text style={styles.modalMessage}>{alertMessage}</Text>
+                  <View style={styles.modalButtons}>
+                    <TouchableOpacity
+                      style={[styles.modalButton, {borderColor: "#252861"}]}
+                      onPress={() => setShowAlert(false)}
+                    >
+                      <Text style={[styles.modalButtonText, {color: "#252861"}]}>Cancelar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.modalButton, { backgroundColor: "#DB2024", borderWidth: 0 }]}
+                      onPress={() => onConfirm()}
+                    >
+                      <Text style={[styles.modalButtonText, { color: "#fff"}]}>Aceptar</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
-            </View>
-          </Modal>
+            </Modal>
 
-          {/* Modal de Alertas de Perfil */}
-          <Modal
-            visible={showAlertPerfil}
-            transparent
-            animationType="fade"
-            onRequestClose={() => setShowAlertPerfil(false)}
-          >
-            <View style={styles.modalOverlay}>
-              <View style={styles.modalContainer}>
-                <View style={styles.modalDetail}>
-                  <Text style={styles.modalTitle}>{alertTitle}</Text>
-                </View>
-                <Text style={styles.modalMessage}>{alertMessage}</Text>
-                <View style={styles.modalButtons}>
-                  <TouchableOpacity
-                    style={[styles.modalButton, { backgroundColor: "#DB2024", borderWidth: 0, flex: 0, paddingHorizontal: 40 }]}
-                    onPress={() => onConfirm()}
-                  >
-                    <Text style={[styles.modalButtonText, { color: "#fff"}]}>Aceptar</Text>
-                  </TouchableOpacity>
+            {/* Modal de Alertas de Perfil */}
+            <Modal
+              visible={showAlertPerfil}
+              transparent
+              animationType="fade"
+              onRequestClose={() => setShowAlertPerfil(false)}
+            >
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalContainer}>
+                  <View style={styles.modalDetail}>
+                    <Text style={styles.modalTitle}>{alertTitle}</Text>
+                  </View>
+                  <Text style={styles.modalMessage}>{alertMessage}</Text>
+                  <View style={styles.modalButtons}>
+                    <TouchableOpacity
+                      style={[styles.modalButton, { backgroundColor: "#DB2024", borderWidth: 0, flex: 0, paddingHorizontal: 40 }]}
+                      onPress={() => onConfirm()}
+                    >
+                      <Text style={[styles.modalButtonText, { color: "#fff"}]}>Aceptar</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
-            </View>
-          </Modal>
-        </KeyboardAvoidingView>
-        <View style={styles.spacer} />
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>© 2025 Jean Piaget</Text>
-        </View>
-      </ImageBackground>
-    </SafeAreaView>
+            </Modal>
+          </ImageBackground>
+        </SafeAreaView>
+      </KeyboardAvoidingView>
   );
 }
 
@@ -564,20 +570,33 @@ const styles = StyleSheet.create({
   },
   background: {
     flex: 1,
-    width: '100%',
+    resizeMode: 'cover',
     height: '100%',
+    width: '100%',
   },
   container: {
-    flexGrow: 1,
+    flex: 1,
     alignItems: 'center',
-    padding: 15,
+    backgroundColor: 'transparent',
   },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'space-between',
+    paddingBottom: 30,
+    backgroundColor: 'transparent',
+  },
+
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: "#C81B1E",
     elevation: 6,
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
   },
   headerLeft: {
     flexDirection: "row",
@@ -588,7 +607,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerBlue: {
-    backgroundColor: "#252861",
+    backgroundColor: "#1E2A78",
     alignItems: 'flex-end',
     paddingTop: 4,
     width: 130,
@@ -622,7 +641,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   tutorIconBackground: {
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffffff',
     width: 45.3,
     height: 45.3,
     borderRadius: 70,
@@ -637,23 +656,31 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   button: {
+    position: 'absolute',
+    top: 60,
+    right: 10,
     flexDirection: 'row',
     backgroundColor: '#252861',
     paddingVertical: 7,
     borderColor: '#000',
     borderWidth: 0.9,
     borderRadius: 5,
+    marginTop: 18,
+    alignSelf: 'flex-end',
+    marginRight: -13,
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
     paddingHorizontal: 8,
+    borderBottomWidth: 0,
+    borderBottomColor: '#f0f0f0',
   },
   buttonText: {
     color: '#fff',
     fontSize: 15,
-    fontWeight: 'bold',
+    fontWeight: '450',
     borderBottomWidth: 1,
     borderBottomColor: '#fff',
     paddingBottom: 3,
@@ -662,39 +689,63 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    marginBottom: 15,
+    padding: 5,
+    marginHorizontal:10,
+    marginVertical:10,
   },
   backButtonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#252861',
-    marginLeft: 5,
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#031666ff',
+    marginLeft: 8,
   },
   formContainer: {
-    width: '100%',
-    backgroundColor: '#fff',
-    borderRadius: 15,
+    width: '95%',
+    maxWidth: 900,
+    backgroundColor: "#ffffffc0",
+    borderRadius: 25, // Puedes usar solo esta propiedad
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    borderColor: '#00000030', // Más transparente
+    borderWidth: 0.5, // Un poco más grueso
+    alignSelf: 'center',
+    marginTop: 25,
+    paddingBottom: 30,
+    // Sombra mejorada
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
     elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    shadowOffset: { width: 0, height: 2 },
-    marginBottom: 30,
   },
   formHeader: {
-    backgroundColor: '#252861',
-    paddingVertical: 15,
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
+    borderWidth: 0.3,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    marginVertical: -1,
+    backgroundColor: "#1E2A78",
+    padding: 13,
+    alignItems: "center",
+    shadowColor: '#000000',
+    shadowOffset: {
+      shadowOpacity: 0.15,
+      shadowRadius: 3,
+      elevation: 1,
+    },
   },
   formTitle: {
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 25,
+    fontWeight: '600',
+    marginBottom: 0,
     textAlign: 'center',
+    color: '#ffffffff',
   },
   formBody: {
-    backgroundColor: '#f0f0f0',
     padding: 20,
     borderBottomLeftRadius: 15,
     borderBottomRightRadius: 15,
@@ -702,7 +753,6 @@ const styles = StyleSheet.create({
   avatarContainer: {
     alignItems: 'center',
     paddingVertical: 20,
-    backgroundColor: '#f0f0f0',
   },
   avatar: {
     width: 120,
@@ -710,6 +760,7 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     borderWidth: 3,
     borderColor: '#252861',
+    backgroundColor: '#dadadac7'
   },
   changePicButton: {
     marginTop: 10,
@@ -723,15 +774,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     marginBottom: 8,
+    marginLeft: 16,
+    alignSelf: 'flex-start',
+    fontWeight: 'condensed',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    marginBottom: 10,
+    borderRadius: 12,
+    borderColor: '#000000ff',
+    borderWidth: 0.3,
+    paddingHorizontal: 15,
+    paddingVertical: 6,
+    marginBottom: 15,
+    marginLeft:8,
+    marginRight:8,
+    width: '95%',
   },
   inputIcon: {
     padding: 10,
@@ -750,41 +809,77 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   boxAñadir: {
-    marginTop: 10,
-    backgroundColor: '#252861',
+    backgroundColor: '#031666',
+    paddingVertical: 12,
     borderRadius: 8,
-    paddingVertical: 15,
-    width: '50%',
+    marginVertical: 15,
+    width: '60%',
     alignItems: 'center',
+    alignSelf: 'center',
+    marginBottom: 20,
     justifyContent: 'center',
   },
-  boxEliminar: {
-    backgroundColor: '#C81B1E',
-    borderRadius: 8,
-    paddingVertical: 15,
-    width: '50%',
-    alignItems: 'center',
-    justifyContent: 'center',
+  changePasswordIcons: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    height: 24,
   },
-  textAlumnName: {
-    color: '#fff',
-    fontSize: 16.5,
-    fontWeight: 'bold',
+  boxChangePassword: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff9d',
+    borderColor: '#4e4e4eff',
+    borderWidth: 0.3,
+    paddingHorizontal: 15,
+    paddingVertical: 17,
+    marginTop: 20,
+    marginBottom: 20,
+    marginLeft:8,
+    marginRight:8,
+    width: '100%',
+    shadowColor: '#000000',
+    shadowOffset: {
+      shadowOpacity: 0.15,
+      shadowRadius: 3,
+      elevation: 1,
+    },
+  },
+  verticalLine: {
+    width: 1,
+    height: '120%',
+    backgroundColor: '#8b8b8bc5'
+  },
+  verticalLineRight: {
+    width: 1,
+    height: '120%',
+    backgroundColor: '#8b8b8bc5',
+  },
+  spaceChangePassword: {
+    width: 150,
+  },
+  textButton: {
+    paddingTop: 2,
+    color: '#ffff',
+    fontSize: 18,
+    fontWeight: '500',
+  },
+  textChangePassword: {
+    paddingTop: 2,
+    paddingLeft: 10,
+    color: '#1d1d1dff',
+    fontSize: 16,
+    fontWeight: '400',
   },
   spacer: {
-    height: 20,
+    height: 30,
   },
   footer: {
     alignItems: "center",
-    paddingTop: 10,
-    paddingBottom: 20,
-    width: '100%',
+    padding: 15,
+    marginTop: 20,
+    marginBottom: -30,
     backgroundColor: "#1E2A78",
-    marginTop: 'auto',
-    position: 'absolute',
-    bottom: 0,           
-    left: 0,           
-    right: 0, 
   },
   footerText: {
     fontSize: 13,
@@ -844,6 +939,7 @@ const styles = StyleSheet.create({
   },
   modalButton: {
     backgroundColor: "#ffffffff",
+    width: '40%',
     borderWidth: 2.5,
     marginHorizontal: 12,
     padding: 12,
@@ -853,6 +949,7 @@ const styles = StyleSheet.create({
   modalButtonText: {
     fontSize: 16,
     fontWeight: "bold",
+    color: '#ffffff'
   },
   valid: {
     color: 'green',
