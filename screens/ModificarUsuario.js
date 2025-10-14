@@ -23,7 +23,7 @@ import { FontAwesome, MaterialCommunityIcons, MaterialIcons, Ionicons } from '@e
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 
-export default function PerfillUsuario() {
+export default function ModificarUsuario() {
   const navigation = useNavigation();
 
   // Estados para los datos del usuario
@@ -207,8 +207,8 @@ const handleUpdateProfile = async () => {
   const isAuthenticated = await authenticateWithBiometrics();
   if (!isAuthenticated) {
     showCustomAlertPerfil(
-      "Autenticación fallida",
-      "Debes autenticarte para actualizar tu perfil.",
+      "Autenticación fallida(Obligatoria)",
+      " Para actualizar tu perfil, es necesario que configures un método de bloqueo de pantalla (patrón, PIN, contraseña o biometría) en tu dispositivo.",
       () => setShowAlertPerfil(false)
     );
     return;
@@ -389,10 +389,6 @@ const handleUpdateProfile = async () => {
               <TouchableOpacity style={styles.menuOverlay} activeOpacity={1} onPress={toggleMenu}>
                   <Animated.View style={[styles.button, { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }]}>
                       <View>
-                          <TouchableOpacity style={styles.menuItem} onPress={() => { toggleMenu(); navigation.navigate('PerfilUsuario'); }}>
-                              <Text style={styles.buttonText}>Ver Perfil</Text>
-                              <Ionicons name="person-outline" size={22} color="white" style={{paddingLeft: 5}} />
-                          </TouchableOpacity>
                           <TouchableOpacity style={styles.menuItem} onPress={() => { toggleMenu(); handleLogOut(); }}>
                               <Text style={styles.buttonText}>Cerrar sesión</Text>
                               <Ionicons name="exit-outline" size={22} color="white" style={{paddingLeft: 5}} />
@@ -413,45 +409,91 @@ const handleUpdateProfile = async () => {
 
               <View style={styles.formContainer}>
                 <View style={styles.formHeader}>
-                  <Text style={styles.formTitle}>Perfil</Text>
+                  <Text style={styles.formTitle}>Modificar Datos</Text>
                 </View>
 
                 <View style={styles.avatarContainer}>
-                  <TouchableOpacity onPress={() => imageUri && setImageModalVisible(true)}>
-                    <Image
-                      source={imageUri ? { uri: imageUri } : require('../assets/piaget-icon.png')}
-                      style={styles.avatar}
-                    />
+                  <Image
+                    source={imageUri ? { uri: imageUri } : require('../assets/piaget-icon.png')}
+                    style={styles.avatar}
+                  />
+                  <TouchableOpacity onPress={pickImage} style={styles.changePicButton} disabled={isUploading}>
+                    <Text style={styles.changePicButtonText}>Cambiar foto</Text>
                   </TouchableOpacity>
+                  {isUploading && <ActivityIndicator style={{ marginTop: 10 }} size="small" color="#252861" />}
                 </View>
 
                 <View>
-                  <Text style={styles.inputLabel}>Nombre:</Text>
+                  <Text style={styles.inputLabel}>Nombre ({nombre})</Text>
                   <View style={[styles.inputContainer, firstNameFocused && styles.inputContainerFocused]}>
                     <FontAwesome name="user" size={20} style={styles.inputIcon} />
-                    <Text
-                    style={styles.textInput}
-                    >{nombre}</Text>
-                  </View>
-                  <Text style={styles.inputLabel}>Apellido:</Text>
-                  <View style={[styles.inputContainer, lastNameFocused && styles.inputContainerFocused]}>
-                    <FontAwesome name="user" size={20} style={styles.inputIcon} />
-                    <Text
-                    style={styles.textInput}
-                    >{apellido}</Text>
-                  </View>
-                  {/* Validación del correo */}
-                  <Text style={styles.inputLabel}>Correo:</Text>
-                  <View style={[styles.inputContainer, emailFocused && styles.inputContainerFocused]}>
-                    <Ionicons name="mail" size={20} style={styles.inputIcon} />
-                    <Text
-                    style={styles.textInput}
-                    >{correo}</Text>
+                    <TextInput
+                      placeholder="Ingrese su nombre (Opcional)"
+                      style={styles.textInput}
+                      value={nombre}
+                      onChangeText={handlenombre}
+                      onFocus={() => setFirstNameFocused(true)}
+                      onBlur={() => setFirstNameFocused(false)}
+                    />
                   </View>
 
+                  <Text style={styles.inputLabel}>Apellido ({apellido})</Text>
+                  <View style={[styles.inputContainer, lastNameFocused && styles.inputContainerFocused]}>
+                    <FontAwesome name="user" size={20} style={styles.inputIcon} />
+                    <TextInput
+                      placeholder="Ingrese su apellido (Opcional)"
+                      style={styles.textInput}
+                      value={apellido}
+                      onChangeText={handleapellido}
+                      onFocus={() => setLastNameFocused(true)}
+                      onBlur={() => setLastNameFocused(false)}
+                    />
+                  </View>
+                  {/* Validación del correo */}
+                  <Text style={styles.inputLabel}>Correo ({correo})</Text>
+                  <View style={[styles.inputContainer, emailFocused && styles.inputContainerFocused]}>
+                    <Ionicons name="mail" size={20} style={styles.inputIcon} />
+                    <TextInput
+                      placeholder="Ingrese un nuevo correo (opcional)"
+                      style={styles.textInput}
+                      keyboardType="email-address"
+                      value={correo}
+                      onChangeText={setCorreo}
+                      autoCapitalize='none'
+                      onFocus={() => setEmailFocused(true)}
+                      onBlur={() => setEmailFocused(false)}
+                    />
+                  </View>
+
+                  {(emailFocused || correo.length > 0) && (
+                    <Text
+                      style={[
+                        styles.validationText,
+                        validadorEmail.test(correo) ? styles.valid : styles.invalid,
+                        { marginLeft: 18, marginBottom: 3 }
+                      ]}
+                    >
+                      {validadorEmail.test(correo) 
+                        ? "Correo válido" 
+                        : "Formato de correo incorrecto"}
+                    </Text>
+                  )}
                   <View style={styles.centerbox}>
-                    <TouchableOpacity style={[styles.boxAñadir]} onPress={() => navigation.navigate('ModificarUsuario')} >
-                      <Text style={[styles.textButton, {paddingTop: 0}]}>Modificar datos</Text>
+                    <TouchableOpacity style={[styles.boxChangePassword]} onPress={() => {
+                      navigation.navigate('ForgotPassword');
+                      }}>
+                      <View style={styles.changePasswordIcons}>
+                        <FontAwesome name="lock" size={20} paddingRight={20} paddingLeft={10} style={styles.icon}/>
+                        <View style={styles.verticalLine} />
+                        <Text style={[styles.textChangePassword, {paddingTop: 0}]}>Cambiar Contraseña</Text>
+                        <View style={[styles.spaceChangePassword]}/>
+                        <View style={styles.verticalLineRight}/>
+                        <MaterialIcons name="navigate-next" size={24} paddingLeft={10} color="black" />
+                      </View>
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity style={[styles.boxAñadir]} onPress={handleUpdateProfile} disabled={isSaving || isUploading}>
+                      <Text style={[styles.textButton, {paddingTop: 0}]}>{isSaving || isUploading ? 'Guardando...' : 'Aceptar'}</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
