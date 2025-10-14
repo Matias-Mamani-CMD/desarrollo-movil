@@ -32,6 +32,10 @@ export default function HomeSecretaria() {
   const [apellido, setApellido] = useState('');
   const [imageUri, setImageUri] = useState(null);
 
+  // Estado para el modal de la imagen
+  const [imageModalVisible, setImageModalVisible] = useState(false);
+
+
   useEffect(() => {
   // Función para cargar los datos
   const fetchUserData = async () => {
@@ -128,10 +132,14 @@ export default function HomeSecretaria() {
           <View style={styles.headerRight}>
             <View style={styles.headerBlue}>
               <View style={styles.iconPlacing}>
-                {/* Ícono de tutor */}
-                <View style={styles.tutorIconBackground}>
-                  <Image source={{ uri: imageUri }} style={{ width: '100%', height: '100%', borderRadius: 50 }} resizeMode="cover"/>
-                </View>
+                {/* Imagen de perfil envuelta en TouchableOpacity */}
+                <TouchableOpacity onPress={() => imageUri && setImageModalVisible(true)}>
+                  <View style={styles.tutorIconBackground}>
+                    <Image source={{ uri: imageUri }} style={{ width: '100%', height: '100%', borderRadius: 50 }} resizeMode="cover"/>
+                  </View>
+                </TouchableOpacity>
+                {/* Imagen de perfil envuelta en TouchableOpacity */}
+                
                 {/* Ícono de menú */}
                 <TouchableOpacity onPress={toggleMenu} style={styles.menuIcon}>
                   <MaterialCommunityIcons name="menu-down" size={32} color="white" />
@@ -294,6 +302,27 @@ export default function HomeSecretaria() {
                 </View>
               </View>
             </Modal>
+
+            {/* Modal para ver la imagen de perfil */}
+            <Modal
+              animationType="fade"
+              transparent={true}
+              visible={imageModalVisible}
+              onRequestClose={() => setImageModalVisible(false)}
+            >
+              <TouchableOpacity 
+                style={styles.imageModalContainer} 
+                activeOpacity={1} 
+                onPress={() => setImageModalVisible(false)}
+              >
+                <Image
+                  source={{ uri: imageUri }}
+                  style={styles.fullScreenImage}
+                  resizeMode="contain"
+                />
+              </TouchableOpacity>
+            </Modal>
+            
         </ScrollView>
       </ImageBackground>
     </SafeAreaView>
@@ -545,7 +574,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     alignItems: 'center',
   },
-  // Modal Styles - ORIGINALES
+  // Modal Styles 
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
@@ -611,4 +640,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+
+  //  ESTILOS PARA EL MODAL DE IMAGEN
+  imageModalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullScreenImage: {
+    width: '90%',
+    height: '80%',
+    borderRadius: 15,
+  },
 });
+
