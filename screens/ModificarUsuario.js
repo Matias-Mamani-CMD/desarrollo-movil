@@ -157,41 +157,50 @@ export default function ModificarUsuario() {
   };
 
   // Manejo de la actualización completa del perfil
-  // Función para verificar biometría
-const authenticateWithBiometrics = async () => {
+  // Función para verificar
+const authenticateUser = async () => {
   try {
-    // Verificar si el dispositivo tiene hardware biométrico
-    const hasHardware = await LocalAuthentication.hasHardwareAsync();
-    if (!hasHardware) {
-      showCustomAlertPerfil(
-        "No disponible",
-        "Tu dispositivo no tiene autenticación biométrica disponible.",
-        () => setShowAlertPerfil(false)
-      );
-      return false;
-    }
-
-    // Verificar si hay datos biométricos guardados
-    const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-    if (!isEnrolled) {
-      showCustomAlertPerfil(
-        "No configurado",
-        "No hay huella dactilar o Face ID configurado en tu dispositivo.",
-        () => setShowAlertPerfil(false)
-      );
-      return false;
-    }
-
-    // Solicitar autenticación biométrica
     const result = await LocalAuthentication.authenticateAsync({
       promptMessage: "Confirma tu identidad para actualizar el perfil",
       cancelLabel: "Cancelar",
-      disableDeviceFallback: false, // Permite usar PIN/patrón como alternativa
+      disableDeviceFallback: false, 
+      fallbackLabel: "Usar contraseña del dispositivo",
+      requireConfirmation: false, // No requiere doble confirmación
     });
 
-    return result.success;
+    if (result.success) {
+      return true;
+    }
+
+    // Si falló verifica el motivo
+    if (result.error === 'user_cancel') {
+      showCustomAlertPerfil(
+        "Autenticación cancelada",
+        "Necesitas confirmar tu identidad para actualizar el perfil.",
+        () => setShowAlertPerfil(false)
+      );
+    } else if (result.error === 'not_enrolled') {
+      showCustomAlertPerfil(
+        "Configuración requerida",
+        "Configura un método de bloqueo de pantalla (huella, Face ID, PIN o patrón) en los ajustes de tu dispositivo.",
+        () => setShowAlertPerfil(false)
+      );
+    } else {
+      showCustomAlertPerfil(
+        "Autenticación fallida",
+        "No se pudo verificar tu identidad. Intenta nuevamente.",
+        () => setShowAlertPerfil(false)
+      );
+    }
+
+    return false;
   } catch (error) {
-    console.error("Error en autenticación biométrica:", error);
+    console.error("Error en autenticación:", error);
+    showCustomAlertPerfil(
+      "Error",
+      "Ocurrió un problema con la autenticación. Verifica tu configuración de seguridad.",
+      () => setShowAlertPerfil(false)
+    );
     return false;
   }
 };
@@ -203,8 +212,8 @@ const handleUpdateProfile = async () => {
     return;
   }
 
-  // AUTENTICACIÓN BIOMÉTRICA ANTES DE PROCEDER
-  const isAuthenticated = await authenticateWithBiometrics();
+  // AUTENTICACIÓN ANTES DE PROCEDER
+  const isAuthenticated = await authenticateUser(); 
   if (!isAuthenticated) {
     showCustomAlertPerfil(
       "Autenticación fallida(Obligatoria)",
