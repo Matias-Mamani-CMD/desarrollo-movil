@@ -9,8 +9,7 @@ import ForgotPassword from '../screens/ForgotPassword';
 import SignUp from '../screens/SignUp';
 import HomeSecretaria from '../screens/HomeSecretaria';
 import AboutUs from '../screens/AboutUs';
-import GestionarTutores from '../screens/GestionarTutores';
-import AddTutor from '../screens/AddTutor';
+import ModificarUsuario from '../screens/ModificarUsuario';
 import PerfilUsuario from '../screens/PerfilUsuario';
 
 const Stack = createStackNavigator();
@@ -45,9 +44,8 @@ function Navigation() {
         <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ gestureEnabled: false }} />
         <Stack.Screen name="HomeSecretaria" component={HomeSecretaria} />
         <Stack.Screen name="AboutUs" component={AboutUs} options={{ gestureEnabled: false }} /> 
-        <Stack.Screen name="GestionarTutores" component={GestionarTutores} options={{ gestureEnabled: false }} />
-        <Stack.Screen name="AddTutor" component={AddTutor} options={{ gestureEnabled: false }} />
         <Stack.Screen name="PerfilUsuario" component={PerfilUsuario} options={{ gestureEnabled: false }} />
+        <Stack.Screen name="ModificarUsuario" component={ModificarUsuario} options={{ gestureEnabled: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

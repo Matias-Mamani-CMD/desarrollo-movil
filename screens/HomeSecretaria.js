@@ -32,6 +32,21 @@ export default function HomeSecretaria() {
   const [apellido, setApellido] = useState('');
   const [imageUri, setImageUri] = useState(null);
 
+  // Estado para el modal de la imagen
+  const [imageModalVisible, setImageModalVisible] = useState(false);
+
+  // Función para obtener las iniciales del nombre
+  const getInitials = () => {
+    if (nombre && apellido) {
+      return `${nombre.charAt(0)}${apellido.charAt(0)}`.toUpperCase();
+    } else if (nombre) {
+      return nombre.charAt(0).toUpperCase();
+    } else if (apellido) {
+      return apellido.charAt(0).toUpperCase();
+    }
+    return '?';
+  };
+
   useEffect(() => {
   // Función para cargar los datos
   const fetchUserData = async () => {
@@ -128,10 +143,22 @@ export default function HomeSecretaria() {
           <View style={styles.headerRight}>
             <View style={styles.headerBlue}>
               <View style={styles.iconPlacing}>
-                {/* Ícono de tutor */}
-                <View style={styles.tutorIconBackground}>
-                  <Image source={{ uri: imageUri }} style={{ width: '100%', height: '100%', borderRadius: 50 }} resizeMode="cover"/>
-                </View>
+                {/* Imagen de perfil envuelta en TouchableOpacity */}
+                <TouchableOpacity onPress={() => setImageModalVisible(true)}>
+                  <View style={styles.tutorIconBackground}>
+                    {imageUri ? (
+                      <Image source={{ uri: imageUri }} style={{ width: '100%', height: '100%', borderRadius: 50 }} resizeMode="cover"/>
+                    ) : (
+                      <View style={[styles.tutorIconBackground, { backgroundColor: '#252861', justifyContent: 'center', alignItems: 'center' }]}>
+                        <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>
+                          {getInitials()}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                </TouchableOpacity>
+                {/* Imagen de perfil envuelta en TouchableOpacity */}
+                
                 {/* Ícono de menú */}
                 <TouchableOpacity onPress={toggleMenu} style={styles.menuIcon}>
                   <MaterialCommunityIcons name="menu-down" size={32} color="white" />
@@ -294,6 +321,38 @@ export default function HomeSecretaria() {
                 </View>
               </View>
             </Modal>
+
+            {/* Modal para ver la imagen de perfil */}
+            <Modal
+              animationType="fade"
+              transparent={true}
+              visible={imageModalVisible}
+              onRequestClose={() => setImageModalVisible(false)}
+            >
+              <View style={styles.imageModalContainer}>
+                <TouchableOpacity 
+                  style={styles.imageModalCloseButton}
+                  onPress={() => setImageModalVisible(false)}
+                >
+                  <Ionicons name="close" size={30} color="white" />
+                </TouchableOpacity>
+                
+                {imageUri ? (
+                  <Image
+                    source={{ uri: imageUri }}
+                    style={styles.fullScreenImage}
+                    resizeMode="contain"
+                  />
+                ) : (
+                  <View style={[styles.fullScreenImagePlaceholder, { backgroundColor: '#252861', justifyContent: 'center', alignItems: 'center' }]}>
+                    <Text style={{ color: 'white', fontSize: 80, fontWeight: 'bold' }}>
+                      {getInitials()}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </Modal>
+            
         </ScrollView>
       </ImageBackground>
     </SafeAreaView>
@@ -545,7 +604,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     alignItems: 'center',
   },
-  // Modal Styles - ORIGINALES
+  // Modal Styles 
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
@@ -610,5 +669,31 @@ const styles = StyleSheet.create({
   modalButtonText: {
     fontSize: 16,
     fontWeight: "bold",
+  },
+
+  //  ESTILOS PARA EL MODAL DE IMAGEN
+  imageModalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  imageModalCloseButton: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    zIndex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 20,
+    padding: 5,
+  },
+  fullScreenImage: {
+    width: '100%',
+    height: '100%',
+  },
+  fullScreenImagePlaceholder: {
+    width: 300,
+    height: 300,
+    borderRadius: 150,
   },
 });

@@ -13,6 +13,7 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import { signOut, onAuthStateChanged, updateEmail } from 'firebase/auth';
 import * as LocalAuthentication from 'expo-local-authentication';
@@ -23,7 +24,7 @@ import { FontAwesome, MaterialCommunityIcons, MaterialIcons, Ionicons } from '@e
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 
-export default function PerfillUsuario() {
+export default function ModificarUsuario() {
   const navigation = useNavigation();
 
   // Estados para los datos del usuario
@@ -110,30 +111,48 @@ export default function PerfillUsuario() {
   }, [isFocused]);
 
   const pickImage = async () => {
+    try {
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      
+      if (permissionResult.granted === false) {
+        alert("¡Permiso denegado! No se puede acceder a la galería.");
+        return;
+      }
 
-  try {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
-    if (permissionResult.granted === false) {
-      alert("¡Permiso denegado! No se puede acceder a la galería.");
-      return;
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: 'images',
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        setImageUri(result.assets[0].uri);
+      } 
+    } catch (error) {
+      alert("Ocurrió un error al intentar abrir la galería.");
     }
+  };
 
-    // Usa 'images' como string
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: 'images',
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
+  // Función para eliminar la foto
+  const handleDeletePhoto = () => {
+    Alert.alert(
+      "Eliminar foto",
+      "¿Estás seguro de que quieres eliminar tu foto de perfil?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel"
+        },
+        { 
+          text: "Eliminar", 
+          onPress: () => setImageUri(null),
+          style: "destructive"
+        }
+      ]
+    );
+  };
 
-    if (!result.canceled) {
-      setImageUri(result.assets[0].uri);
-    } 
-  } catch (error) {
-    alert("Ocurrió un error al intentar abrir la galería.");
-  }
-};
   // Sube la imagen seleccionada a Cloudinary
   const uploadImageToCloudinary = async (uri) => {
     const CLOUD_NAME = "drrfdxlr9"; 
@@ -168,6 +187,156 @@ export default function PerfillUsuario() {
     }
   };
 
+  // Función para verificar
+const authenticateUser = async () => {
+  try {
+    const result = await LocalAuthentication.authenticateAsync({
+      promptMessage: "Confirma tu identidad para actualizar el perfil",
+      cancelLabel: "Cancelar",
+      disableDeviceFallback: false, 
+      fallbackLabel: "Usar contraseña del dispositivo",
+      requireConfirmation: false,
+    });
+
+    if (result.success) {
+      return true;
+    }
+
+    if (result.error === 'user_cancel') {
+      showCustomAlertPerfil(
+        "Autenticación cancelada",
+        "Necesitas confirmar tu identidad para actualizar el perfil.",
+        () => setShowAlertPerfil(false)
+      );
+    } else if (result.error === 'not_enrolled') {
+      showCustomAlertPerfil(
+        "Configuración requerida",
+        "Configura un método de bloqueo de pantalla (huella, Face ID, PIN o patrón) en los ajustes de tu dispositivo.",
+        () => setShowAlertPerfil(false)
+      );
+    } else {
+      showCustomAlertPerfil(
+        "Autenticación fallida",
+        "No se pudo verificar tu identidad. Intenta nuevamente.",
+        () => setShowAlertPerfil(false)
+      );
+    }
+
+    return false;
+  } catch (error) {
+    console.error("Error en autenticación:", error);
+    showCustomAlertPerfil(
+      "Error",
+      "Ocurrió un problema con la autenticación. Verifica tu configuración de seguridad.",
+      () => setShowAlertPerfil(false)
+    );
+    return false;
+  }
+};
+
+const handleUpdateProfile = async () => {
+  if (!validadorEmail.test(correo)) {
+    showCustomAlertPerfil("Error", "El Formato del correo es invalido.", () => setShowAlertPerfil(false));
+    setIsSaving(false);
+    return;
+  }
+
+  // AUTENTICACIÓN ANTES DE PROCEDER
+  const isAuthenticated = await authenticateUser(); 
+  if (!isAuthenticated) {
+    showCustomAlertPerfil(
+      "Autenticación fallida(Obligatoria)",
+      " Para actualizar tu perfil, es necesario que configures un método de bloqueo de pantalla (patrón, PIN, contraseña o biometría) en tu dispositivo.",
+      () => setShowAlertPerfil(false)
+    );
+    return;
+  }
+
+  setIsSaving(true);
+  const user = auth.currentUser;
+  if (!user) {
+    showCustomAlertPerfil("Error", "No se pudo identificar al usuario.", () => setShowAlertPerfil(false));
+    setIsSaving(false);
+    return;
+  }
+
+  try {
+    const docRef = doc(db, "users", user.uid);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) {
+      showCustomAlertPerfil("Error", "No se encontraron los datos del perfil.", () => setShowAlertPerfil(false));
+      setIsSaving(false);
+      return;
+    }
+    const currentUserData = docSnap.data();
+    
+    let newImageURL = currentUserData.photoURL;
+    
+    // Si imageUri es null (foto eliminada), se establece como null
+    if (imageUri === null) {
+      newImageURL = null;
+    } 
+    // Si hay una nueva imagen local, se sube a Cloudinary
+    else if (imageUri && imageUri.startsWith('file://')) {
+      const uploadedURL = await uploadImageToCloudinary(imageUri);
+      if (uploadedURL) {
+        newImageURL = uploadedURL;
+      } else {
+        throw new Error("Fallo al subir la nueva imagen.");
+      }
+    }
+
+    const dataToUpdate = {};
+    const newFirstName = nombre.trim();
+    const newLastName = apellido.trim();
+    const newEmail = correo.trim();
+
+    if (newFirstName && newFirstName !== currentUserData.firstName) dataToUpdate.firstName = newFirstName;
+    if (newLastName && newLastName !== currentUserData.lastName) dataToUpdate.lastName = newLastName;
+    if (newImageURL !== currentUserData.photoURL) dataToUpdate.photoURL = newImageURL;
+
+    const emailHasChanged = newEmail && newEmail !== user.email;
+    if (emailHasChanged) dataToUpdate.email = newEmail;
+
+    if (Object.keys(dataToUpdate).length === 0) {
+      showCustomAlertPerfil("Sin cambios", "No hay cambios nuevos por realizar.", () => setShowAlertPerfil(false));
+      setIsSaving(false);
+      return;
+    }
+
+    if (emailHasChanged) await updateEmail(user, newEmail);
+    await updateDoc(docRef, dataToUpdate);
+
+    if (emailHasChanged) {
+      showCustomAlertPerfil(
+        "Cambios Realizados",
+        "Debes iniciar sesión con tu nuevo correo electrónico.",
+        async () => {
+          await signOut(auth);
+          setShowAlertPerfil(false);
+          navigation.replace('Login');
+        }
+      );
+    } else {
+      showCustomAlertPerfil(
+        "Éxito",
+        "Tu perfil ha sido actualizado correctamente.",
+        () => setShowAlertPerfil(false)
+      );
+    }
+  } catch (error) {
+    console.error("Error al actualizar el perfil: ", error);
+    let errorMessage = "Ocurrió un problema al actualizar tu perfil.";
+    if (error.code === 'auth/requires-recent-login') {
+      errorMessage = "Esta operación es sensible. Por favor, cierra sesión y vuelve a iniciarla antes de cambiar tu correo.";
+    } else if (error.code === 'auth/email-already-in-use') {
+      errorMessage = "El nuevo correo electrónico ya está en uso por otra cuenta.";
+    }
+    showCustomAlertPerfil("Error", errorMessage, () => setShowAlertPerfil(false));
+  } finally {
+    setIsSaving(false);
+  }
+};
 
   const showCustomAlert = (title, message, confirmAction) => {
     setAlertTitle(title);
@@ -272,10 +441,6 @@ export default function PerfillUsuario() {
               <TouchableOpacity style={styles.menuOverlay} activeOpacity={1} onPress={toggleMenu}>
                   <Animated.View style={[styles.button, { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }]}>
                       <View>
-                          <TouchableOpacity style={styles.menuItem} onPress={() => { toggleMenu(); navigation.navigate('PerfilUsuario'); }}>
-                              <Text style={styles.buttonText}>Ver Perfil</Text>
-                              <Ionicons name="person-outline" size={22} color="white" style={{paddingLeft: 5}} />
-                          </TouchableOpacity>
                           <TouchableOpacity style={styles.menuItem} onPress={() => { toggleMenu(); handleLogOut(); }}>
                               <Text style={styles.buttonText}>Cerrar sesión</Text>
                               <Ionicons name="exit-outline" size={22} color="white" style={{paddingLeft: 5}} />
@@ -296,7 +461,7 @@ export default function PerfillUsuario() {
 
               <View style={styles.formContainer}>
                 <View style={styles.formHeader}>
-                  <Text style={styles.formTitle}>Perfil</Text>
+                  <Text style={styles.formTitle}>Modificar Datos</Text>
                 </View>
 
                 <View style={styles.avatarContainer}>
@@ -314,35 +479,93 @@ export default function PerfillUsuario() {
                       </View>
                     )}
                   </TouchableOpacity>
+                  
+                  <View style={styles.photoButtonsContainer}>
+                    <TouchableOpacity onPress={pickImage} style={styles.photoButton} disabled={isUploading}>
+                      <Text style={styles.photoButtonText}>Cambiar foto</Text>
+                    </TouchableOpacity>
+                    
+                    {imageUri && (
+                      <TouchableOpacity onPress={handleDeletePhoto} style={[styles.photoButton, styles.deleteButton]} disabled={isUploading}>
+                        <Text style={[styles.photoButtonText, styles.deleteButtonText]}>Eliminar foto</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                  
+                  {isUploading && <ActivityIndicator style={{ marginTop: 10 }} size="small" color="#252861" />}
                 </View>
 
                 <View>
-                  <Text style={styles.inputLabel}>Nombre:</Text>
+                  <Text style={styles.inputLabel}>Nombre ({nombre})</Text>
                   <View style={[styles.inputContainer, firstNameFocused && styles.inputContainerFocused]}>
                     <FontAwesome name="user" size={20} style={styles.inputIcon} />
-                    <Text
-                    style={styles.textInput}
-                    >{nombre}</Text>
-                  </View>
-                  <Text style={styles.inputLabel}>Apellido:</Text>
-                  <View style={[styles.inputContainer, lastNameFocused && styles.inputContainerFocused]}>
-                    <FontAwesome name="user" size={20} style={styles.inputIcon} />
-                    <Text
-                    style={styles.textInput}
-                    >{apellido}</Text>
-                  </View>
-                  {/* Validación del correo */}
-                  <Text style={styles.inputLabel}>Correo:</Text>
-                  <View style={[styles.inputContainer, emailFocused && styles.inputContainerFocused]}>
-                    <Ionicons name="mail" size={20} style={styles.inputIcon} />
-                    <Text
-                    style={styles.textInput}
-                    >{correo}</Text>
+                    <TextInput
+                      placeholder="Ingrese su nombre (Opcional)"
+                      style={styles.textInput}
+                      value={nombre}
+                      onChangeText={handlenombre}
+                      onFocus={() => setFirstNameFocused(true)}
+                      onBlur={() => setFirstNameFocused(false)}
+                    />
                   </View>
 
+                  <Text style={styles.inputLabel}>Apellido ({apellido})</Text>
+                  <View style={[styles.inputContainer, lastNameFocused && styles.inputContainerFocused]}>
+                    <FontAwesome name="user" size={20} style={styles.inputIcon} />
+                    <TextInput
+                      placeholder="Ingrese su apellido (Opcional)"
+                      style={styles.textInput}
+                      value={apellido}
+                      onChangeText={handleapellido}
+                      onFocus={() => setLastNameFocused(true)}
+                      onBlur={() => setLastNameFocused(false)}
+                    />
+                  </View>
+                  {/* Validación del correo */}
+                  <Text style={styles.inputLabel}>Correo ({correo})</Text>
+                  <View style={[styles.inputContainer, emailFocused && styles.inputContainerFocused]}>
+                    <Ionicons name="mail" size={20} style={styles.inputIcon} />
+                    <TextInput
+                      placeholder="Ingrese un nuevo correo (opcional)"
+                      style={styles.textInput}
+                      keyboardType="email-address"
+                      value={correo}
+                      onChangeText={setCorreo}
+                      autoCapitalize='none'
+                      onFocus={() => setEmailFocused(true)}
+                      onBlur={() => setEmailFocused(false)}
+                    />
+                  </View>
+
+                  {(emailFocused || correo.length > 0) && (
+                    <Text
+                      style={[
+                        styles.validationText,
+                        validadorEmail.test(correo) ? styles.valid : styles.invalid,
+                        { marginLeft: 18, marginBottom: 3 }
+                      ]}
+                    >
+                      {validadorEmail.test(correo) 
+                        ? "Correo válido" 
+                        : "Formato de correo incorrecto"}
+                    </Text>
+                  )}
                   <View style={styles.centerbox}>
-                    <TouchableOpacity style={[styles.boxAñadir]} onPress={() => navigation.navigate('ModificarUsuario')} >
-                      <Text style={[styles.textButton, {paddingTop: 0}]}>Modificar datos</Text>
+                    <TouchableOpacity style={[styles.boxChangePassword]} onPress={() => {
+                      navigation.navigate('ForgotPassword');
+                      }}>
+                      <View style={styles.changePasswordIcons}>
+                        <FontAwesome name="lock" size={20} paddingRight={20} paddingLeft={10} style={styles.icon}/>
+                        <View style={styles.verticalLine} />
+                        <Text style={[styles.textChangePassword, {paddingTop: 0}]}>Cambiar Contraseña</Text>
+                        <View style={[styles.spaceChangePassword]}/>
+                        <View style={styles.verticalLineRight}/>
+                        <MaterialIcons name="navigate-next" size={24} paddingLeft={10} color="black" />
+                      </View>
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity style={[styles.boxAñadir]} onPress={handleUpdateProfile} disabled={isSaving || isUploading}>
+                      <Text style={[styles.textButton, {paddingTop: 0}]}>{isSaving || isUploading ? 'Guardando...' : 'Aceptar'}</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -384,7 +607,7 @@ export default function PerfillUsuario() {
               </View>
             </Modal>
 
-            {/* Modal para ver la imagen de perfil */}
+            {/* Modal para ver la imagen de perfil en grande */}
             <Modal
               animationType="fade"
               transparent={true}
@@ -403,10 +626,10 @@ export default function PerfillUsuario() {
                   <Image
                     source={{ uri: imageUri }}
                     style={styles.fullScreenImage}
-                    resizeMode="cover"
+                    resizeMode="contain"
                   />
                 ) : (
-                  <View style={styles.fullScreenImagePlaceholder}>
+                  <View style={[styles.fullScreenImagePlaceholder, { backgroundColor: '#252861', justifyContent: 'center', alignItems: 'center' }]}>
                     <Text style={{ color: 'white', fontSize: 80, fontWeight: 'bold' }}>
                       {getInitials()}
                     </Text>
@@ -844,7 +1067,26 @@ const styles = StyleSheet.create({
     borderColor: "#1E2A78",
     borderWidth: 2,
   },
-  //  ESTILOS PARA EL MODAL DE IMAGEN
+    imageModalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullScreenImage: {
+    width: '90%',
+    height: '80%',
+    borderRadius: 15,
+  },
+  photoButtonText: {
+    color: 'black',
+    fontSize: 15,
+  },
+    deleteButtonText: {
+      marginTop: 10,
+    color: '#df0000ff',
+  },
+    //  ESTILOS PARA EL MODAL DE IMAGEN
   imageModalContainer: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.85)',
@@ -861,16 +1103,12 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   fullScreenImage: {
-    width: 300,
-    height: 300,
-    borderRadius: 150,
+    width: '100%',
+    height: '100%',
   },
   fullScreenImagePlaceholder: {
     width: 300,
     height: 300,
     borderRadius: 150,
-    backgroundColor: '#252861',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
